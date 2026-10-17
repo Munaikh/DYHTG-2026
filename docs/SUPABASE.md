@@ -373,8 +373,9 @@ is zero. Verify anonymous Auth enabled and API exposure limited to
 If versions drift, stop integration and apply/review the missing migration;
 do not edit the existing course/content version in place.
 
-For a **hosted demo replay**, explicitly leave the old room, reconcile its pending
-commands, then create a new room/code with the same player sessions. The new room
+For a **hosted demo replay**, end an active room with explicit `leave`; finished
+or incomplete rooms need no further departure. Reconcile pending commands, then
+create a new room/code with the same player sessions. The new room
 starts with empty submissions and rewards. Keep old rooms/receipts for recovery
 and audit; no reset/delete RPC is exposed. Immutable answer/reward records are
 deliberate. Do not delete Auth users to reset a match.
