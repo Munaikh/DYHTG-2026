@@ -16,7 +16,20 @@ select ok(not (select prosecdef from pg_proc
   where oid='public.arena_issue_arrival_approval(text,text,text)'::regprocedure), 'approval wrapper is invoker');
 select is((select array_agg(schemaname||'.'||tablename order by tablename)
   from pg_publication_tables where pubname='supabase_realtime'),
-  array['public.arena_invalidations'], 'Realtime publishes only safe invalidations');
+  array['public.arena_invalidations','public.battle_invalidations'],
+  'Realtime publishes only safe invalidations');
+select columns_are('public','battle_invalidations',array['id','revision'],
+  'battle notifications contain only an ID and revision, never answers or locations');
+select ok((select relrowsecurity from pg_class
+  where oid='public.battle_invalidations'::regclass), 'battle notifications enforce RLS');
+select ok(has_table_privilege('authenticated','public.battle_invalidations','SELECT'),
+  'authenticated members can request battle notifications through RLS');
+select ok(not exists (
+  select 1 from unnest(array['anon','authenticated']) r(role)
+  cross join unnest(array['SELECT','INSERT','UPDATE','DELETE']) p(privilege)
+  where not (r.role='authenticated' and p.privilege='SELECT')
+    and has_table_privilege(r.role,'public.battle_invalidations',p.privilege)
+), 'battle notifications deny anonymous reads and all client writes');
 
 insert into auth.users(id,raw_user_meta_data,raw_app_meta_data) values
   ('00000000-0000-4000-8000-000000000101','{"arenaOrganiser":true}','{}'),
