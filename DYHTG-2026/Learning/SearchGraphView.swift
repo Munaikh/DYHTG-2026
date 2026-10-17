@@ -9,7 +9,7 @@ struct SearchGraphView: View {
     var onSelect: (NodeID) -> Void = { _ in }
 
     private let nodeSize: CGFloat = 44
-    private let inset = CGSize(width: 44, height: 12)
+    private let inset = CGSize(width: 44, height: 40)
 
     var body: some View {
         let layout = GraphLayout(scenario: presentation.scenario)
@@ -57,7 +57,7 @@ struct SearchGraphView: View {
     private func point(_ unit: CGPoint, in size: CGSize) -> CGPoint {
         CGPoint(
             x: inset.width + unit.x * (size.width - inset.width * 2),
-            y: inset.height + unit.y * (size.height - inset.height * 2) - 10
+            y: inset.height + unit.y * (size.height - inset.height * 2)
         )
     }
 
@@ -67,7 +67,9 @@ struct SearchGraphView: View {
         if presentation.routeEdges.contains(key) || (edge.bidirectional && presentation.routeEdges.contains(reverse)) {
             return .route
         }
-        if let highlightedEdge, highlightedEdge.from == edge.from, highlightedEdge.to == edge.to {
+        if let highlightedEdge,
+           (highlightedEdge.from == edge.from && highlightedEdge.to == edge.to)
+            || (edge.bidirectional && highlightedEdge.from == edge.to && highlightedEdge.to == edge.from) {
             return .active
         }
         return .normal
@@ -90,7 +92,7 @@ private struct EdgeView: View {
 
     private var color: Color {
         switch emphasis {
-        case .normal: Color(.tertiaryLabel)
+        case .normal: Color(.secondaryLabel).opacity(0.7)
         case .active, .route: .accentColor
         }
     }
@@ -124,9 +126,9 @@ private struct EdgeView: View {
             )
 
             Text(cost, format: .number)
-                .font(.caption.weight(.semibold))
+                .font(.caption.weight(.bold))
                 .monospacedDigit()
-                .foregroundStyle(emphasis == .normal ? Color.secondary : Color.accentColor)
+                .foregroundStyle(emphasis == .normal ? Color.primary : Color.accentColor)
                 .padding(.horizontal, 5)
                 .padding(.vertical, 1)
                 .background(Color(.secondarySystemGroupedBackground), in: .rect(cornerRadius: 4))
@@ -150,6 +152,9 @@ private struct NodeView: View {
                 shape
                 Text(node.label)
                     .font(.headline)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.65)
+                    .padding(.horizontal, 3)
                     .foregroundStyle(node.state == .current ? Color.white : node.state == .undiscovered ? Color.secondary : Color.primary)
             }
             .frame(width: size, height: size)
@@ -162,9 +167,9 @@ private struct NodeView: View {
             }
 
             Text(caption)
-                .font(.caption2)
+                .font(.caption.weight(.medium))
                 .monospacedDigit()
-                .foregroundStyle(.secondary)
+                .foregroundStyle(.primary)
                 .fixedSize()
         }
         .accessibilityElement(children: .ignore)
@@ -185,7 +190,7 @@ private struct NodeView: View {
         case .undiscovered:
             Circle()
                 .fill(Color(.secondarySystemGroupedBackground))
-                .overlay(Circle().strokeBorder(Color(.tertiaryLabel), lineWidth: 1.5))
+                .overlay(Circle().strokeBorder(Color(.secondaryLabel), lineWidth: 1.5))
         case .frontier:
             Circle()
                 .fill(Color(.secondarySystemGroupedBackground))

@@ -1,31 +1,30 @@
 import SwiftUI
 
 struct RootView: View {
-    let store: MatchStore
-
+    @State private var duel = DuelStore()
+    @State private var selectedTab = 0
     @Environment(\.scenePhase) private var scenePhase
 
     var body: some View {
-        ZStack {
-            switch store.route {
-            case .home:
-                HomeView(store: store)
-                    .transition(.opacity)
-            case .lobby:
-                LobbyView(store: store)
-                    .transition(.opacity)
-            case .match:
-                MatchView(store: store)
-                    .transition(.opacity)
-            case .results:
-                ResultsView(store: store)
-                    .transition(.opacity)
-            }
+        TabView(selection: $selectedTab) {
+            LearnHomeView()
+                .tabItem { Label("Learn", systemImage: "spark.book.closed.fill") }
+                .tag(0)
+            PlayHomeView(store: duel)
+                .tabItem { Label("Play", systemImage: "bolt.shield.fill") }
+                .badge(duel.snapshot?.phase == .answering && duel.viewer?.submitted == false ? "Your turn" : nil)
+                .tag(1)
+            VisualizeHomeView()
+                .tabItem { Label("Visualize", systemImage: "map.fill") }
+                .tag(2)
         }
-        .animation(.easeInOut(duration: 0.25), value: store.route)
-        .onChange(of: scenePhase) { _, phase in
-            guard phase == .active else { return }
-            Task { await store.refresh() }
+        .tint(ArenaPalette.teal)
+        .onAppear {
+            if duel.snapshot != nil || duel.pending != nil { selectedTab = 1 }
+        }
+        .task(id: scenePhase) {
+            guard scenePhase == .active else { return }
+            await duel.observe()
         }
     }
 }

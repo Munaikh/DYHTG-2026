@@ -88,6 +88,16 @@ struct GraphLayout {
     let rows: Int
 
     init(scenario: GraphScenario) {
+        if !scenario.nodes.isEmpty, scenario.nodes.allSatisfy({ node in
+            guard let point = node.position else { return false }
+            return point.x.isFinite && point.y.isFinite && (0...1).contains(point.x) && (0...1).contains(point.y)
+        }) {
+            positions = Dictionary(uniqueKeysWithValues: scenario.nodes.map { node in
+                (node.id, CGPoint(x: node.position!.x, y: node.position!.y))
+            })
+            rows = scenario.nodes.count > 5 ? 3 : 2
+            return
+        }
         var neighbours: [NodeID: Set<NodeID>] = [:]
         for edge in scenario.edges {
             neighbours[edge.from, default: []].insert(edge.to)

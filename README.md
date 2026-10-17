@@ -1,75 +1,142 @@
-# DYHTG-2026
+# Algorithm Arena · DYHTG 2026
 
-A minimal SwiftUI iOS app for iPhone and iPad, targeting iOS 17 or later.
+[Hackathon demo guide and validation](docs/HACKATHON_DEMO.md) · [Plot Twist Duel backend](docs/DUEL.md)
 
-## Algorithm Arena planning
+A native SwiftUI app for learning Dijkstra and A* by making predictions, competing
+with a friend, and watching searches unfold. Targets **iOS 17+** on iPhone and
+iPad, using **Swift 6** and the Supabase Swift SDK.
 
-This starter will become a learning-first campus game for two iPhone players using Dijkstra or A*.
+## Three ways to explore
 
-- [MVP implementation plan](docs/PLAN.md): learning outcomes, gameplay, architecture, course, AR and acceptance criteria.
-- [Two-person work breakdown](docs/WORK_BREAKDOWN.md): assigned GitHub issues, blockers, ownership and integration handoffs.
-- [Part 1: algorithms, learning content and backend](https://github.com/Munaikh/DYHTG-2026/issues/1) — Munaikh.
-- [Part 2: native iOS experience, navigation and AR](https://github.com/Munaikh/DYHTG-2026/issues/2) — owaini0.
+| Tab | Experience |
+| --- | --- |
+| **Learn** | Interactive lessons for both algorithms: predict the next node, update a cost, inspect the replay, and try a new graph. Progress saves on the device; no room or nickname is required. |
+| **Play** | **Plot Twist Duel**: two players, three prediction rounds, private answers, shared animated reveals, and server-authoritative scores. A bridge closes in round two; a different network tests understanding in round three. |
+| **Visualize** | A campus search laboratory with map/graph views, two prepared journeys, Dijkstra/A* selection, play/pause/step/scrub controls, adjustable playback speed, and a node-cost table. Close a path to trigger a detour or disconnect the destination, then compare route costs and expanded-node counts. |
 
-## Run
+Plot Twist Duel awards 100 points for each correct prediction, with no speed
+bonus. Both players submit before answers or new scores are revealed, and both
+continue before the next round starts. The host can start a rematch after the
+results. [Duel contract, content, recovery, and backend runbook](docs/DUEL.md).
 
-1. Open `DYHTG-2026.xcodeproj` in Xcode.
-2. Select the `DYHTG-2026` scheme and an iOS simulator.
-3. Press Command-R to build and run.
+Learn and search calculations run locally. Play needs a network connection and
+uses anonymous Supabase sessions. Map tiles come from MapKit. The campus paths
+are an educational model awaiting an outdoor survey; Visualize does not request
+location permission or provide walking directions.
 
-The app starts in `DYHTG-2026/DYHTG2026App.swift`. Edit
-`DYHTG-2026/ContentView.swift` to build the first screen; a SwiftUI preview is included.
+## Run the app
 
-For a physical device, choose your development team in Signing & Capabilities
-and replace the starter bundle identifier `com.example.DYHTG2026` with your own.
+Use Xcode with a Swift 6 toolchain and an installed iOS Simulator runtime.
 
-No third-party dependencies are required.
+1. Open `DYHTG-2026.xcodeproj` and let Xcode resolve its Swift package dependencies.
+2. Select the `DYHTG-2026` scheme and an iPhone or iPad simulator.
+3. Press **Command-R**.
 
-## Shared contracts
+The entry point is [`DYHTG2026App.swift`](DYHTG-2026/App/DYHTG2026App.swift);
+[`RootView.swift`](DYHTG-2026/App/RootView.swift) owns the three-tab shell.
+For a physical device, select your development team under Signing & Capabilities
+and use a bundle identifier available to that team.
 
-The Foundation-only Swift package in `Packages/AlgorithmArenaCore` defines the
-app/backend boundary. [Contract documentation and JSON fixtures](contracts/README.md)
-cover both algorithms, private feedback gates, mock services, and recovery.
+Build for the simulator from the repository root:
 
-Run its tests independently of the app:
+```sh
+xcodebuild \
+  -project DYHTG-2026.xcodeproj \
+  -scheme DYHTG-2026 \
+  -configuration Debug \
+  -destination 'generic/platform=iOS Simulator' \
+  -derivedDataPath /tmp/algorithm-arena-build \
+  CODE_SIGNING_ALLOWED=NO build
+```
+
+The app uses the configured development backend in
+[`ArenaBackend.swift`](DYHTG-2026/Live/ArenaBackend.swift). Only a publishable key
+belongs in the client. See [`supabase/client-config.json`](supabase/client-config.json)
+and [the backend setup guide](docs/SUPABASE.md#project-and-configuration) when
+working with another environment. Keep the committed `Package.resolved` file so
+Xcode resolves the same SDK versions.
+
+## Test
+
+Run the Foundation-only package tests, client recovery checks, and independent
+content verifiers:
 
 ```sh
 swift test --package-path Packages/AlgorithmArenaCore
-```
-
-The separate `AlgorithmArenaFixtures` product supplies synthetic development data.
-The core now includes deterministic Dijkstra/A*, replay traces, and
-[dynamic routing between any two selected campus points](docs/SEARCH.md).
-`CampusRouter` builds start/goal nodes on a supplied versioned pedestrian network;
-it does not require the JMS/Library endpoints or game checkpoints.
-
-The included [Gilmorehill survey candidate](docs/COURSE_SURVEY.md) is awaiting an
-outdoor survey and is not suitable for navigation. Xcode/map selection integration
-remains with the iOS track. Check the independent Python fixture verifier with:
-
-```sh
-python3 scripts/verify_search_fixtures.py
-```
-
-The [authored learning bank](docs/LEARNING.md) supplies all six question slots for
-each algorithm, worked explanations, replay references and first-attempt checks.
-Client-safe prompts and server-private answer fixtures live separately under
-`content/learning/v1`. The `AlgorithmArenaLearning` product is for server/authoring
-tools and isolated previews/tests; keep it out of the production app.
-
-```sh
+bash scripts/test_duel_store.sh
+python3 -B scripts/verify_search_fixtures.py
 python3 -B scripts/verify_learning_content.py
 ```
 
-## Supabase multiplayer backend
+These cover canonical Dijkstra/A* traces, heuristic validation, lesson content,
+prepared campus closures and unreachable destinations, duel wire contracts, and
+client recovery. The store harness exercises the production `DuelStore` with a
+controlled transport, including lost responses, persistence, stale revisions,
+cancellation, and concurrent actions. The Xcode scheme currently has no XCTest
+bundle; a successful app build is separate from these executable checks.
 
-The [Supabase lobby backend](docs/SUPABASE.md) implements contract-v1 room
-creation/join, anonymous player identity, algorithm agreement and readiness,
-member-only snapshots, idempotent commands and safe Realtime invalidations.
-Reproducible configuration, migrations, security tests and integration tests live
-under `supabase/` and `scripts/test_supabase_lobby.mjs`. The same backend now
-validates the complete match, arrivals, locked route choices,
-private submissions, gated feedback and exactly-once scoring (#7). Run the focused
-match reliability test with `node scripts/test_supabase_match.mjs`. The runbook
-also covers concurrency/privacy checks, Swift/server parity, organiser setup,
-recovery and demo reset (#8). The iOS adapter remains separate work.
+For real Auth/PostgREST multiplayer tests, use **Node 22+** and a running local
+Supabase stack with the committed migrations:
+
+```sh
+node scripts/test_supabase_duel.mjs
+```
+
+To test the configured hosted development project and decode its actual response
+corpus with Swift:
+
+```sh
+DUEL_WIRE_PATH=/tmp/duel-hosted-wire.json node scripts/test_supabase_duel.mjs --remote
+DUEL_WIRE_PATH=/tmp/duel-hosted-wire.json swift test \
+  --package-path Packages/AlgorithmArenaCore --filter DuelContractTests
+```
+
+The hosted test creates anonymous test identities and rooms. It exercises both
+algorithms, racing and duplicate submissions, hidden answers/scores, wrong
+answers, reconnect, all three rounds, results, rematch, and leave. See
+[the duel verification notes](docs/DUEL.md#verification) for setup and scope.
+
+For a manual multiplayer check, run the app on two simulators or devices. Create
+a duel on one, join using its six-character code on the other, ready both
+players, and start as the host. Check that one player's locked answer stays
+private until the other submits, then complete all three rounds and a rematch.
+Also relaunch during an active room to check recovery. A terminal opponent is
+available for one-simulator development:
+
+```sh
+node scripts/duel_partner.mjs ROOMCODE --auto
+```
+
+It uses a separate anonymous identity and the public graph state. It does not
+replace checking the UI on both clients. Review both lessons, the map and graph,
+closures, no-route recovery, larger text, and Reduce Motion on the target devices.
+
+## Code and content
+
+- [`DYHTG-2026/Learn`](DYHTG-2026/Learn): lessons and local progress.
+- [`DYHTG-2026/Duel`](DYHTG-2026/Duel): multiplayer UI, transport, and persistent command recovery.
+- [`DYHTG-2026/Visualization`](DYHTG-2026/Visualization): campus experiments and search presentation.
+- [`Packages/AlgorithmArenaCore`](Packages/AlgorithmArenaCore): Foundation-only search engine, traces, routing, public lesson catalog, and wire models.
+- [`content/duel/v1/server`](content/duel/v1/server): server-only authored duel rounds and answer keys; excluded from the app target.
+- [`supabase/migrations`](supabase/migrations): additive database migrations, including the indoor duel mode.
+
+The public lesson catalog is separate from private multiplayer answer banks.
+`AlgorithmArenaLearning` contains historical question-bank authoring data and is
+not linked into the production app. Detailed references:
+[search and routing](docs/SEARCH.md), [shared contracts](contracts/README.md),
+[learning content](docs/LEARNING.md), and [Plot Twist Duel](docs/DUEL.md).
+
+## Historical outdoor plan
+
+The original concept used campus checkpoints, arrival verification, route
+choices, and AR. Its source and backend remain in the repository as historical
+work; those flows are **not part of the current three-tab app**. The active
+multiplayer mode is the indoor Plot Twist Duel, and the map's role is algorithm
+visualization.
+
+The [original MVP plan](docs/PLAN.md), [two-person work breakdown](docs/WORK_BREAKDOWN.md),
+[outdoor backend runbook](docs/SUPABASE.md), and
+[Gilmorehill survey candidate](docs/COURSE_SURVEY.md) document that earlier scope.
+Their checkpoint requirements and implementation-status notes should not be used
+as the current product specification. The legacy backend suites remain available
+as `scripts/test_supabase_lobby.mjs` and `scripts/test_supabase_match.mjs`.

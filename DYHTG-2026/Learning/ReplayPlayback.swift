@@ -21,6 +21,7 @@ final class ReplayPlayback {
     var presentation: SearchPresentation {
         var presentation = SearchPresentation(scenario: scenario, algorithm: trace.algorithm, state: step.state)
         if case .expand(let id) = step.event { presentation.current = id }
+        if case .relax(let from, _, _, _, _) = step.event { presentation.current = from }
         if index == lastIndex, case .route(let nodes, _) = trace.outcome { presentation.routeNodes = nodes }
         return presentation
     }
