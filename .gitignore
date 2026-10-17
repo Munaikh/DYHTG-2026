@@ -6,3 +6,9 @@ xcuserdata/
 .xcodebuildmcp/
 .build/
 .swiftpm/
+
+# Local backend credentials and client overrides
+.env
+.env.*
+!.env.example
+*.local.xcconfig
