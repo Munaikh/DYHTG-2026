@@ -50,3 +50,32 @@ Open `DYHTG-2026.xcodeproj`, choose the `DYHTG-2026` scheme and build on each si
 | Learn | Plot twist | Results | Map detour |
 |---|---|---|---|
 | ![Learning completion](evidence/three-tab/learn-completed.jpg) | ![Bridge closure](evidence/three-tab/duel-twist.jpg) | ![Duel result](evidence/three-tab/duel-result.jpg) | ![Map detour](evidence/three-tab/visualize-detour.jpg) |
+
+
+## Rebased welcome and profile — 17 October 2026
+
+`codex/algorithm-battles-pathfinder` is based on `feat/plot-twist-duel` at
+`866b07a`. The active three-tab shell, refined graphs, anonymous multiplayer
+contract and campus lab remain the baseline. The animated welcome introduces
+these features; each tab opens the same local profile editor.
+
+Verified on the rebased build:
+
+- Native simulator build succeeds; 46 core tests, 12 recovery checks, 22 golden
+  traces, and 12 authored challenge checks pass.
+- All 15 hosted multiplayer checks pass for Dijkstra and A*, plus three Swift
+  contract checks against the fresh hosted response corpus.
+- A simulator with an independent authenticated test partner completes all three
+  Dijkstra rounds and reaches matching 300–300 results using the edited nickname.
+- Welcome forward/back navigation, completion, replay and skip work; completion
+  persists across app relaunch.
+- Empty names disable Save. Cancel discards drafts. Saved nickname, avatar and
+  color persist across relaunch; Play uses the saved name for new rooms.
+- Visualize still opens the campus map with its existing playback controls.
+- The inherited friend-battle migration passes its isolated PostgreSQL test suite.
+
+Profiles are local to the device; they do not require email sign-in or change
+an active room's player identity. No backend migration was deployed for this
+integration. The older friend-battle/road-routing experiment remains dormant.
+
+![Local profile editor](evidence/three-tab/profile-editor.jpg)

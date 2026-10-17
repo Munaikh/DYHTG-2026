@@ -50,6 +50,7 @@ struct PlayHomeView: View {
             .navigationTitle(store.snapshot == nil ? "Play" : "Plot Twist Duel")
             .navigationBarTitleDisplayMode(store.snapshot == nil ? .large : .inline)
             .toolbar {
+                ToolbarItem(placement: .topBarTrailing) { ProfileButton() }
                 if let snapshot = store.snapshot, snapshot.phase != .finished && snapshot.phase != .incomplete {
                     ToolbarItem(placement: .topBarTrailing) {
                         Button("Leave", systemImage: "rectangle.portrait.and.arrow.right") { leaving = true }

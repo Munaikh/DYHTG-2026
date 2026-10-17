@@ -1,0 +1,23 @@
+name: Friend battles
+on:
+  pull_request:
+    paths: ['supabase/**', 'scripts/test_friend_battles.mjs', '.github/workflows/friend-battles.yml']
+  push:
+    branches: [main]
+    paths: ['supabase/**', 'scripts/test_friend_battles.mjs', '.github/workflows/friend-battles.yml']
+permissions:
+  contents: read
+jobs:
+  database:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.22.0'
+      - name: Install isolated PostgreSQL test runtime
+        run: npm install --prefix "$RUNNER_TEMP/arena-db" --no-save @electric-sql/pglite@0.3.14
+      - name: Verify friend battle rules and privacy
+        env:
+          PGLITE_MODULE: ${{ runner.temp }}/arena-db/node_modules/@electric-sql/pglite/dist/index.js
+        run: node scripts/test_friend_battles.mjs

@@ -3,6 +3,7 @@ import SwiftUI
 struct RootView: View {
     @State private var duel = DuelStore()
     @State private var selectedTab = 0
+    @AppStorage("onboardingCompleted.v1") private var onboardingCompleted = false
     @Environment(\.scenePhase) private var scenePhase
 
     var body: some View {
@@ -19,6 +20,12 @@ struct RootView: View {
                 .tag(2)
         }
         .tint(ArenaPalette.teal)
+        .fullScreenCover(isPresented: Binding(
+            get: { !onboardingCompleted },
+            set: { onboardingCompleted = !$0 }
+        )) {
+            OnboardingView { onboardingCompleted = true }
+        }
         .onAppear {
             if duel.snapshot != nil || duel.pending != nil { selectedTab = 1 }
         }

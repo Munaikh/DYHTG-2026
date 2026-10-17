@@ -41,6 +41,7 @@ struct VisualizeHomeView: View {
             .navigationTitle("Visualize")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
+                ToolbarItem(placement: .topBarLeading) { ProfileButton() }
                 ToolbarItem(placement: .topBarTrailing) {
                     Menu {
                         Picker("Journey", selection: $journey) {
