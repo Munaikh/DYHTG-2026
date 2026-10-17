@@ -9,6 +9,57 @@ public enum FixtureCatalog {
       documents[path] = try ContractJSON.encoder().encode(value) + Data([0x0A])
     }
     try add("course.json", ArenaFixtures.course)
+    // Additive engine/course examples preserve the original v1 mock contract documents.
+    for scenario in SearchFixtures.scenarios {
+      let prefix = "search/\(scenario.id.rawValue)"
+      try add("\(prefix)/scenario.json", scenario)
+      for algorithm in AlgorithmKind.allCases {
+        try add(
+          "\(prefix)/\(algorithm.rawValue).json",
+          SearchEngine.search(scenario, algorithm: algorithm))
+      }
+    }
+    let candidate = try GilmorehillCourse.candidate()
+    let navigator = try CourseNavigator(
+      course: candidate, expected: GilmorehillCourse.candidateReference)
+    let prefix = "courses/\(candidate.reference.id.rawValue)/\(candidate.reference.version)"
+    try add("\(prefix)/course.json", candidate)
+    let network = CampusPathNetwork(course: candidate)
+    let router = try CampusRouter(network: network, expected: candidate.reference)
+    try add("\(prefix)/network.json", network)
+    let selections: [(String, Coordinate, Coordinate)] = [
+      (
+        "interior-points", .init(latitude: 55.87370, longitude: -4.29350),
+        .init(latitude: 55.87340, longitude: -4.28875)
+      ),
+      (
+        "same-path-reverse", .init(latitude: 55.87380, longitude: -4.29344),
+        .init(latitude: 55.87330, longitude: -4.29367)
+      ),
+    ]
+    for (id, source, goal) in selections {
+      let graph = try router.graph(from: source, to: goal)
+      let requestPrefix = "\(prefix)/requests/\(id)"
+      try add("\(requestPrefix)/graph.json", graph)
+      for algorithm in AlgorithmKind.allCases {
+        let result = try graph.search(algorithm: algorithm)
+        try add("\(requestPrefix)/\(algorithm.rawValue)-trace.json", result.trace)
+        try add("\(requestPrefix)/\(algorithm.rawValue)-route.json", result.route)
+      }
+    }
+    try add(
+      "\(prefix)/heuristics.json",
+      candidate.nodes.sorted { $0.id < $1.id }.map { try navigator.heuristics(to: $0.id) })
+    for branch in RouteBranch.allCases {
+      try add("\(prefix)/\(branch.rawValue)-route.json", navigator.route(for: branch))
+    }
+    for algorithm in AlgorithmKind.allCases {
+      try add(
+        "\(prefix)/\(algorithm.rawValue)-trace.json",
+        navigator.search(
+          from: candidate.stops.start, to: candidate.stops.finish, algorithm: algorithm
+        ).trace)
+    }
     for algorithm in AlgorithmKind.allCases {
       let prefix = algorithm.rawValue
       try add("\(prefix)/trace.json", ArenaFixtures.trace(algorithm))

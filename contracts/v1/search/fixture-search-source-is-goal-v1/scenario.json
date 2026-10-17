@@ -1,0 +1,15 @@
+{
+  "edges" : [
+
+  ],
+  "goal" : "S",
+  "id" : "fixture-search-source-is-goal-v1",
+  "nodes" : [
+    {
+      "heuristic" : 0,
+      "id" : "S",
+      "label" : "S"
+    }
+  ],
+  "source" : "S"
+}

@@ -85,6 +85,12 @@ Highest score wins; equal scores are a draw. Show checkpoint progress and remain
 
 ## Course and location
 
+**Routing clarification, 17 October 2026:** users can select any two points within
+the campus. Build start/goal nodes dynamically by snapping those selections onto
+the versioned pedestrian network and splitting its paths. Search must not hardcode
+the game start, finish, or checkpoint IDs. The JMS-to-Library proposal below is
+sample course/network data; game checkpoints remain separate configuration.
+
 Prepare a candidate route through Lilybank Gardens, Lilybank House/Hetherington alternatives, and the Fraser Building between JMS and the Library. These landmarks are a survey proposal, not a verified accessible route. Use the [official campus map](https://www.gla.ac.uk/explore/maps/) and an outdoor accessibility check to freeze stopping points, coordinates, pedestrian polylines, measured distances, and graph costs. Both branches must rejoin before checkpoint three.
 
 Use only accessible pedestrian paths with safe stopping areas. Validate the 500–800 m total and 50–100 m bonus increment from actual polylines. If access restrictions prevent the proposed course, record the issue and agree a revision rather than presenting invented or unchecked geometry as safe.

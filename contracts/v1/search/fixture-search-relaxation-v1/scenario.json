@@ -1,0 +1,59 @@
+{
+  "edges" : [
+    {
+      "bidirectional" : false,
+      "cost" : 8,
+      "from" : "S",
+      "to" : "A"
+    },
+    {
+      "bidirectional" : false,
+      "cost" : 1,
+      "from" : "S",
+      "to" : "B"
+    },
+    {
+      "bidirectional" : false,
+      "cost" : 2,
+      "from" : "B",
+      "to" : "A"
+    },
+    {
+      "bidirectional" : false,
+      "cost" : 1,
+      "from" : "A",
+      "to" : "G"
+    },
+    {
+      "bidirectional" : false,
+      "cost" : 9,
+      "from" : "B",
+      "to" : "G"
+    }
+  ],
+  "goal" : "G",
+  "id" : "fixture-search-relaxation-v1",
+  "nodes" : [
+    {
+      "heuristic" : 0,
+      "id" : "S",
+      "label" : "S"
+    },
+    {
+      "heuristic" : 0,
+      "id" : "A",
+      "label" : "A"
+    },
+    {
+      "heuristic" : 0,
+      "id" : "B",
+      "label" : "B"
+    },
+    {
+      "heuristic" : 0,
+      "id" : "G",
+      "label" : "G"
+    }
+  ],
+  "source" : "S"
+}

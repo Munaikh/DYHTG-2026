@@ -1,0 +1,157 @@
+{
+  "paths" : [
+    {
+      "bidirectional" : true,
+      "fromJunction" : "01-jms",
+      "id" : "jms-gardens",
+      "polyline" : [
+        {
+          "latitude" : 55.87312,
+          "longitude" : -4.2937
+        },
+        {
+          "latitude" : 55.87345,
+          "longitude" : -4.29365
+        },
+        {
+          "latitude" : 55.87395,
+          "longitude" : -4.29335
+        },
+        {
+          "latitude" : 55.87425,
+          "longitude" : -4.29275
+        }
+      ],
+      "toJunction" : "02-lilybank-gardens"
+    },
+    {
+      "bidirectional" : true,
+      "fromJunction" : "02-lilybank-gardens",
+      "id" : "gardens-house",
+      "polyline" : [
+        {
+          "latitude" : 55.87425,
+          "longitude" : -4.29275
+        },
+        {
+          "latitude" : 55.87465,
+          "longitude" : -4.2926
+        },
+        {
+          "latitude" : 55.87468,
+          "longitude" : -4.29145
+        }
+      ],
+      "toJunction" : "03-lilybank-house"
+    },
+    {
+      "bidirectional" : true,
+      "fromJunction" : "03-lilybank-house",
+      "id" : "house-rejoin",
+      "polyline" : [
+        {
+          "latitude" : 55.87468,
+          "longitude" : -4.29145
+        },
+        {
+          "latitude" : 55.8747,
+          "longitude" : -4.2909
+        },
+        {
+          "latitude" : 55.87415,
+          "longitude" : -4.29065
+        },
+        {
+          "latitude" : 55.87375,
+          "longitude" : -4.2902
+        }
+      ],
+      "toJunction" : "05-rejoin"
+    },
+    {
+      "bidirectional" : true,
+      "fromJunction" : "02-lilybank-gardens",
+      "id" : "gardens-hetherington",
+      "polyline" : [
+        {
+          "latitude" : 55.87425,
+          "longitude" : -4.29275
+        },
+        {
+          "latitude" : 55.875,
+          "longitude" : -4.2926
+        },
+        {
+          "latitude" : 55.875,
+          "longitude" : -4.29045
+        },
+        {
+          "latitude" : 55.87415,
+          "longitude" : -4.29045
+        }
+      ],
+      "toJunction" : "04-hetherington"
+    },
+    {
+      "bidirectional" : true,
+      "fromJunction" : "04-hetherington",
+      "id" : "hetherington-rejoin",
+      "polyline" : [
+        {
+          "latitude" : 55.87415,
+          "longitude" : -4.29045
+        },
+        {
+          "latitude" : 55.87375,
+          "longitude" : -4.2902
+        }
+      ],
+      "toJunction" : "05-rejoin"
+    },
+    {
+      "bidirectional" : true,
+      "fromJunction" : "05-rejoin",
+      "id" : "rejoin-fraser",
+      "polyline" : [
+        {
+          "latitude" : 55.87375,
+          "longitude" : -4.2902
+        },
+        {
+          "latitude" : 55.87335,
+          "longitude" : -4.2901
+        },
+        {
+          "latitude" : 55.87312,
+          "longitude" : -4.28955
+        }
+      ],
+      "toJunction" : "06-fraser"
+    },
+    {
+      "bidirectional" : true,
+      "fromJunction" : "06-fraser",
+      "id" : "fraser-library",
+      "polyline" : [
+        {
+          "latitude" : 55.87312,
+          "longitude" : -4.28955
+        },
+        {
+          "latitude" : 55.87312,
+          "longitude" : -4.28875
+        },
+        {
+          "latitude" : 55.8736,
+          "longitude" : -4.28875
+        }
+      ],
+      "toJunction" : "07-library"
+    }
+  ],
+  "readiness" : "awaitingSurvey",
+  "reference" : {
+    "id" : "gilmorehill-jms-library",
+    "version" : "candidate-2026-10-17-1"
+  }
+}

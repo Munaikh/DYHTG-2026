@@ -1,0 +1,83 @@
+{
+  "algorithm" : "aStar",
+  "outcome" : {
+    "route" : {
+      "cost" : 0,
+      "nodeIDs" : [
+        "S"
+      ]
+    }
+  },
+  "scenarioID" : "fixture-search-source-is-goal-v1",
+  "steps" : [
+    {
+      "event" : {
+        "initial" : {
+
+        }
+      },
+      "index" : 0,
+      "state" : {
+        "costs" : [
+          {
+            "g" : 0,
+            "h" : 0,
+            "nodeID" : "S"
+          }
+        ],
+        "frontier" : [
+          "S"
+        ],
+        "settled" : [
+
+        ]
+      }
+    },
+    {
+      "event" : {
+        "expand" : {
+          "nodeID" : "S"
+        }
+      },
+      "index" : 1,
+      "state" : {
+        "costs" : [
+          {
+            "g" : 0,
+            "h" : 0,
+            "nodeID" : "S"
+          }
+        ],
+        "frontier" : [
+
+        ],
+        "settled" : [
+          "S"
+        ]
+      }
+    },
+    {
+      "event" : {
+        "reachedGoal" : {
+          "nodeID" : "S"
+        }
+      },
+      "index" : 2,
+      "state" : {
+        "costs" : [
+          {
+            "g" : 0,
+            "h" : 0,
+            "nodeID" : "S"
+          }
+        ],
+        "frontier" : [
+
+        ],
+        "settled" : [
+          "S"
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,72 @@
+{
+  "course" : {
+    "id" : "gilmorehill-jms-library",
+    "version" : "candidate-2026-10-17-1"
+  },
+  "distanceMetres" : 699,
+  "edgeIDs" : [
+    "jms-gardens",
+    "gardens-hetherington",
+    "hetherington-rejoin",
+    "rejoin-fraser",
+    "fraser-library"
+  ],
+  "nodeIDs" : [
+    "01-jms",
+    "02-lilybank-gardens",
+    "04-hetherington",
+    "05-rejoin",
+    "06-fraser",
+    "07-library"
+  ],
+  "polyline" : [
+    {
+      "latitude" : 55.87312,
+      "longitude" : -4.2937
+    },
+    {
+      "latitude" : 55.87345,
+      "longitude" : -4.29365
+    },
+    {
+      "latitude" : 55.87395,
+      "longitude" : -4.29335
+    },
+    {
+      "latitude" : 55.87425,
+      "longitude" : -4.29275
+    },
+    {
+      "latitude" : 55.875,
+      "longitude" : -4.2926
+    },
+    {
+      "latitude" : 55.875,
+      "longitude" : -4.29045
+    },
+    {
+      "latitude" : 55.87415,
+      "longitude" : -4.29045
+    },
+    {
+      "latitude" : 55.87375,
+      "longitude" : -4.2902
+    },
+    {
+      "latitude" : 55.87335,
+      "longitude" : -4.2901
+    },
+    {
+      "latitude" : 55.87312,
+      "longitude" : -4.28955
+    },
+    {
+      "latitude" : 55.87312,
+      "longitude" : -4.28875
+    },
+    {
+      "latitude" : 55.8736,
+      "longitude" : -4.28875
+    }
+  ]
+}

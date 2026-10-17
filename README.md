@@ -37,6 +37,16 @@ Run its tests independently of the app:
 swift test --package-path Packages/AlgorithmArenaCore
 ```
 
-The separate `AlgorithmArenaFixtures` product supplies synthetic development data;
-its course is not surveyed or suitable for outdoor navigation. Xcode integration
-remains with the iOS track after shared-contract review.
+The separate `AlgorithmArenaFixtures` product supplies synthetic development data.
+The core now includes deterministic Dijkstra/A*, replay traces, and
+[dynamic routing between any two selected campus points](docs/SEARCH.md).
+`CampusRouter` builds start/goal nodes on a supplied versioned pedestrian network;
+it does not require the JMS/Library endpoints or game checkpoints.
+
+The included [Gilmorehill survey candidate](docs/COURSE_SURVEY.md) is awaiting an
+outdoor survey and is not suitable for navigation. Xcode/map selection integration
+remains with the iOS track. Check the independent Python fixture verifier with:
+
+```sh
+python3 scripts/verify_search_fixtures.py
+```

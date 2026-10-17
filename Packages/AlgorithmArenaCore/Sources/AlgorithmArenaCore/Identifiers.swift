@@ -37,6 +37,15 @@ public enum ContractVersion: Int, Codable, Sendable { case v1 = 1 }
 public enum AlgorithmKind: String, Codable, CaseIterable, Sendable { case dijkstra, aStar }
 public enum RouteBranch: String, Codable, CaseIterable, Sendable { case standard, bonus }
 
+func isASCIIIdentifier(_ value: String) -> Bool {
+  !value.isEmpty && value.utf8.allSatisfy { (0x21...0x7E).contains($0) }
+}
+
+/// Length-prefix components so opaque IDs containing delimiters cannot collide.
+func searchScenarioID(_ components: [String]) -> ScenarioID {
+  .init(rawValue: components.map { "\($0.utf8.count):\($0)" }.joined(separator: ":"))
+}
+
 /// Use this codec at the transport boundary; dates are UTC ISO-8601, to whole seconds.
 public enum ContractJSON {
   public static func encoder() -> JSONEncoder {
