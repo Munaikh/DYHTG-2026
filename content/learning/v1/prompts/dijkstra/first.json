@@ -1,0 +1,118 @@
+{
+  "action" : {
+    "selectNode" : {
+      "options" : [
+        "N",
+        "M"
+      ]
+    }
+  },
+  "algorithm" : "dijkstra",
+  "contentVersion" : "2026-10-17.1",
+  "feedbackGate" : "afterBothSubmissions",
+  "id" : "learning-dijkstra-first-v1",
+  "maximumPoints" : 20,
+  "presentedState" : {
+    "costs" : [
+      {
+        "g" : 0,
+        "h" : 5,
+        "nodeID" : "L"
+      },
+      {
+        "g" : 3,
+        "h" : 6,
+        "nodeID" : "M",
+        "predecessor" : "L"
+      },
+      {
+        "g" : 6,
+        "h" : 1,
+        "nodeID" : "N",
+        "predecessor" : "L"
+      },
+      {
+        "h" : 0,
+        "nodeID" : "Z"
+      }
+    ],
+    "frontier" : [
+      "M",
+      "N"
+    ],
+    "settled" : [
+      "L"
+    ]
+  },
+  "prompt" : "N is drawn closer to the goal. Which frontier node expands next?",
+  "scenario" : {
+    "edges" : [
+      {
+        "bidirectional" : false,
+        "cost" : 3,
+        "from" : "L",
+        "to" : "M"
+      },
+      {
+        "bidirectional" : false,
+        "cost" : 6,
+        "from" : "L",
+        "to" : "N"
+      },
+      {
+        "bidirectional" : false,
+        "cost" : 8,
+        "from" : "M",
+        "to" : "Z"
+      },
+      {
+        "bidirectional" : false,
+        "cost" : 2,
+        "from" : "N",
+        "to" : "Z"
+      }
+    ],
+    "goal" : "Z",
+    "id" : "learning-dijkstra-first-graph-v1",
+    "nodes" : [
+      {
+        "heuristic" : 5,
+        "id" : "L",
+        "label" : "L",
+        "position" : {
+          "x" : 0.05,
+          "y" : 0.5
+        }
+      },
+      {
+        "heuristic" : 6,
+        "id" : "M",
+        "label" : "M",
+        "position" : {
+          "x" : 0.35,
+          "y" : 0.15
+        }
+      },
+      {
+        "heuristic" : 1,
+        "id" : "N",
+        "label" : "N",
+        "position" : {
+          "x" : 0.8,
+          "y" : 0.7
+        }
+      },
+      {
+        "heuristic" : 0,
+        "id" : "Z",
+        "label" : "Z",
+        "position" : {
+          "x" : 0.95,
+          "y" : 0.5
+        }
+      }
+    ],
+    "source" : "L"
+  },
+  "slot" : "first"
+}

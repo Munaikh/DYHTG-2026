@@ -1,14 +1,27 @@
 import Foundation
 
-/// A learning graph is independent of the player's physical course and branch.
+/// Illustrative placement in a learning graph, independent of the physical course.
+public struct ScenarioPosition: Codable, Equatable, Sendable {
+  /// Normalised diagram coordinates in 0...1; x increases right, y increases down.
+  /// Illustrative layout only, never GPS coordinates or a source of edge costs.
+  public let x: Double
+  public let y: Double
+  public init(x: Double, y: Double) {
+    self.x = x
+    self.y = y
+  }
+}
+
 public struct ScenarioNode: Codable, Equatable, Sendable, Identifiable {
   public let id: NodeID
   public let label: String
   public let heuristic: Int
-  public init(id: NodeID, label: String, heuristic: Int) {
+  public let position: ScenarioPosition?
+  public init(id: NodeID, label: String, heuristic: Int, position: ScenarioPosition? = nil) {
     self.id = id
     self.label = label
     self.heuristic = heuristic
+    self.position = position
   }
 }
 

@@ -1,0 +1,155 @@
+{
+  "action" : {
+    "enterCost" : {
+      "nodeID" : "M"
+    }
+  },
+  "algorithm" : "dijkstra",
+  "contentVersion" : "2026-10-17.1",
+  "feedbackGate" : "immediate",
+  "id" : "learning-dijkstra-bonusMiddle-v1",
+  "maximumPoints" : 40,
+  "presentedState" : {
+    "costs" : [
+      {
+        "g" : 0,
+        "h" : 6,
+        "nodeID" : "J"
+      },
+      {
+        "g" : 2,
+        "h" : 5,
+        "nodeID" : "K",
+        "predecessor" : "J"
+      },
+      {
+        "g" : 6,
+        "h" : 4,
+        "nodeID" : "L",
+        "predecessor" : "J"
+      },
+      {
+        "g" : 9,
+        "h" : 2,
+        "nodeID" : "M",
+        "predecessor" : "J"
+      },
+      {
+        "h" : 0,
+        "nodeID" : "Z"
+      }
+    ],
+    "frontier" : [
+      "L",
+      "M"
+    ],
+    "settled" : [
+      "J",
+      "K"
+    ]
+  },
+  "prompt" : "Starting at K, relax K → L, then use that updated g to relax L → M. After both updates, what g(M) should be kept?",
+  "scenario" : {
+    "edges" : [
+      {
+        "bidirectional" : false,
+        "cost" : 2,
+        "from" : "J",
+        "to" : "K"
+      },
+      {
+        "bidirectional" : false,
+        "cost" : 6,
+        "from" : "J",
+        "to" : "L"
+      },
+      {
+        "bidirectional" : false,
+        "cost" : 9,
+        "from" : "J",
+        "to" : "M"
+      },
+      {
+        "bidirectional" : false,
+        "cost" : 1,
+        "from" : "K",
+        "to" : "L"
+      },
+      {
+        "bidirectional" : false,
+        "cost" : 8,
+        "from" : "K",
+        "to" : "M"
+      },
+      {
+        "bidirectional" : false,
+        "cost" : 2,
+        "from" : "L",
+        "to" : "M"
+      },
+      {
+        "bidirectional" : false,
+        "cost" : 2,
+        "from" : "M",
+        "to" : "Z"
+      },
+      {
+        "bidirectional" : false,
+        "cost" : 10,
+        "from" : "L",
+        "to" : "Z"
+      }
+    ],
+    "goal" : "Z",
+    "id" : "learning-dijkstra-bonusMiddle-graph-v1",
+    "nodes" : [
+      {
+        "heuristic" : 6,
+        "id" : "J",
+        "label" : "J",
+        "position" : {
+          "x" : 0.05,
+          "y" : 0.5
+        }
+      },
+      {
+        "heuristic" : 5,
+        "id" : "K",
+        "label" : "K",
+        "position" : {
+          "x" : 0.3,
+          "y" : 0.15
+        }
+      },
+      {
+        "heuristic" : 4,
+        "id" : "L",
+        "label" : "L",
+        "position" : {
+          "x" : 0.4,
+          "y" : 0.8
+        }
+      },
+      {
+        "heuristic" : 2,
+        "id" : "M",
+        "label" : "M",
+        "position" : {
+          "x" : 0.7,
+          "y" : 0.2
+        }
+      },
+      {
+        "heuristic" : 0,
+        "id" : "Z",
+        "label" : "Z",
+        "position" : {
+          "x" : 0.95,
+          "y" : 0.5
+        }
+      }
+    ],
+    "source" : "J"
+  },
+  "slot" : "bonusMiddle"
+}

@@ -1,0 +1,579 @@
+{
+  "correctAnswer" : {
+    "node" : {
+      "nodeID" : "Q"
+    }
+  },
+  "definition" : {
+    "action" : {
+      "selectNode" : {
+        "options" : [
+          "Q",
+          "R"
+        ]
+      }
+    },
+    "algorithm" : "aStar",
+    "contentVersion" : "2026-10-17.1",
+    "feedbackGate" : "immediate",
+    "id" : "learning-aStar-practice-v1",
+    "maximumPoints" : 0,
+    "presentedState" : {
+      "costs" : [
+        {
+          "g" : 0,
+          "h" : 6,
+          "nodeID" : "P"
+        },
+        {
+          "g" : 6,
+          "h" : 1,
+          "nodeID" : "Q",
+          "predecessor" : "P"
+        },
+        {
+          "g" : 2,
+          "h" : 6,
+          "nodeID" : "R",
+          "predecessor" : "P"
+        },
+        {
+          "h" : 0,
+          "nodeID" : "T"
+        }
+      ],
+      "frontier" : [
+        "Q",
+        "R"
+      ],
+      "settled" : [
+        "P"
+      ]
+    },
+    "prompt" : "g is cost so far; h estimates the remaining cost; f = g + h is the selection priority. Expand the frontier node with the lowest f. h is not a confirmed walking cost. Which frontier node expands next? This prediction is unscored.",
+    "scenario" : {
+      "edges" : [
+        {
+          "bidirectional" : false,
+          "cost" : 6,
+          "from" : "P",
+          "to" : "Q"
+        },
+        {
+          "bidirectional" : false,
+          "cost" : 2,
+          "from" : "P",
+          "to" : "R"
+        },
+        {
+          "bidirectional" : false,
+          "cost" : 2,
+          "from" : "Q",
+          "to" : "T"
+        },
+        {
+          "bidirectional" : false,
+          "cost" : 8,
+          "from" : "R",
+          "to" : "T"
+        }
+      ],
+      "goal" : "T",
+      "id" : "learning-aStar-practice-graph-v1",
+      "nodes" : [
+        {
+          "heuristic" : 6,
+          "id" : "P",
+          "label" : "P",
+          "position" : {
+            "x" : 0.05,
+            "y" : 0.5
+          }
+        },
+        {
+          "heuristic" : 1,
+          "id" : "Q",
+          "label" : "Q",
+          "position" : {
+            "x" : 0.35,
+            "y" : 0.15
+          }
+        },
+        {
+          "heuristic" : 6,
+          "id" : "R",
+          "label" : "R",
+          "position" : {
+            "x" : 0.8,
+            "y" : 0.7
+          }
+        },
+        {
+          "heuristic" : 0,
+          "id" : "T",
+          "label" : "T",
+          "position" : {
+            "x" : 0.95,
+            "y" : 0.5
+          }
+        }
+      ],
+      "source" : "P"
+    },
+    "slot" : "practice"
+  },
+  "explanation" : "g is cost so far; h estimates the remaining cost; f = g + h is the selection priority. Expand the frontier node with the lowest f. h is not a confirmed walking cost.",
+  "presentedStepIndex" : 3,
+  "routes" : {
+
+  },
+  "trace" : {
+    "algorithm" : "aStar",
+    "outcome" : {
+      "route" : {
+        "cost" : 8,
+        "nodeIDs" : [
+          "P",
+          "Q",
+          "T"
+        ]
+      }
+    },
+    "scenarioID" : "learning-aStar-practice-graph-v1",
+    "steps" : [
+      {
+        "event" : {
+          "initial" : {
+
+          }
+        },
+        "index" : 0,
+        "state" : {
+          "costs" : [
+            {
+              "g" : 0,
+              "h" : 6,
+              "nodeID" : "P"
+            },
+            {
+              "h" : 1,
+              "nodeID" : "Q"
+            },
+            {
+              "h" : 6,
+              "nodeID" : "R"
+            },
+            {
+              "h" : 0,
+              "nodeID" : "T"
+            }
+          ],
+          "frontier" : [
+            "P"
+          ],
+          "settled" : [
+
+          ]
+        }
+      },
+      {
+        "event" : {
+          "expand" : {
+            "nodeID" : "P"
+          }
+        },
+        "index" : 1,
+        "state" : {
+          "costs" : [
+            {
+              "g" : 0,
+              "h" : 6,
+              "nodeID" : "P"
+            },
+            {
+              "h" : 1,
+              "nodeID" : "Q"
+            },
+            {
+              "h" : 6,
+              "nodeID" : "R"
+            },
+            {
+              "h" : 0,
+              "nodeID" : "T"
+            }
+          ],
+          "frontier" : [
+
+          ],
+          "settled" : [
+            "P"
+          ]
+        }
+      },
+      {
+        "event" : {
+          "relax" : {
+            "accepted" : true,
+            "candidateCost" : 6,
+            "from" : "P",
+            "to" : "Q"
+          }
+        },
+        "index" : 2,
+        "state" : {
+          "costs" : [
+            {
+              "g" : 0,
+              "h" : 6,
+              "nodeID" : "P"
+            },
+            {
+              "g" : 6,
+              "h" : 1,
+              "nodeID" : "Q",
+              "predecessor" : "P"
+            },
+            {
+              "h" : 6,
+              "nodeID" : "R"
+            },
+            {
+              "h" : 0,
+              "nodeID" : "T"
+            }
+          ],
+          "frontier" : [
+            "Q"
+          ],
+          "settled" : [
+            "P"
+          ]
+        }
+      },
+      {
+        "event" : {
+          "relax" : {
+            "accepted" : true,
+            "candidateCost" : 2,
+            "from" : "P",
+            "to" : "R"
+          }
+        },
+        "index" : 3,
+        "state" : {
+          "costs" : [
+            {
+              "g" : 0,
+              "h" : 6,
+              "nodeID" : "P"
+            },
+            {
+              "g" : 6,
+              "h" : 1,
+              "nodeID" : "Q",
+              "predecessor" : "P"
+            },
+            {
+              "g" : 2,
+              "h" : 6,
+              "nodeID" : "R",
+              "predecessor" : "P"
+            },
+            {
+              "h" : 0,
+              "nodeID" : "T"
+            }
+          ],
+          "frontier" : [
+            "Q",
+            "R"
+          ],
+          "settled" : [
+            "P"
+          ]
+        }
+      },
+      {
+        "event" : {
+          "expand" : {
+            "nodeID" : "Q"
+          }
+        },
+        "index" : 4,
+        "state" : {
+          "costs" : [
+            {
+              "g" : 0,
+              "h" : 6,
+              "nodeID" : "P"
+            },
+            {
+              "g" : 6,
+              "h" : 1,
+              "nodeID" : "Q",
+              "predecessor" : "P"
+            },
+            {
+              "g" : 2,
+              "h" : 6,
+              "nodeID" : "R",
+              "predecessor" : "P"
+            },
+            {
+              "h" : 0,
+              "nodeID" : "T"
+            }
+          ],
+          "frontier" : [
+            "R"
+          ],
+          "settled" : [
+            "P",
+            "Q"
+          ]
+        }
+      },
+      {
+        "event" : {
+          "relax" : {
+            "accepted" : true,
+            "candidateCost" : 8,
+            "from" : "Q",
+            "to" : "T"
+          }
+        },
+        "index" : 5,
+        "state" : {
+          "costs" : [
+            {
+              "g" : 0,
+              "h" : 6,
+              "nodeID" : "P"
+            },
+            {
+              "g" : 6,
+              "h" : 1,
+              "nodeID" : "Q",
+              "predecessor" : "P"
+            },
+            {
+              "g" : 2,
+              "h" : 6,
+              "nodeID" : "R",
+              "predecessor" : "P"
+            },
+            {
+              "g" : 8,
+              "h" : 0,
+              "nodeID" : "T",
+              "predecessor" : "Q"
+            }
+          ],
+          "frontier" : [
+            "R",
+            "T"
+          ],
+          "settled" : [
+            "P",
+            "Q"
+          ]
+        }
+      },
+      {
+        "event" : {
+          "expand" : {
+            "nodeID" : "R"
+          }
+        },
+        "index" : 6,
+        "state" : {
+          "costs" : [
+            {
+              "g" : 0,
+              "h" : 6,
+              "nodeID" : "P"
+            },
+            {
+              "g" : 6,
+              "h" : 1,
+              "nodeID" : "Q",
+              "predecessor" : "P"
+            },
+            {
+              "g" : 2,
+              "h" : 6,
+              "nodeID" : "R",
+              "predecessor" : "P"
+            },
+            {
+              "g" : 8,
+              "h" : 0,
+              "nodeID" : "T",
+              "predecessor" : "Q"
+            }
+          ],
+          "frontier" : [
+            "T"
+          ],
+          "settled" : [
+            "P",
+            "Q",
+            "R"
+          ]
+        }
+      },
+      {
+        "event" : {
+          "relax" : {
+            "accepted" : false,
+            "candidateCost" : 10,
+            "from" : "R",
+            "previousCost" : 8,
+            "to" : "T"
+          }
+        },
+        "index" : 7,
+        "state" : {
+          "costs" : [
+            {
+              "g" : 0,
+              "h" : 6,
+              "nodeID" : "P"
+            },
+            {
+              "g" : 6,
+              "h" : 1,
+              "nodeID" : "Q",
+              "predecessor" : "P"
+            },
+            {
+              "g" : 2,
+              "h" : 6,
+              "nodeID" : "R",
+              "predecessor" : "P"
+            },
+            {
+              "g" : 8,
+              "h" : 0,
+              "nodeID" : "T",
+              "predecessor" : "Q"
+            }
+          ],
+          "frontier" : [
+            "T"
+          ],
+          "settled" : [
+            "P",
+            "Q",
+            "R"
+          ]
+        }
+      },
+      {
+        "event" : {
+          "expand" : {
+            "nodeID" : "T"
+          }
+        },
+        "index" : 8,
+        "state" : {
+          "costs" : [
+            {
+              "g" : 0,
+              "h" : 6,
+              "nodeID" : "P"
+            },
+            {
+              "g" : 6,
+              "h" : 1,
+              "nodeID" : "Q",
+              "predecessor" : "P"
+            },
+            {
+              "g" : 2,
+              "h" : 6,
+              "nodeID" : "R",
+              "predecessor" : "P"
+            },
+            {
+              "g" : 8,
+              "h" : 0,
+              "nodeID" : "T",
+              "predecessor" : "Q"
+            }
+          ],
+          "frontier" : [
+
+          ],
+          "settled" : [
+            "P",
+            "Q",
+            "R",
+            "T"
+          ]
+        }
+      },
+      {
+        "event" : {
+          "reachedGoal" : {
+            "nodeID" : "T"
+          }
+        },
+        "index" : 9,
+        "state" : {
+          "costs" : [
+            {
+              "g" : 0,
+              "h" : 6,
+              "nodeID" : "P"
+            },
+            {
+              "g" : 6,
+              "h" : 1,
+              "nodeID" : "Q",
+              "predecessor" : "P"
+            },
+            {
+              "g" : 2,
+              "h" : 6,
+              "nodeID" : "R",
+              "predecessor" : "P"
+            },
+            {
+              "g" : 8,
+              "h" : 0,
+              "nodeID" : "T",
+              "predecessor" : "Q"
+            }
+          ],
+          "frontier" : [
+
+          ],
+          "settled" : [
+            "P",
+            "Q",
+            "R",
+            "T"
+          ]
+        }
+      }
+    ]
+  },
+  "workedStepTraceIndices" : [
+    [
+      3
+    ],
+    [
+      3
+    ],
+    [
+      4
+    ]
+  ],
+  "workedSteps" : [
+    "Q: g = 6, h = 1, f = 6 + 1 = 7.",
+    "R: g = 2, h = 6, f = 2 + 6 = 8.",
+    "Expand Q, the frontier node with the smallest priority value."
+  ]
+}

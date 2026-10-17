@@ -50,3 +50,13 @@ remains with the iOS track. Check the independent Python fixture verifier with:
 ```sh
 python3 scripts/verify_search_fixtures.py
 ```
+
+The [authored learning bank](docs/LEARNING.md) supplies all six question slots for
+each algorithm, worked explanations, replay references and first-attempt checks.
+Client-safe prompts and server-private answer fixtures live separately under
+`content/learning/v1`. The `AlgorithmArenaLearning` product is for server/authoring
+tools and isolated previews/tests; keep it out of the production app.
+
+```sh
+python3 -B scripts/verify_learning_content.py
+```

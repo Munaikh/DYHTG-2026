@@ -1,0 +1,121 @@
+{
+  "action" : {
+    "enterCost" : {
+      "nodeID" : "W"
+    }
+  },
+  "algorithm" : "dijkstra",
+  "contentVersion" : "2026-10-17.1",
+  "feedbackGate" : "immediate",
+  "id" : "learning-dijkstra-standardMiddle-v1",
+  "maximumPoints" : 20,
+  "presentedState" : {
+    "costs" : [
+      {
+        "g" : 0,
+        "h" : 4,
+        "nodeID" : "U"
+      },
+      {
+        "g" : 2,
+        "h" : 3,
+        "nodeID" : "V",
+        "predecessor" : "U"
+      },
+      {
+        "g" : 7,
+        "h" : 2,
+        "nodeID" : "W",
+        "predecessor" : "U"
+      },
+      {
+        "h" : 0,
+        "nodeID" : "Z"
+      }
+    ],
+    "frontier" : [
+      "W"
+    ],
+    "settled" : [
+      "U",
+      "V"
+    ]
+  },
+  "prompt" : "Relax V → W. Add the cost so far to the edge cost and compare with the existing tentative cost. What updated g(W) should be kept?",
+  "scenario" : {
+    "edges" : [
+      {
+        "bidirectional" : false,
+        "cost" : 2,
+        "from" : "U",
+        "to" : "V"
+      },
+      {
+        "bidirectional" : false,
+        "cost" : 7,
+        "from" : "U",
+        "to" : "W"
+      },
+      {
+        "bidirectional" : false,
+        "cost" : 3,
+        "from" : "V",
+        "to" : "W"
+      },
+      {
+        "bidirectional" : false,
+        "cost" : 2,
+        "from" : "W",
+        "to" : "Z"
+      },
+      {
+        "bidirectional" : false,
+        "cost" : 10,
+        "from" : "V",
+        "to" : "Z"
+      }
+    ],
+    "goal" : "Z",
+    "id" : "learning-dijkstra-standardMiddle-graph-v1",
+    "nodes" : [
+      {
+        "heuristic" : 4,
+        "id" : "U",
+        "label" : "U",
+        "position" : {
+          "x" : 0.05,
+          "y" : 0.5
+        }
+      },
+      {
+        "heuristic" : 3,
+        "id" : "V",
+        "label" : "V",
+        "position" : {
+          "x" : 0.35,
+          "y" : 0.15
+        }
+      },
+      {
+        "heuristic" : 2,
+        "id" : "W",
+        "label" : "W",
+        "position" : {
+          "x" : 0.8,
+          "y" : 0.7
+        }
+      },
+      {
+        "heuristic" : 0,
+        "id" : "Z",
+        "label" : "Z",
+        "position" : {
+          "x" : 0.95,
+          "y" : 0.5
+        }
+      }
+    ],
+    "source" : "U"
+  },
+  "slot" : "standardMiddle"
+}

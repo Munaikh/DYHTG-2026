@@ -1,0 +1,180 @@
+{
+  "action" : {
+    "transfer" : {
+      "nodeOptions" : [
+        "Q",
+        "R",
+        "T"
+      ],
+      "reasons" : [
+        {
+          "id" : "cost-only",
+          "text" : "It has the lowest g alone."
+        },
+        {
+          "id" : "goal-distance",
+          "text" : "It has the lowest h alone."
+        },
+        {
+          "id" : "frontier-priority",
+          "text" : "It has the lowest f = g + h in the frontier."
+        },
+        {
+          "id" : "already-settled",
+          "text" : "It was already expanded."
+        }
+      ]
+    }
+  },
+  "algorithm" : "aStar",
+  "contentVersion" : "2026-10-17.1",
+  "feedbackGate" : "immediate",
+  "id" : "learning-aStar-learningCheck-v1",
+  "maximumPoints" : 0,
+  "presentedState" : {
+    "costs" : [
+      {
+        "g" : 1,
+        "h" : 3,
+        "nodeID" : "P",
+        "predecessor" : "X"
+      },
+      {
+        "g" : 4,
+        "h" : 5,
+        "nodeID" : "Q",
+        "predecessor" : "P"
+      },
+      {
+        "g" : 7,
+        "h" : 1,
+        "nodeID" : "R",
+        "predecessor" : "P"
+      },
+      {
+        "g" : 12,
+        "h" : 0,
+        "nodeID" : "T",
+        "predecessor" : "X"
+      },
+      {
+        "g" : 0,
+        "h" : 4,
+        "nodeID" : "X"
+      }
+    ],
+    "frontier" : [
+      "R",
+      "Q",
+      "T"
+    ],
+    "settled" : [
+      "X",
+      "P"
+    ]
+  },
+  "prompt" : "This unfamiliar graph is partway through a search. Which frontier node expands next, and why? Your first attempt is recorded separately and earns no match points.",
+  "scenario" : {
+    "edges" : [
+      {
+        "bidirectional" : false,
+        "cost" : 1,
+        "from" : "X",
+        "to" : "P"
+      },
+      {
+        "bidirectional" : false,
+        "cost" : 5,
+        "from" : "X",
+        "to" : "Q"
+      },
+      {
+        "bidirectional" : false,
+        "cost" : 12,
+        "from" : "X",
+        "to" : "T"
+      },
+      {
+        "bidirectional" : false,
+        "cost" : 3,
+        "from" : "P",
+        "to" : "Q"
+      },
+      {
+        "bidirectional" : false,
+        "cost" : 6,
+        "from" : "P",
+        "to" : "R"
+      },
+      {
+        "bidirectional" : false,
+        "cost" : 4,
+        "from" : "Q",
+        "to" : "R"
+      },
+      {
+        "bidirectional" : false,
+        "cost" : 5,
+        "from" : "Q",
+        "to" : "T"
+      },
+      {
+        "bidirectional" : false,
+        "cost" : 1,
+        "from" : "R",
+        "to" : "T"
+      }
+    ],
+    "goal" : "T",
+    "id" : "learning-aStar-learningCheck-graph-v1",
+    "nodes" : [
+      {
+        "heuristic" : 4,
+        "id" : "X",
+        "label" : "X",
+        "position" : {
+          "x" : 0.05,
+          "y" : 0.5
+        }
+      },
+      {
+        "heuristic" : 3,
+        "id" : "P",
+        "label" : "P",
+        "position" : {
+          "x" : 0.3,
+          "y" : 0.15
+        }
+      },
+      {
+        "heuristic" : 5,
+        "id" : "Q",
+        "label" : "Q",
+        "position" : {
+          "x" : 0.4,
+          "y" : 0.8
+        }
+      },
+      {
+        "heuristic" : 1,
+        "id" : "R",
+        "label" : "R",
+        "position" : {
+          "x" : 0.7,
+          "y" : 0.2
+        }
+      },
+      {
+        "heuristic" : 0,
+        "id" : "T",
+        "label" : "T",
+        "position" : {
+          "x" : 0.95,
+          "y" : 0.5
+        }
+      }
+    ],
+    "source" : "X"
+  },
+  "slot" : "learningCheck"
+}

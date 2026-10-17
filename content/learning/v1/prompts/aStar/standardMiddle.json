@@ -1,0 +1,121 @@
+{
+  "action" : {
+    "enterCost" : {
+      "nodeID" : "E"
+    }
+  },
+  "algorithm" : "aStar",
+  "contentVersion" : "2026-10-17.1",
+  "feedbackGate" : "immediate",
+  "id" : "learning-aStar-standardMiddle-v1",
+  "maximumPoints" : 20,
+  "presentedState" : {
+    "costs" : [
+      {
+        "g" : 0,
+        "h" : 5,
+        "nodeID" : "C"
+      },
+      {
+        "g" : 3,
+        "h" : 4,
+        "nodeID" : "D",
+        "predecessor" : "C"
+      },
+      {
+        "g" : 9,
+        "h" : 3,
+        "nodeID" : "E",
+        "predecessor" : "C"
+      },
+      {
+        "h" : 0,
+        "nodeID" : "H"
+      }
+    ],
+    "frontier" : [
+      "E"
+    ],
+    "settled" : [
+      "C",
+      "D"
+    ]
+  },
+  "prompt" : "Relax D → E. Add the cost so far to the edge cost and compare with the existing tentative cost. What updated g(E) should be kept?",
+  "scenario" : {
+    "edges" : [
+      {
+        "bidirectional" : false,
+        "cost" : 3,
+        "from" : "C",
+        "to" : "D"
+      },
+      {
+        "bidirectional" : false,
+        "cost" : 9,
+        "from" : "C",
+        "to" : "E"
+      },
+      {
+        "bidirectional" : false,
+        "cost" : 2,
+        "from" : "D",
+        "to" : "E"
+      },
+      {
+        "bidirectional" : false,
+        "cost" : 3,
+        "from" : "E",
+        "to" : "H"
+      },
+      {
+        "bidirectional" : false,
+        "cost" : 11,
+        "from" : "D",
+        "to" : "H"
+      }
+    ],
+    "goal" : "H",
+    "id" : "learning-aStar-standardMiddle-graph-v1",
+    "nodes" : [
+      {
+        "heuristic" : 5,
+        "id" : "C",
+        "label" : "C",
+        "position" : {
+          "x" : 0.05,
+          "y" : 0.5
+        }
+      },
+      {
+        "heuristic" : 4,
+        "id" : "D",
+        "label" : "D",
+        "position" : {
+          "x" : 0.35,
+          "y" : 0.15
+        }
+      },
+      {
+        "heuristic" : 3,
+        "id" : "E",
+        "label" : "E",
+        "position" : {
+          "x" : 0.8,
+          "y" : 0.7
+        }
+      },
+      {
+        "heuristic" : 0,
+        "id" : "H",
+        "label" : "H",
+        "position" : {
+          "x" : 0.95,
+          "y" : 0.5
+        }
+      }
+    ],
+    "source" : "C"
+  },
+  "slot" : "standardMiddle"
+}
