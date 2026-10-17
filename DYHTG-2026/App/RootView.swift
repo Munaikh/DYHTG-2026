@@ -8,7 +8,7 @@ struct RootView: View {
     var body: some View {
         TabView(selection: $selectedTab) {
             LearnHomeView()
-                .tabItem { Label("Learn", systemImage: "spark.book.closed.fill") }
+                .tabItem { Label("Learn", systemImage: "book.closed.fill") }
                 .tag(0)
             PlayHomeView(store: duel)
                 .tabItem { Label("Play", systemImage: "bolt.shield.fill") }
