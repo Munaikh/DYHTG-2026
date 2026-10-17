@@ -1,0 +1,70 @@
+{
+  "algorithm" : "aStar",
+  "course" : {
+    "id" : "synthetic-course",
+    "version" : "fixture-1"
+  },
+  "creatorID" : "player-one",
+  "matchID" : "fixture-match",
+  "phase" : "active",
+  "players" : [
+    {
+      "algorithmConfirmed" : true,
+      "arrivals" : [
+        {
+          "method" : "location",
+          "nodeID" : "start"
+        },
+        {
+          "method" : "location",
+          "nodeID" : "first"
+        }
+      ],
+      "completedChallengeIDs" : [
+        "fixture-aStar-first-v1"
+      ],
+      "connection" : "online",
+      "id" : "player-one",
+      "nickname" : "Alex",
+      "pendingRewardMaximum" : 20,
+      "ready" : true,
+      "releasedScore" : 0,
+      "remainingAvailablePoints" : 60,
+      "routeChoice" : "standard",
+      "stage" : {
+        "walking" : {
+          "target" : "standard"
+        }
+      }
+    },
+    {
+      "algorithmConfirmed" : true,
+      "arrivals" : [
+        {
+          "method" : "location",
+          "nodeID" : "start"
+        },
+        {
+          "method" : "location",
+          "nodeID" : "first"
+        }
+      ],
+      "completedChallengeIDs" : [
+
+      ],
+      "connection" : "online",
+      "id" : "player-two",
+      "nickname" : "Sam",
+      "pendingRewardMaximum" : 0,
+      "ready" : true,
+      "releasedScore" : 0,
+      "remainingAvailablePoints" : 100,
+      "stage" : {
+        "challenge" : {
+          "challengeID" : "fixture-aStar-first-v1"
+        }
+      }
+    }
+  ],
+  "roomCode" : "ARENA1"
+}

@@ -1,0 +1,99 @@
+{
+  "action" : {
+    "enterCost" : {
+      "nodeID" : "W"
+    }
+  },
+  "algorithm" : "dijkstra",
+  "contentVersion" : "fixture-1",
+  "feedbackGate" : "immediate",
+  "id" : "fixture-dijkstra-bonusMiddle-v1",
+  "maximumPoints" : 40,
+  "presentedState" : {
+    "costs" : [
+      {
+        "g" : 0,
+        "h" : 6,
+        "nodeID" : "J"
+      },
+      {
+        "g" : 3,
+        "h" : 4,
+        "nodeID" : "K",
+        "predecessor" : "J"
+      },
+      {
+        "g" : 2,
+        "h" : 7,
+        "nodeID" : "L",
+        "predecessor" : "J"
+      },
+      {
+        "h" : 0,
+        "nodeID" : "W"
+      }
+    ],
+    "frontier" : [
+      "L",
+      "K"
+    ],
+    "settled" : [
+      "J"
+    ]
+  },
+  "prompt" : "Via L the candidate cost to W is 12. Via K, g = 3 and the edge to W costs 4. Which lower cost should be kept?",
+  "scenario" : {
+    "edges" : [
+      {
+        "bidirectional" : false,
+        "cost" : 3,
+        "from" : "J",
+        "to" : "K"
+      },
+      {
+        "bidirectional" : false,
+        "cost" : 2,
+        "from" : "J",
+        "to" : "L"
+      },
+      {
+        "bidirectional" : false,
+        "cost" : 4,
+        "from" : "K",
+        "to" : "W"
+      },
+      {
+        "bidirectional" : false,
+        "cost" : 10,
+        "from" : "L",
+        "to" : "W"
+      }
+    ],
+    "goal" : "W",
+    "id" : "fixture-scenario-bonusMiddle-v1",
+    "nodes" : [
+      {
+        "heuristic" : 6,
+        "id" : "J",
+        "label" : "J"
+      },
+      {
+        "heuristic" : 4,
+        "id" : "K",
+        "label" : "K"
+      },
+      {
+        "heuristic" : 7,
+        "id" : "L",
+        "label" : "L"
+      },
+      {
+        "heuristic" : 0,
+        "id" : "W",
+        "label" : "W"
+      }
+    ],
+    "source" : "J"
+  },
+  "slot" : "bonusMiddle"
+}

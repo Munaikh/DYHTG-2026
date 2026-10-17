@@ -24,3 +24,19 @@ For a physical device, choose your development team in Signing & Capabilities
 and replace the starter bundle identifier `com.example.DYHTG2026` with your own.
 
 No third-party dependencies are required.
+
+## Shared contracts
+
+The Foundation-only Swift package in `Packages/AlgorithmArenaCore` defines the
+app/backend boundary. [Contract documentation and JSON fixtures](contracts/README.md)
+cover both algorithms, private feedback gates, mock services, and recovery.
+
+Run its tests independently of the app:
+
+```sh
+swift test --package-path Packages/AlgorithmArenaCore
+```
+
+The separate `AlgorithmArenaFixtures` product supplies synthetic development data;
+its course is not surveyed or suitable for outdoor navigation. Xcode integration
+remains with the iOS track after shared-contract review.

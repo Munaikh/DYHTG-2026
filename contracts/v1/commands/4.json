@@ -1,0 +1,19 @@
+{
+  "action" : {
+    "confirmAlgorithm" : {
+      "algorithm" : "aStar"
+    }
+  },
+  "contractVersion" : 1,
+  "id" : "00000000-0000-4000-8000-000000000103",
+  "scope" : {
+    "match" : {
+      "course" : {
+        "id" : "synthetic-course",
+        "version" : "fixture-1"
+      },
+      "expectedRevision" : 1,
+      "matchID" : "fixture-match"
+    }
+  }
+}

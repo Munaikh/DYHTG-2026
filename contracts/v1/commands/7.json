@@ -1,0 +1,31 @@
+{
+  "action" : {
+    "confirmArrival" : {
+      "evidence" : {
+        "location" : {
+          "fix" : {
+            "capturedAt" : "2026-10-17T12:00:00Z",
+            "coordinate" : {
+              "latitude" : 0,
+              "longitude" : 0
+            },
+            "horizontalAccuracyMetres" : 8
+          }
+        }
+      },
+      "nodeID" : "start"
+    }
+  },
+  "contractVersion" : 1,
+  "id" : "00000000-0000-4000-8000-000000000106",
+  "scope" : {
+    "match" : {
+      "course" : {
+        "id" : "synthetic-course",
+        "version" : "fixture-1"
+      },
+      "expectedRevision" : 1,
+      "matchID" : "fixture-match"
+    }
+  }
+}

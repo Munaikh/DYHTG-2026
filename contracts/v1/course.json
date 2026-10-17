@@ -1,0 +1,208 @@
+{
+  "arrivalPolicy" : {
+    "maximumFixAgeSeconds" : 10,
+    "maximumHorizontalAccuracyMetres" : 20,
+    "radiusMetres" : 25
+  },
+  "contractVersion" : 1,
+  "edges" : [
+    {
+      "bidirectional" : true,
+      "costMetres" : 100,
+      "from" : "start",
+      "id" : "start-first",
+      "polyline" : [
+        {
+          "latitude" : 0,
+          "longitude" : 0
+        },
+        {
+          "latitude" : 0.0009,
+          "longitude" : 0
+        }
+      ],
+      "to" : "first"
+    },
+    {
+      "bidirectional" : true,
+      "costMetres" : 120,
+      "from" : "first",
+      "id" : "first-standard",
+      "polyline" : [
+        {
+          "latitude" : 0.0009,
+          "longitude" : 0
+        },
+        {
+          "latitude" : 0.0018,
+          "longitude" : 0.0006
+        }
+      ],
+      "to" : "standard"
+    },
+    {
+      "bidirectional" : true,
+      "costMetres" : 130,
+      "from" : "standard",
+      "id" : "standard-third",
+      "polyline" : [
+        {
+          "latitude" : 0.0018,
+          "longitude" : 0.0006
+        },
+        {
+          "latitude" : 0.0027,
+          "longitude" : 0
+        }
+      ],
+      "to" : "third"
+    },
+    {
+      "bidirectional" : true,
+      "costMetres" : 155,
+      "from" : "first",
+      "id" : "first-bonus",
+      "polyline" : [
+        {
+          "latitude" : 0.0009,
+          "longitude" : 0
+        },
+        {
+          "latitude" : 0.0018,
+          "longitude" : -0.001
+        }
+      ],
+      "to" : "bonus"
+    },
+    {
+      "bidirectional" : true,
+      "costMetres" : 170,
+      "from" : "bonus",
+      "id" : "bonus-third",
+      "polyline" : [
+        {
+          "latitude" : 0.0018,
+          "longitude" : -0.001
+        },
+        {
+          "latitude" : 0.0027,
+          "longitude" : 0
+        }
+      ],
+      "to" : "third"
+    },
+    {
+      "bidirectional" : true,
+      "costMetres" : 150,
+      "from" : "third",
+      "id" : "third-finish",
+      "polyline" : [
+        {
+          "latitude" : 0.0027,
+          "longitude" : 0
+        },
+        {
+          "latitude" : 0.004,
+          "longitude" : 0
+        }
+      ],
+      "to" : "finish"
+    }
+  ],
+  "name" : "Synthetic branch course — not for navigation",
+  "nodes" : [
+    {
+      "coordinate" : {
+        "latitude" : 0,
+        "longitude" : 0
+      },
+      "id" : "start",
+      "name" : "Demo start",
+      "stoppingNote" : "Synthetic; not a real stopping area."
+    },
+    {
+      "coordinate" : {
+        "latitude" : 0.0009,
+        "longitude" : 0
+      },
+      "id" : "first",
+      "name" : "Checkpoint one",
+      "stoppingNote" : "Synthetic."
+    },
+    {
+      "coordinate" : {
+        "latitude" : 0.0018,
+        "longitude" : 0.0006
+      },
+      "id" : "standard",
+      "name" : "Standard middle",
+      "stoppingNote" : "Synthetic."
+    },
+    {
+      "coordinate" : {
+        "latitude" : 0.0018,
+        "longitude" : -0.001
+      },
+      "id" : "bonus",
+      "name" : "Bonus middle",
+      "stoppingNote" : "Synthetic."
+    },
+    {
+      "coordinate" : {
+        "latitude" : 0.0027,
+        "longitude" : 0
+      },
+      "id" : "third",
+      "name" : "Checkpoint three",
+      "stoppingNote" : "Synthetic."
+    },
+    {
+      "coordinate" : {
+        "latitude" : 0.004,
+        "longitude" : 0
+      },
+      "id" : "finish",
+      "name" : "Demo finish",
+      "stoppingNote" : "Synthetic."
+    }
+  ],
+  "readiness" : "synthetic",
+  "reference" : {
+    "id" : "synthetic-course",
+    "version" : "fixture-1"
+  },
+  "routes" : [
+    {
+      "branch" : "standard",
+      "difficulty" : "One cost update",
+      "distanceMetres" : 500,
+      "edgeIDs" : [
+        "start-first",
+        "first-standard",
+        "standard-third",
+        "third-finish"
+      ],
+      "middleRewardPoints" : 20
+    },
+    {
+      "branch" : "bonus",
+      "difficulty" : "Compare and replace a tentative cost",
+      "distanceMetres" : 575,
+      "edgeIDs" : [
+        "start-first",
+        "first-bonus",
+        "bonus-third",
+        "third-finish"
+      ],
+      "middleRewardPoints" : 40
+    }
+  ],
+  "stops" : {
+    "bonusMiddle" : "bonus",
+    "finish" : "finish",
+    "first" : "first",
+    "standardMiddle" : "standard",
+    "start" : "start",
+    "third" : "third"
+  }
+}

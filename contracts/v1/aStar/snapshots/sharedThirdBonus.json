@@ -1,0 +1,1363 @@
+{
+  "contractVersion" : 1,
+  "revision" : 18,
+  "room" : {
+    "algorithm" : "aStar",
+    "course" : {
+      "id" : "synthetic-course",
+      "version" : "fixture-1"
+    },
+    "creatorID" : "player-one",
+    "matchID" : "fixture-match",
+    "phase" : "active",
+    "players" : [
+      {
+        "algorithmConfirmed" : true,
+        "arrivals" : [
+          {
+            "method" : "location",
+            "nodeID" : "start"
+          },
+          {
+            "method" : "location",
+            "nodeID" : "first"
+          },
+          {
+            "method" : "location",
+            "nodeID" : "bonus"
+          },
+          {
+            "method" : "location",
+            "nodeID" : "third"
+          }
+        ],
+        "completedChallengeIDs" : [
+          "fixture-aStar-first-v1",
+          "fixture-aStar-bonusMiddle-v1"
+        ],
+        "connection" : "online",
+        "id" : "player-one",
+        "nickname" : "Alex",
+        "pendingRewardMaximum" : 0,
+        "ready" : true,
+        "releasedScore" : 60,
+        "remainingAvailablePoints" : 40,
+        "routeChoice" : "bonus",
+        "stage" : {
+          "challenge" : {
+            "challengeID" : "fixture-aStar-third-v1"
+          }
+        }
+      },
+      {
+        "algorithmConfirmed" : true,
+        "arrivals" : [
+          {
+            "method" : "location",
+            "nodeID" : "start"
+          },
+          {
+            "method" : "location",
+            "nodeID" : "first"
+          },
+          {
+            "method" : "location",
+            "nodeID" : "standard"
+          },
+          {
+            "method" : "location",
+            "nodeID" : "third"
+          }
+        ],
+        "completedChallengeIDs" : [
+          "fixture-aStar-first-v1",
+          "fixture-aStar-standardMiddle-v1"
+        ],
+        "connection" : "online",
+        "id" : "player-two",
+        "nickname" : "Sam",
+        "pendingRewardMaximum" : 0,
+        "ready" : true,
+        "releasedScore" : 20,
+        "remainingAvailablePoints" : 40,
+        "routeChoice" : "standard",
+        "stage" : {
+          "challenge" : {
+            "challengeID" : "fixture-aStar-third-v1"
+          }
+        }
+      }
+    ],
+    "roomCode" : "ARENA1"
+  },
+  "serverTime" : "2026-10-17T12:00:00Z",
+  "viewer" : {
+    "availableChallenges" : [
+      {
+        "action" : {
+          "selectRoute" : {
+            "options" : [
+              {
+                "id" : "via-a",
+                "text" : "D → E → H"
+              },
+              {
+                "id" : "via-b",
+                "text" : "D → F → H"
+              }
+            ]
+          }
+        },
+        "algorithm" : "aStar",
+        "contentVersion" : "fixture-1",
+        "feedbackGate" : "afterBothSubmissions",
+        "id" : "fixture-aStar-third-v1",
+        "maximumPoints" : 20,
+        "presentedState" : {
+          "costs" : [
+            {
+              "g" : 0,
+              "h" : 8,
+              "nodeID" : "D"
+            },
+            {
+              "g" : 5,
+              "h" : 4,
+              "nodeID" : "E",
+              "predecessor" : "D"
+            },
+            {
+              "g" : 2,
+              "h" : 9,
+              "nodeID" : "F",
+              "predecessor" : "D"
+            },
+            {
+              "h" : 0,
+              "nodeID" : "H"
+            }
+          ],
+          "frontier" : [
+            "E",
+            "F"
+          ],
+          "settled" : [
+            "D"
+          ]
+        },
+        "prompt" : "Which route has the lower total cost?",
+        "scenario" : {
+          "edges" : [
+            {
+              "bidirectional" : false,
+              "cost" : 5,
+              "from" : "D",
+              "to" : "E"
+            },
+            {
+              "bidirectional" : false,
+              "cost" : 2,
+              "from" : "D",
+              "to" : "F"
+            },
+            {
+              "bidirectional" : false,
+              "cost" : 4,
+              "from" : "E",
+              "to" : "H"
+            },
+            {
+              "bidirectional" : false,
+              "cost" : 11,
+              "from" : "F",
+              "to" : "H"
+            }
+          ],
+          "goal" : "H",
+          "id" : "fixture-scenario-third-v1",
+          "nodes" : [
+            {
+              "heuristic" : 8,
+              "id" : "D",
+              "label" : "D"
+            },
+            {
+              "heuristic" : 4,
+              "id" : "E",
+              "label" : "E"
+            },
+            {
+              "heuristic" : 9,
+              "id" : "F",
+              "label" : "F"
+            },
+            {
+              "heuristic" : 0,
+              "id" : "H",
+              "label" : "H"
+            }
+          ],
+          "source" : "D"
+        },
+        "slot" : "third"
+      }
+    ],
+    "feedback" : [
+      {
+        "released" : {
+          "feedback" : {
+            "answers" : [
+              {
+                "answer" : {
+                  "node" : {
+                    "nodeID" : "Q"
+                  }
+                },
+                "awardedPoints" : 0,
+                "isCorrect" : true,
+                "playerID" : "player-one"
+              }
+            ],
+            "challengeID" : "fixture-aStar-practice-v1",
+            "correctAnswer" : {
+              "node" : {
+                "nodeID" : "Q"
+              }
+            },
+            "explanation" : "Use the smallest g + h, not h alone. The estimate h is not a confirmed walking cost.",
+            "trace" : {
+              "algorithm" : "aStar",
+              "outcome" : {
+                "route" : {
+                  "cost" : 7,
+                  "nodeIDs" : [
+                    "P",
+                    "Q",
+                    "U"
+                  ]
+                }
+              },
+              "scenarioID" : "fixture-scenario-practice-v1",
+              "steps" : [
+                {
+                  "event" : {
+                    "initial" : {
+
+                    }
+                  },
+                  "index" : 0,
+                  "state" : {
+                    "costs" : [
+                      {
+                        "g" : 0,
+                        "h" : 6,
+                        "nodeID" : "P"
+                      },
+                      {
+                        "h" : 4,
+                        "nodeID" : "Q"
+                      },
+                      {
+                        "h" : 7,
+                        "nodeID" : "R"
+                      },
+                      {
+                        "h" : 0,
+                        "nodeID" : "U"
+                      }
+                    ],
+                    "frontier" : [
+                      "P"
+                    ],
+                    "settled" : [
+
+                    ]
+                  }
+                },
+                {
+                  "event" : {
+                    "expand" : {
+                      "nodeID" : "P"
+                    }
+                  },
+                  "index" : 1,
+                  "state" : {
+                    "costs" : [
+                      {
+                        "g" : 0,
+                        "h" : 6,
+                        "nodeID" : "P"
+                      },
+                      {
+                        "h" : 4,
+                        "nodeID" : "Q"
+                      },
+                      {
+                        "h" : 7,
+                        "nodeID" : "R"
+                      },
+                      {
+                        "h" : 0,
+                        "nodeID" : "U"
+                      }
+                    ],
+                    "frontier" : [
+
+                    ],
+                    "settled" : [
+                      "P"
+                    ]
+                  }
+                },
+                {
+                  "event" : {
+                    "relax" : {
+                      "accepted" : true,
+                      "candidateCost" : 3,
+                      "from" : "P",
+                      "to" : "Q"
+                    }
+                  },
+                  "index" : 2,
+                  "state" : {
+                    "costs" : [
+                      {
+                        "g" : 0,
+                        "h" : 6,
+                        "nodeID" : "P"
+                      },
+                      {
+                        "g" : 3,
+                        "h" : 4,
+                        "nodeID" : "Q",
+                        "predecessor" : "P"
+                      },
+                      {
+                        "h" : 7,
+                        "nodeID" : "R"
+                      },
+                      {
+                        "h" : 0,
+                        "nodeID" : "U"
+                      }
+                    ],
+                    "frontier" : [
+                      "Q"
+                    ],
+                    "settled" : [
+                      "P"
+                    ]
+                  }
+                },
+                {
+                  "event" : {
+                    "relax" : {
+                      "accepted" : true,
+                      "candidateCost" : 1,
+                      "from" : "P",
+                      "to" : "R"
+                    }
+                  },
+                  "index" : 3,
+                  "state" : {
+                    "costs" : [
+                      {
+                        "g" : 0,
+                        "h" : 6,
+                        "nodeID" : "P"
+                      },
+                      {
+                        "g" : 3,
+                        "h" : 4,
+                        "nodeID" : "Q",
+                        "predecessor" : "P"
+                      },
+                      {
+                        "g" : 1,
+                        "h" : 7,
+                        "nodeID" : "R",
+                        "predecessor" : "P"
+                      },
+                      {
+                        "h" : 0,
+                        "nodeID" : "U"
+                      }
+                    ],
+                    "frontier" : [
+                      "Q",
+                      "R"
+                    ],
+                    "settled" : [
+                      "P"
+                    ]
+                  }
+                },
+                {
+                  "event" : {
+                    "expand" : {
+                      "nodeID" : "Q"
+                    }
+                  },
+                  "index" : 4,
+                  "state" : {
+                    "costs" : [
+                      {
+                        "g" : 0,
+                        "h" : 6,
+                        "nodeID" : "P"
+                      },
+                      {
+                        "g" : 3,
+                        "h" : 4,
+                        "nodeID" : "Q",
+                        "predecessor" : "P"
+                      },
+                      {
+                        "g" : 1,
+                        "h" : 7,
+                        "nodeID" : "R",
+                        "predecessor" : "P"
+                      },
+                      {
+                        "h" : 0,
+                        "nodeID" : "U"
+                      }
+                    ],
+                    "frontier" : [
+                      "R"
+                    ],
+                    "settled" : [
+                      "P",
+                      "Q"
+                    ]
+                  }
+                },
+                {
+                  "event" : {
+                    "relax" : {
+                      "accepted" : true,
+                      "candidateCost" : 7,
+                      "from" : "Q",
+                      "to" : "U"
+                    }
+                  },
+                  "index" : 5,
+                  "state" : {
+                    "costs" : [
+                      {
+                        "g" : 0,
+                        "h" : 6,
+                        "nodeID" : "P"
+                      },
+                      {
+                        "g" : 3,
+                        "h" : 4,
+                        "nodeID" : "Q",
+                        "predecessor" : "P"
+                      },
+                      {
+                        "g" : 1,
+                        "h" : 7,
+                        "nodeID" : "R",
+                        "predecessor" : "P"
+                      },
+                      {
+                        "g" : 7,
+                        "h" : 0,
+                        "nodeID" : "U",
+                        "predecessor" : "Q"
+                      }
+                    ],
+                    "frontier" : [
+                      "U",
+                      "R"
+                    ],
+                    "settled" : [
+                      "P",
+                      "Q"
+                    ]
+                  }
+                },
+                {
+                  "event" : {
+                    "expand" : {
+                      "nodeID" : "U"
+                    }
+                  },
+                  "index" : 6,
+                  "state" : {
+                    "costs" : [
+                      {
+                        "g" : 0,
+                        "h" : 6,
+                        "nodeID" : "P"
+                      },
+                      {
+                        "g" : 3,
+                        "h" : 4,
+                        "nodeID" : "Q",
+                        "predecessor" : "P"
+                      },
+                      {
+                        "g" : 1,
+                        "h" : 7,
+                        "nodeID" : "R",
+                        "predecessor" : "P"
+                      },
+                      {
+                        "g" : 7,
+                        "h" : 0,
+                        "nodeID" : "U",
+                        "predecessor" : "Q"
+                      }
+                    ],
+                    "frontier" : [
+                      "R"
+                    ],
+                    "settled" : [
+                      "P",
+                      "Q",
+                      "U"
+                    ]
+                  }
+                },
+                {
+                  "event" : {
+                    "reachedGoal" : {
+                      "nodeID" : "U"
+                    }
+                  },
+                  "index" : 7,
+                  "state" : {
+                    "costs" : [
+                      {
+                        "g" : 0,
+                        "h" : 6,
+                        "nodeID" : "P"
+                      },
+                      {
+                        "g" : 3,
+                        "h" : 4,
+                        "nodeID" : "Q",
+                        "predecessor" : "P"
+                      },
+                      {
+                        "g" : 1,
+                        "h" : 7,
+                        "nodeID" : "R",
+                        "predecessor" : "P"
+                      },
+                      {
+                        "g" : 7,
+                        "h" : 0,
+                        "nodeID" : "U",
+                        "predecessor" : "Q"
+                      }
+                    ],
+                    "frontier" : [
+                      "R"
+                    ],
+                    "settled" : [
+                      "P",
+                      "Q",
+                      "U"
+                    ]
+                  }
+                }
+              ]
+            },
+            "workedSteps" : [
+              "Q: 3 + 4 = 7",
+              "R: 1 + 7 = 8",
+              "Expand Q."
+            ]
+          }
+        }
+      },
+      {
+        "released" : {
+          "feedback" : {
+            "answers" : [
+              {
+                "answer" : {
+                  "node" : {
+                    "nodeID" : "A"
+                  }
+                },
+                "awardedPoints" : 20,
+                "isCorrect" : true,
+                "playerID" : "player-one"
+              },
+              {
+                "answer" : {
+                  "node" : {
+                    "nodeID" : "B"
+                  }
+                },
+                "awardedPoints" : 0,
+                "isCorrect" : false,
+                "playerID" : "player-two"
+              }
+            ],
+            "challengeID" : "fixture-aStar-first-v1",
+            "correctAnswer" : {
+              "node" : {
+                "nodeID" : "A"
+              }
+            },
+            "explanation" : "Use the smallest g + h, not h alone. The estimate h is not a confirmed walking cost.",
+            "trace" : {
+              "algorithm" : "aStar",
+              "outcome" : {
+                "route" : {
+                  "cost" : 5,
+                  "nodeIDs" : [
+                    "S",
+                    "A",
+                    "G"
+                  ]
+                }
+              },
+              "scenarioID" : "fixture-scenario-first-v1",
+              "steps" : [
+                {
+                  "event" : {
+                    "initial" : {
+
+                    }
+                  },
+                  "index" : 0,
+                  "state" : {
+                    "costs" : [
+                      {
+                        "g" : 0,
+                        "h" : 4,
+                        "nodeID" : "S"
+                      },
+                      {
+                        "h" : 3,
+                        "nodeID" : "A"
+                      },
+                      {
+                        "h" : 5,
+                        "nodeID" : "B"
+                      },
+                      {
+                        "h" : 0,
+                        "nodeID" : "G"
+                      }
+                    ],
+                    "frontier" : [
+                      "S"
+                    ],
+                    "settled" : [
+
+                    ]
+                  }
+                },
+                {
+                  "event" : {
+                    "expand" : {
+                      "nodeID" : "S"
+                    }
+                  },
+                  "index" : 1,
+                  "state" : {
+                    "costs" : [
+                      {
+                        "g" : 0,
+                        "h" : 4,
+                        "nodeID" : "S"
+                      },
+                      {
+                        "h" : 3,
+                        "nodeID" : "A"
+                      },
+                      {
+                        "h" : 5,
+                        "nodeID" : "B"
+                      },
+                      {
+                        "h" : 0,
+                        "nodeID" : "G"
+                      }
+                    ],
+                    "frontier" : [
+
+                    ],
+                    "settled" : [
+                      "S"
+                    ]
+                  }
+                },
+                {
+                  "event" : {
+                    "relax" : {
+                      "accepted" : true,
+                      "candidateCost" : 2,
+                      "from" : "S",
+                      "to" : "A"
+                    }
+                  },
+                  "index" : 2,
+                  "state" : {
+                    "costs" : [
+                      {
+                        "g" : 0,
+                        "h" : 4,
+                        "nodeID" : "S"
+                      },
+                      {
+                        "g" : 2,
+                        "h" : 3,
+                        "nodeID" : "A",
+                        "predecessor" : "S"
+                      },
+                      {
+                        "h" : 5,
+                        "nodeID" : "B"
+                      },
+                      {
+                        "h" : 0,
+                        "nodeID" : "G"
+                      }
+                    ],
+                    "frontier" : [
+                      "A"
+                    ],
+                    "settled" : [
+                      "S"
+                    ]
+                  }
+                },
+                {
+                  "event" : {
+                    "relax" : {
+                      "accepted" : true,
+                      "candidateCost" : 1,
+                      "from" : "S",
+                      "to" : "B"
+                    }
+                  },
+                  "index" : 3,
+                  "state" : {
+                    "costs" : [
+                      {
+                        "g" : 0,
+                        "h" : 4,
+                        "nodeID" : "S"
+                      },
+                      {
+                        "g" : 2,
+                        "h" : 3,
+                        "nodeID" : "A",
+                        "predecessor" : "S"
+                      },
+                      {
+                        "g" : 1,
+                        "h" : 5,
+                        "nodeID" : "B",
+                        "predecessor" : "S"
+                      },
+                      {
+                        "h" : 0,
+                        "nodeID" : "G"
+                      }
+                    ],
+                    "frontier" : [
+                      "A",
+                      "B"
+                    ],
+                    "settled" : [
+                      "S"
+                    ]
+                  }
+                },
+                {
+                  "event" : {
+                    "expand" : {
+                      "nodeID" : "A"
+                    }
+                  },
+                  "index" : 4,
+                  "state" : {
+                    "costs" : [
+                      {
+                        "g" : 0,
+                        "h" : 4,
+                        "nodeID" : "S"
+                      },
+                      {
+                        "g" : 2,
+                        "h" : 3,
+                        "nodeID" : "A",
+                        "predecessor" : "S"
+                      },
+                      {
+                        "g" : 1,
+                        "h" : 5,
+                        "nodeID" : "B",
+                        "predecessor" : "S"
+                      },
+                      {
+                        "h" : 0,
+                        "nodeID" : "G"
+                      }
+                    ],
+                    "frontier" : [
+                      "B"
+                    ],
+                    "settled" : [
+                      "S",
+                      "A"
+                    ]
+                  }
+                },
+                {
+                  "event" : {
+                    "relax" : {
+                      "accepted" : true,
+                      "candidateCost" : 5,
+                      "from" : "A",
+                      "to" : "G"
+                    }
+                  },
+                  "index" : 5,
+                  "state" : {
+                    "costs" : [
+                      {
+                        "g" : 0,
+                        "h" : 4,
+                        "nodeID" : "S"
+                      },
+                      {
+                        "g" : 2,
+                        "h" : 3,
+                        "nodeID" : "A",
+                        "predecessor" : "S"
+                      },
+                      {
+                        "g" : 1,
+                        "h" : 5,
+                        "nodeID" : "B",
+                        "predecessor" : "S"
+                      },
+                      {
+                        "g" : 5,
+                        "h" : 0,
+                        "nodeID" : "G",
+                        "predecessor" : "A"
+                      }
+                    ],
+                    "frontier" : [
+                      "G",
+                      "B"
+                    ],
+                    "settled" : [
+                      "S",
+                      "A"
+                    ]
+                  }
+                },
+                {
+                  "event" : {
+                    "expand" : {
+                      "nodeID" : "G"
+                    }
+                  },
+                  "index" : 6,
+                  "state" : {
+                    "costs" : [
+                      {
+                        "g" : 0,
+                        "h" : 4,
+                        "nodeID" : "S"
+                      },
+                      {
+                        "g" : 2,
+                        "h" : 3,
+                        "nodeID" : "A",
+                        "predecessor" : "S"
+                      },
+                      {
+                        "g" : 1,
+                        "h" : 5,
+                        "nodeID" : "B",
+                        "predecessor" : "S"
+                      },
+                      {
+                        "g" : 5,
+                        "h" : 0,
+                        "nodeID" : "G",
+                        "predecessor" : "A"
+                      }
+                    ],
+                    "frontier" : [
+                      "B"
+                    ],
+                    "settled" : [
+                      "S",
+                      "A",
+                      "G"
+                    ]
+                  }
+                },
+                {
+                  "event" : {
+                    "reachedGoal" : {
+                      "nodeID" : "G"
+                    }
+                  },
+                  "index" : 7,
+                  "state" : {
+                    "costs" : [
+                      {
+                        "g" : 0,
+                        "h" : 4,
+                        "nodeID" : "S"
+                      },
+                      {
+                        "g" : 2,
+                        "h" : 3,
+                        "nodeID" : "A",
+                        "predecessor" : "S"
+                      },
+                      {
+                        "g" : 1,
+                        "h" : 5,
+                        "nodeID" : "B",
+                        "predecessor" : "S"
+                      },
+                      {
+                        "g" : 5,
+                        "h" : 0,
+                        "nodeID" : "G",
+                        "predecessor" : "A"
+                      }
+                    ],
+                    "frontier" : [
+                      "B"
+                    ],
+                    "settled" : [
+                      "S",
+                      "A",
+                      "G"
+                    ]
+                  }
+                }
+              ]
+            },
+            "workedSteps" : [
+              "A: 2 + 3 = 5",
+              "B: 1 + 5 = 6",
+              "Expand A."
+            ]
+          }
+        }
+      },
+      {
+        "released" : {
+          "feedback" : {
+            "answers" : [
+              {
+                "answer" : {
+                  "cost" : {
+                    "value" : 7
+                  }
+                },
+                "awardedPoints" : 40,
+                "isCorrect" : true,
+                "playerID" : "player-one"
+              }
+            ],
+            "challengeID" : "fixture-aStar-bonusMiddle-v1",
+            "correctAnswer" : {
+              "cost" : {
+                "value" : 7
+              }
+            },
+            "explanation" : "Replace the tentative cost only when the new path is cheaper.",
+            "trace" : {
+              "algorithm" : "aStar",
+              "outcome" : {
+                "route" : {
+                  "cost" : 7,
+                  "nodeIDs" : [
+                    "J",
+                    "K",
+                    "W"
+                  ]
+                }
+              },
+              "scenarioID" : "fixture-scenario-bonusMiddle-v1",
+              "steps" : [
+                {
+                  "event" : {
+                    "initial" : {
+
+                    }
+                  },
+                  "index" : 0,
+                  "state" : {
+                    "costs" : [
+                      {
+                        "g" : 0,
+                        "h" : 6,
+                        "nodeID" : "J"
+                      },
+                      {
+                        "h" : 4,
+                        "nodeID" : "K"
+                      },
+                      {
+                        "h" : 7,
+                        "nodeID" : "L"
+                      },
+                      {
+                        "h" : 0,
+                        "nodeID" : "W"
+                      }
+                    ],
+                    "frontier" : [
+                      "J"
+                    ],
+                    "settled" : [
+
+                    ]
+                  }
+                },
+                {
+                  "event" : {
+                    "expand" : {
+                      "nodeID" : "J"
+                    }
+                  },
+                  "index" : 1,
+                  "state" : {
+                    "costs" : [
+                      {
+                        "g" : 0,
+                        "h" : 6,
+                        "nodeID" : "J"
+                      },
+                      {
+                        "h" : 4,
+                        "nodeID" : "K"
+                      },
+                      {
+                        "h" : 7,
+                        "nodeID" : "L"
+                      },
+                      {
+                        "h" : 0,
+                        "nodeID" : "W"
+                      }
+                    ],
+                    "frontier" : [
+
+                    ],
+                    "settled" : [
+                      "J"
+                    ]
+                  }
+                },
+                {
+                  "event" : {
+                    "relax" : {
+                      "accepted" : true,
+                      "candidateCost" : 3,
+                      "from" : "J",
+                      "to" : "K"
+                    }
+                  },
+                  "index" : 2,
+                  "state" : {
+                    "costs" : [
+                      {
+                        "g" : 0,
+                        "h" : 6,
+                        "nodeID" : "J"
+                      },
+                      {
+                        "g" : 3,
+                        "h" : 4,
+                        "nodeID" : "K",
+                        "predecessor" : "J"
+                      },
+                      {
+                        "h" : 7,
+                        "nodeID" : "L"
+                      },
+                      {
+                        "h" : 0,
+                        "nodeID" : "W"
+                      }
+                    ],
+                    "frontier" : [
+                      "K"
+                    ],
+                    "settled" : [
+                      "J"
+                    ]
+                  }
+                },
+                {
+                  "event" : {
+                    "relax" : {
+                      "accepted" : true,
+                      "candidateCost" : 2,
+                      "from" : "J",
+                      "to" : "L"
+                    }
+                  },
+                  "index" : 3,
+                  "state" : {
+                    "costs" : [
+                      {
+                        "g" : 0,
+                        "h" : 6,
+                        "nodeID" : "J"
+                      },
+                      {
+                        "g" : 3,
+                        "h" : 4,
+                        "nodeID" : "K",
+                        "predecessor" : "J"
+                      },
+                      {
+                        "g" : 2,
+                        "h" : 7,
+                        "nodeID" : "L",
+                        "predecessor" : "J"
+                      },
+                      {
+                        "h" : 0,
+                        "nodeID" : "W"
+                      }
+                    ],
+                    "frontier" : [
+                      "K",
+                      "L"
+                    ],
+                    "settled" : [
+                      "J"
+                    ]
+                  }
+                },
+                {
+                  "event" : {
+                    "expand" : {
+                      "nodeID" : "K"
+                    }
+                  },
+                  "index" : 4,
+                  "state" : {
+                    "costs" : [
+                      {
+                        "g" : 0,
+                        "h" : 6,
+                        "nodeID" : "J"
+                      },
+                      {
+                        "g" : 3,
+                        "h" : 4,
+                        "nodeID" : "K",
+                        "predecessor" : "J"
+                      },
+                      {
+                        "g" : 2,
+                        "h" : 7,
+                        "nodeID" : "L",
+                        "predecessor" : "J"
+                      },
+                      {
+                        "h" : 0,
+                        "nodeID" : "W"
+                      }
+                    ],
+                    "frontier" : [
+                      "L"
+                    ],
+                    "settled" : [
+                      "J",
+                      "K"
+                    ]
+                  }
+                },
+                {
+                  "event" : {
+                    "relax" : {
+                      "accepted" : true,
+                      "candidateCost" : 7,
+                      "from" : "K",
+                      "to" : "W"
+                    }
+                  },
+                  "index" : 5,
+                  "state" : {
+                    "costs" : [
+                      {
+                        "g" : 0,
+                        "h" : 6,
+                        "nodeID" : "J"
+                      },
+                      {
+                        "g" : 3,
+                        "h" : 4,
+                        "nodeID" : "K",
+                        "predecessor" : "J"
+                      },
+                      {
+                        "g" : 2,
+                        "h" : 7,
+                        "nodeID" : "L",
+                        "predecessor" : "J"
+                      },
+                      {
+                        "g" : 7,
+                        "h" : 0,
+                        "nodeID" : "W",
+                        "predecessor" : "K"
+                      }
+                    ],
+                    "frontier" : [
+                      "W",
+                      "L"
+                    ],
+                    "settled" : [
+                      "J",
+                      "K"
+                    ]
+                  }
+                },
+                {
+                  "event" : {
+                    "expand" : {
+                      "nodeID" : "W"
+                    }
+                  },
+                  "index" : 6,
+                  "state" : {
+                    "costs" : [
+                      {
+                        "g" : 0,
+                        "h" : 6,
+                        "nodeID" : "J"
+                      },
+                      {
+                        "g" : 3,
+                        "h" : 4,
+                        "nodeID" : "K",
+                        "predecessor" : "J"
+                      },
+                      {
+                        "g" : 2,
+                        "h" : 7,
+                        "nodeID" : "L",
+                        "predecessor" : "J"
+                      },
+                      {
+                        "g" : 7,
+                        "h" : 0,
+                        "nodeID" : "W",
+                        "predecessor" : "K"
+                      }
+                    ],
+                    "frontier" : [
+                      "L"
+                    ],
+                    "settled" : [
+                      "J",
+                      "K",
+                      "W"
+                    ]
+                  }
+                },
+                {
+                  "event" : {
+                    "reachedGoal" : {
+                      "nodeID" : "W"
+                    }
+                  },
+                  "index" : 7,
+                  "state" : {
+                    "costs" : [
+                      {
+                        "g" : 0,
+                        "h" : 6,
+                        "nodeID" : "J"
+                      },
+                      {
+                        "g" : 3,
+                        "h" : 4,
+                        "nodeID" : "K",
+                        "predecessor" : "J"
+                      },
+                      {
+                        "g" : 2,
+                        "h" : 7,
+                        "nodeID" : "L",
+                        "predecessor" : "J"
+                      },
+                      {
+                        "g" : 7,
+                        "h" : 0,
+                        "nodeID" : "W",
+                        "predecessor" : "K"
+                      }
+                    ],
+                    "frontier" : [
+                      "L"
+                    ],
+                    "settled" : [
+                      "J",
+                      "K",
+                      "W"
+                    ]
+                  }
+                }
+              ]
+            },
+            "workedSteps" : [
+              "Via K: 3 + 4 = 7",
+              "7 < 12, so keep 7 via K."
+            ]
+          }
+        }
+      }
+    ],
+    "playerID" : "player-one",
+    "submissions" : [
+      {
+        "acceptedAt" : "2026-10-17T12:00:00Z",
+        "answer" : {
+          "node" : {
+            "nodeID" : "Q"
+          }
+        },
+        "challengeID" : "fixture-aStar-practice-v1",
+        "commandID" : "00000000-0000-4000-8000-000000000002"
+      },
+      {
+        "acceptedAt" : "2026-10-17T12:00:00Z",
+        "answer" : {
+          "node" : {
+            "nodeID" : "A"
+          }
+        },
+        "challengeID" : "fixture-aStar-first-v1",
+        "commandID" : "00000000-0000-4000-8000-000000000001"
+      },
+      {
+        "acceptedAt" : "2026-10-17T12:00:00Z",
+        "answer" : {
+          "cost" : {
+            "value" : 7
+          }
+        },
+        "challengeID" : "fixture-aStar-bonusMiddle-v1",
+        "commandID" : "00000000-0000-4000-8000-000000000003"
+      }
+    ]
+  }
+}
