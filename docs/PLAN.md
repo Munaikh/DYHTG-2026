@@ -29,7 +29,7 @@ Audience: introductory computing students. Explanations use plain language, the 
 | Duration | Approximately 10–20 minutes |
 | Navigation | Campus graph, route line, current location, next checkpoint, scores, and opponent progress |
 | AR | Optional surface-anchored search replay at a stationary checkpoint |
-| Backend | Dedicated Supabase project in London, under the existing DYHTG organisation |
+| Backend | Dedicated Supabase project in Frankfurt, under the existing DYHTG organisation |
 | Design | Native outdoor game: deep green accent, neutral surfaces, clear graph hierarchy |
 
 Accounts, persistent leaderboards, BFS, larger matches, additional courses, indoor navigation, LiDAR mapping, continuous AR navigation, opponent interference, paid hints, and mid-match algorithm switching are out of scope. Both algorithms are available, but there is no mandatory cross-algorithm comparison within a match.
@@ -135,7 +135,7 @@ The pure Swift engine produces the route and replay trace. Both 2D and AR views 
 
 ## Supabase and match reliability
 
-Create a separate London-region project in the DYHTG organisation. Use anonymous authentication with a persisted session, nickname, and room code. Pin client dependencies and commit their lockfiles. Store only client-safe project configuration in the app; privileged credentials stay server-side.
+Use the dedicated Frankfurt-region project in the DYHTG organisation. The owner approved Frankfurt (`eu-central-1`) on 17 October 2026, replacing the original London-region requirement. Use anonymous authentication with a persisted session, nickname, and room code. Pin client dependencies and commit their lockfiles. Store only client-safe project configuration in the app; privileged credentials stay server-side.
 
 Implement authenticated commands for creating/joining a room, changing/confirming the algorithm, readiness/start, arrival, route choice, answer submission, finish, and departure. Store membership/progress, private submissions, and a reward ledger. Validate membership, expected match phase, arrival/route prerequisites, and feedback eligibility server-side.
 

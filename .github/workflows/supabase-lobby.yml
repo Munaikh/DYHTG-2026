@@ -1,0 +1,32 @@
+name: Supabase lobby
+on:
+  pull_request:
+    paths: ['supabase/**', 'scripts/test_supabase_lobby.mjs', '.github/workflows/supabase-lobby.yml']
+  push:
+    branches: [main]
+    paths: ['supabase/**', 'scripts/test_supabase_lobby.mjs', '.github/workflows/supabase-lobby.yml']
+permissions:
+  contents: read
+jobs:
+  lobby:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.22.0'
+      - uses: supabase/setup-cli@v1
+        with:
+          version: 2.117.0
+      - name: Start isolated local services
+        run: supabase start -x storage-api,imgproxy,mailpit,postgres-meta,studio,edge-runtime,logflare,vector,supavisor
+      - name: Check database security boundaries
+        run: supabase test db
+      - name: Test Auth, room concurrency, retries, snapshots and Realtime
+        run: node scripts/test_supabase_lobby.mjs
+      - name: Check database security advisors
+        run: supabase db advisors --local --type security --level warn --fail-on warn
+      - name: Stop local services
+        if: always()
+        run: supabase stop --no-backup
