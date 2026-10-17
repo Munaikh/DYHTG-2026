@@ -70,5 +70,6 @@ Reproducible configuration, migrations, security tests and integration tests liv
 under `supabase/` and `scripts/test_supabase_lobby.mjs`. The same backend now
 validates the complete match, arrivals, locked route choices,
 private submissions, gated feedback and exactly-once scoring (#7). Run the focused
-match smoke test with `node scripts/test_supabase_match.mjs`. The iOS adapter
-remains separate work.
+match reliability test with `node scripts/test_supabase_match.mjs`. The runbook
+also covers concurrency/privacy checks, Swift/server parity, organiser setup,
+recovery and demo reset (#8). The iOS adapter remains separate work.

@@ -1,4 +1,4 @@
-# Supabase rooms, match rules and scoring (#6, #7)
+# Supabase rooms, match rules, scoring and reliability (#6–#8)
 
 This backend implements contract v1 without changing the Foundation package or
 adding dependencies to the iOS target. The native `MatchService` adapter and Xcode
@@ -27,7 +27,7 @@ supabase db advisors --local --type security --level warn --fail-on warn
 ```
 
 Node 22 or later is required; the tests use built-in fetch and WebSocket, with no
-npm packages. They create three anonymous users and several rooms in the selected
+npm packages. They create three anonymous users per script and several rooms in the selected
 local stack. Repeated runs count toward the anonymous signup limit (30/IP/hour).
 Reset only this isolated local database when a clean run is needed; never reset a
 hosted database to run these tests. The SQL tests roll back their own fixtures.
@@ -39,9 +39,9 @@ supabase login
 supabase config diff --project-ref gftmvsmamkpvqrvbhoze
 # Review the diff: this configuration is for a NEW dedicated project.
 supabase config push --project-ref gftmvsmamkpvqrvbhoze
-supabase db push --project-ref gftmvsmamkpvqrvbhoze
-supabase migration list --project-ref gftmvsmamkpvqrvbhoze
-supabase db advisors --project-ref gftmvsmamkpvqrvbhoze --type security --level warn
+supabase db push --linked --project-ref gftmvsmamkpvqrvbhoze
+supabase migration list --linked --project-ref gftmvsmamkpvqrvbhoze
+supabase db advisors --linked --project-ref gftmvsmamkpvqrvbhoze --type security --level warn
 ```
 
 Inspect the dashboard to verify anonymous
@@ -259,9 +259,147 @@ per player/match. Invalid tokens reveal no proof details. Both issuing and using
 a proof are recorded privately; the snapshot records `method: organiserApproval`.
 The app never receives an organiser password or privileged API key.
 
-The focused smoke test completes Dijkstra at 80/100 and an A* draw at 60/60,
+The match test completes Dijkstra at 80/100 and an A* draw at 40/40,
 checks pending/released feedback, locked routes, duplicate deliveries, unscored
 understanding checks, restoration and departure. It provisions an organiser only
 on localhost using the local admin key in memory. Hosted development runs require
 `--remote`, client-safe environment configuration, and `ARENA_ORGANISER_TOKEN`.
 The test creates users/rooms; do not point it at a production project.
+
+## Reliability checks and iOS handoff (#8)
+
+Run from the repository root with Docker, Supabase CLI **2.117.0**, Node **22+**
+and Swift **6+**. CI pins Node **22.22.0**. No npm dependencies are needed.
+
+```sh
+supabase test db
+node scripts/test_supabase_lobby.mjs
+ARENA_MATCH_WIRE_OUTPUT=/tmp/arena-match-wire.json node scripts/test_supabase_match.mjs
+ARENA_MATCH_WIRE_OUTPUT=/tmp/arena-match-wire.json swift test --package-path Packages/AlgorithmArenaCore
+python3 scripts/verify_search_fixtures.py
+python3 -B scripts/verify_learning_content.py
+supabase db advisors --local --type security --level warn --fail-on warn
+supabase db query --local --file supabase/verify_deployment.sql
+```
+
+The match harness compares the running local database's course and all 12 private
+documents with the checked-in Swift exports. Every unlocked prompt and released
+explanation/replay is checked against that bank. It can write a token-free corpus
+of actual receipts, snapshots and application errors; the Swift test decodes it
+with the production contract types. Without `ARENA_MATCH_WIRE_OUTPUT`, ordinary
+Swift tests skip only that live-response check. The Supabase workflow requires
+the corpus and runs its decoder on macOS after the backend job succeeds.
+
+| Coverage | Automated evidence |
+| --- | --- |
+| Room capacity and stale writes | Four competing-join races; only one command at a shared revision commits |
+| Start, route, answer, finish | Concurrent distinct UUIDs; original receipt retries; reconcile the losing player's action |
+| Scoring and feedback | Dijkstra standard/bonus 80/100; A* wrong first/middle answers yield 40/40; pending feedback hides correctness and rewards; middle feedback is self-only |
+| Permissions | Third identity rejected by match commands/snapshot/override RPCs; member-only invalidations; all private tables denied to clients |
+| Recovery | Refresh preserves player identity; dropped Realtime connection recovers missed changes with fetch/subscribe/fetch; old pending receipt cannot replace a newer released snapshot |
+| Departure | Explicit leave yields incomplete, including when a shared answer/reward remains unreleased |
+| Overrides | Role spoofing/revocation, wrong player/room/node, expiry, single use, private issue/use logs, 30/minute issuance and 5/minute redemption limits |
+| Contract/version | Live server responses decode in Swift; unsupported course versions fail without mutation; content and course equal the authored exports |
+
+For the iOS adapter, reconcile these cases using the same saved Auth identity:
+
+1. **Request never reached the server:** refetch and resend the saved command
+   unchanged. If another action advanced the room, handle `staleRevision` using
+   the new snapshot; do not assume the action was accepted.
+2. **Request committed but its response was lost:** resend the original UUID,
+   revision and payload. Apply its receipt only if it supersedes local state,
+   then refetch. An older receipt may still show pending feedback.
+3. **Background/relaunch or missed invalidations:** restore/refresh the session,
+   fetch, subscribe, fetch again. Ignore invalidations/receipts at older revisions
+   and resume from the newest authorised snapshot. Connectivity loss never sends
+   `leave`; do not create another anonymous identity.
+
+Secure Keychain persistence, native network interruption handling and outdoor
+two-phone GPS/AR acceptance remain with #14/#15. These backend tests do not
+establish those device behaviours.
+
+### Provision and revoke a demo organiser
+
+An operator signs in with their own Auth session. In the dedicated project's SQL
+Editor, an administrator grants that specific Auth user the capability:
+
+```sql
+update auth.users
+set raw_app_meta_data=coalesce(raw_app_meta_data,'{}'::jsonb)||'{"arenaOrganiser":true}'::jsonb
+where id='<organiser Auth user UUID>'::uuid;
+```
+
+Keep admin/service-role credentials on the server/operator machine. Keep the
+organiser's session with the operator; players receive only the short-lived
+`approvalID` from the RPC documented above. Never bundle an organiser token in
+the app or give players a shared organiser login. The local harness grants its
+test host this capability using the **local** admin key only, held in memory.
+
+To revoke issuance immediately, remove the trusted flag:
+
+```sql
+update auth.users set raw_app_meta_data=raw_app_meta_data-'arenaOrganiser'
+where id='<organiser Auth user UUID>'::uuid;
+```
+
+Existing issued proofs remain usable until consumed or their two-minute expiry.
+For an audit, inspect `private.arena_arrival_approvals` by room/player/issuer;
+`created_at`, `expires_at` and `used_at` record issuance and successful use.
+`private.arena_arrivals.method` and the authorised snapshot identify overrides.
+Keep proof IDs and sessions out of shared logs. On `rateLimited`, wait the
+returned `retryAfterSeconds`; on `invalidApproval`, obtain a new bound proof.
+
+### Deployment verification and demo reset
+
+Use the configuration/migration commands near the top of this runbook. This issue
+adds tests and documentation, with no schema migration. After deployment, run:
+
+```sh
+supabase db query --linked --project-ref gftmvsmamkpvqrvbhoze --file supabase/verify_deployment.sql
+```
+
+If the CLI cannot initialise its database connection, run the contents of
+`supabase/verify_deployment.sql` in the dedicated project's SQL Editor instead.
+The same read-only query was verified locally via CLI and on the hosted project
+via the Supabase connector on **17 October 2026**: matching migration/course/content
+versions, zero private client grants, and only the invalidation table published.
+
+Expected migrations: `20261017171103`, `20261017171212`, `20261017173114`.
+Expected course: `gilmorehill-jms-library` / `candidate-2026-10-17-1`, unsurveyed.
+Expected content: `2026-10-17.1`, six slots each for `dijkstra` and `aStar`.
+Only `public.arena_invalidations` belongs in Realtime and `private_client_grants`
+is zero. Verify anonymous Auth enabled and API exposure limited to
+`public` in the dashboard. Client configuration is `supabase/client-config.json`.
+If versions drift, stop integration and apply/review the missing migration;
+do not edit the existing course/content version in place.
+
+For a **hosted demo replay**, explicitly leave the old room, reconcile its pending
+commands, then create a new room/code with the same player sessions. The new room
+starts with empty submissions and rewards. Keep old rooms/receipts for recovery
+and audit; no reset/delete RPC is exposed. Immutable answer/reward records are
+deliberate. Do not delete Auth users to reset a match.
+
+For a **clean local rebuild only**, the following resets the `algorithm-arena`
+stack configured in this checkout, deleting its local test rooms/users and
+reapplying all migrations:
+
+```sh
+supabase db reset --local --no-seed
+```
+
+Use no `--linked`, `--project-ref` or hosted database URL for a reset. Re-run the
+checks above afterwards. Six anonymous signups per full test run count against
+the 30/IP/hour limit; database reset does not promise to clear the running Auth
+service's rate counter. If sign-in is rate limited, wait for its window before
+rerunning. Avoid changing the hosted limit just to make tests pass.
+
+Database tests use rolled-back fixtures, following the official
+[Supabase testing guide](https://supabase.com/docs/guides/local-development/testing/overview).
+
+Local evidence on **17 October 2026**: **56 pgTAP assertions**, **13 lobby checks**,
+both full match scenarios and pending-feedback departure, **43 Swift tests**
+(including real-response decoding), **22 search traces** and **12 authored
+challenges** pass. Local security advisors report no warnings. The hosted advisor
+still reports the expected anonymous-member policy described above; private-table
+default-denial notices are informational. The complete reliability suite ran
+locally; the hosted verification in this issue was read-only.

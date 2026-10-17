@@ -1,10 +1,10 @@
 name: Supabase match
 on:
   pull_request:
-    paths: ['supabase/**', 'scripts/test_supabase_lobby.mjs', 'scripts/test_supabase_match.mjs', '.github/workflows/supabase-lobby.yml']
+    paths: ['supabase/**', 'Packages/AlgorithmArenaCore/**', 'contracts/**', 'content/learning/**', 'scripts/test_supabase_lobby.mjs', 'scripts/test_supabase_match.mjs', '.github/workflows/supabase-lobby.yml']
   push:
     branches: [main]
-    paths: ['supabase/**', 'scripts/test_supabase_lobby.mjs', 'scripts/test_supabase_match.mjs', '.github/workflows/supabase-lobby.yml']
+    paths: ['supabase/**', 'Packages/AlgorithmArenaCore/**', 'contracts/**', 'content/learning/**', 'scripts/test_supabase_lobby.mjs', 'scripts/test_supabase_match.mjs', '.github/workflows/supabase-lobby.yml']
 permissions:
   contents: read
 jobs:
@@ -25,10 +25,32 @@ jobs:
         run: supabase test db
       - name: Test Auth, room concurrency, retries, snapshots and Realtime
         run: node scripts/test_supabase_lobby.mjs
-      - name: Smoke test authoritative match and scoring
+      - name: Test match races, privacy, scoring and restored sessions
+        env:
+          ARENA_MATCH_WIRE_OUTPUT: ${{ runner.temp }}/arena-match-wire.json
         run: node scripts/test_supabase_match.mjs
+      - name: Save token-free REST responses for Swift contract verification
+        uses: actions/upload-artifact@v4
+        with:
+          name: arena-match-wire
+          path: ${{ runner.temp }}/arena-match-wire.json
+          if-no-files-found: error
+          retention-days: 1
       - name: Check database security advisors
         run: supabase db advisors --local --type security --level warn --fail-on warn
       - name: Stop local services
         if: always()
         run: supabase stop --no-backup
+  server-contracts:
+    needs: lobby
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: arena-match-wire
+          path: ${{ runner.temp }}
+      - name: Decode actual server responses using the Swift contract
+        env:
+          ARENA_MATCH_WIRE_OUTPUT: ${{ runner.temp }}/arena-match-wire.json
+        run: swift test --package-path Packages/AlgorithmArenaCore --filter serverResponsesMatchSwiftContract
