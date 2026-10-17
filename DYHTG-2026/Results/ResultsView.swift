@@ -4,6 +4,8 @@ import SwiftUI
 struct ResultsView: View {
     @Bindable var store: MatchStore
 
+    @Environment(\.arenaReduceMotion) private var reduceMotion
+    @State private var revealed = false
     @State private var checkChallenge: ChallengeRoute?
 
     var body: some View {
@@ -11,10 +13,16 @@ struct ResultsView: View {
             if let snapshot = store.snapshot, let viewer = store.viewer {
                 List {
                     Section {
-                        Text(summary(snapshot.room.result))
-                            .foregroundStyle(.secondary)
-                            .listRowBackground(Color.clear)
-                            .listRowInsets(EdgeInsets(top: 0, leading: 20, bottom: 8, trailing: 20))
+                        VStack(alignment: .leading, spacing: 12) {
+                            Image(systemName: resultSymbol(snapshot.room.result))
+                                .font(.system(size: 44)).foregroundStyle(.tint)
+                                .scaleEffect(revealed ? 1 : 0.8).accessibilityHidden(true)
+                            Text(summary(snapshot.room.result))
+                            Text("Match points reward answers and completion. Walking speed earns no points.").font(.footnote)
+                        }
+                        .foregroundStyle(.secondary)
+                        .listRowBackground(Color.clear)
+                        .listRowInsets(EdgeInsets(top: 0, leading: 20, bottom: 8, trailing: 20))
                     }
 
                     Section {
@@ -50,6 +58,7 @@ struct ResultsView: View {
                     }
                 }
                 .navigationTitle(headline(snapshot.room.result))
+                .onAppear { withAnimation(reduceMotion ? nil : .spring(duration: 0.4)) { revealed = true } }
                 .bottomActions {
                     PrimaryButton(title: "Done") {
                         Task { await store.leave() }
@@ -81,6 +90,15 @@ struct ResultsView: View {
             } footer: {
                 Text("One unscored question on a new graph.")
             }
+        }
+    }
+
+    private func resultSymbol(_ result: MatchResult?) -> String {
+        switch result {
+        case .winner(let id, _): id == store.viewer?.id ? "trophy.fill" : "flag.checkered"
+        case .draw: "equal.circle.fill"
+        case .incomplete: "pause.circle.fill"
+        case nil: "hourglass"
         }
     }
 

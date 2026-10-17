@@ -81,9 +81,12 @@ struct ChallengeView: View {
         .scrollDismissesKeyboard(.interactively)
         .bottomActions {
             if challenge.feedbackGate == .afterBothSubmissions {
-                Text("Feedback unlocks once both players have answered.")
+                Label("Your answer stays private. Feedback unlocks after both players submit.", systemImage: "lock.fill")
                     .font(.footnote)
                     .foregroundStyle(.secondary)
+            }
+            if draft.wrappedValue.answer(for: challenge.action) == nil {
+                Text("Complete the labelled answer fields to enable Submit answer.").font(.footnote).foregroundStyle(.secondary)
             }
             PrimaryButton(title: "Submit Answer", busyTitle: "Submitting...", isBusy: isSubmitting) {
                 if challenge.maximumPoints > 0 {

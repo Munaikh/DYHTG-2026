@@ -56,7 +56,7 @@ struct RouteChoiceSheet: View {
                 } header: {
                     Text("Next Stop")
                 } footer: {
-                    Text("Both routes rejoin before Checkpoint 3. The question at your next stop stays hidden until you lock in a route.")
+                    Text("Standard allows 80 match points in total; bonus allows 100. Both rejoin before Checkpoint 3. Walking speed earns no points. Your next question stays hidden until you lock in a route.")
                 }
             }
             .navigationTitle("Choose Route")

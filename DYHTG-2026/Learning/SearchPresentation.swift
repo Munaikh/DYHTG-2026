@@ -30,12 +30,15 @@ struct NodeSummary: Identifiable {
     var f: Int? { g.map { $0 + h } }
 }
 
+enum IndoorCostDisplay { case breadthFirst, depthFirst, greedy }
+
 struct SearchPresentation {
     let scenario: GraphScenario
     let algorithm: AlgorithmKind
     let state: SearchState
     var current: NodeID?
     var routeNodes: [NodeID] = []
+    var indoorCostDisplay: IndoorCostDisplay? = nil
 
     var routeEdges: Set<String> {
         Set(zip(routeNodes, routeNodes.dropFirst()).map { "\($0.0.rawValue)>\($0.1.rawValue)" })
@@ -73,6 +76,13 @@ struct SearchPresentation {
 
     func costText(_ node: NodeSummary) -> String {
         let g = node.g.map(String.init) ?? "∞"
+        if let indoorCostDisplay {
+            switch indoorCostDisplay {
+            case .breadthFirst: return "depth \(g)"
+            case .depthFirst: return "cost \(g)"
+            case .greedy: return "h \(node.h)"
+            }
+        }
         switch algorithm {
         case .dijkstra:
             return "g \(g)"

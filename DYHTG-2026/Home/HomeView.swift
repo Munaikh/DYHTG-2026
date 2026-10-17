@@ -9,6 +9,7 @@ struct HomeView: View {
     @State private var isCreating = false
     @State private var lastMode = MatchStore.Mode.live
     @State private var failure: ActionError?
+    @Environment(\.dismiss) private var dismiss
     @FocusState private var nicknameFocused: Bool
 
     private var trimmedNickname: String {
@@ -37,13 +38,31 @@ struct HomeView: View {
                 }
 
                 Section {
+                    Label("Two players · three checkpoints", systemImage: "flag.checkered")
+                    Text("Solve Dijkstra or A* questions along the route.")
+                        .foregroundStyle(.secondary)
+                    DisclosureGroup("How does it work?") {
+                        Text("Start at the James McCune Smith Learning Hub and finish at the Library. Choose a standard or bonus middle stop. Answers earn match points; walking speed earns none.")
+                            .font(.subheadline)
+                    }
+                } header: {
+                    Text("Campus challenge")
                 } footer: {
-                    Text("Pick Dijkstra or A*, then walk from the James McCune Smith Learning Hub to the Library. At each of three checkpoints, predict what the algorithm does next. Reasoning scores points; walking speed doesn't. Practice Solo pairs you with a simulated player.")
+                    Text("Practice Solo uses a simulated player. Create or join a room to play with a real teammate.")
                 }
             }
             .scrollDismissesKeyboard(.interactively)
-            .navigationTitle("New Match")
+            .navigationTitle("Campus match")
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Close") { dismiss() }.disabled(isCreating)
+                }
+            }
+            .interactiveDismissDisabled(isCreating)
             .bottomActions {
+                if !nicknameIsValid {
+                    Text("Enter a nickname to enable the match buttons.").font(.footnote).foregroundStyle(.secondary)
+                }
                 Group {
                     PrimaryButton(title: "Create Room", busyTitle: "Creating Room...", isBusy: isCreating) {
                         createRoom(mode: .live)

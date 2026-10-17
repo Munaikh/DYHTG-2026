@@ -1,10 +1,12 @@
 # DYHTG-2026
 
-A minimal SwiftUI iOS app for iPhone and iPad, targeting iOS 17 or later.
+A native Swift 6 / SwiftUI educational game for iOS 17 and later.
 
 ## Algorithm Arena planning
 
-This starter will become a learning-first campus game for two iPhone players using Dijkstra or A*.
+The campus game supports two players using Dijkstra or A*. The native learning expansion adds indoor lessons, practice, XP, quests, titles and saved progress for five algorithms.
+
+See [game experience implementation and validation](GAME_EXPERIENCE_IMPLEMENTATION.md).
 
 - [MVP implementation plan](docs/PLAN.md): learning outcomes, gameplay, architecture, course, AR and acceptance criteria.
 - [Two-person work breakdown](docs/WORK_BREAKDOWN.md): assigned GitHub issues, blockers, ownership and integration handoffs.
@@ -17,13 +19,12 @@ This starter will become a learning-first campus game for two iPhone players usi
 2. Select the `DYHTG-2026` scheme and an iOS simulator.
 3. Press Command-R to build and run.
 
-The app starts in `DYHTG-2026/DYHTG2026App.swift`. Edit
-`DYHTG-2026/ContentView.swift` to build the first screen; a SwiftUI preview is included.
+The app starts in `DYHTG-2026/App/DYHTG2026App.swift`. Its existing root coordinates the new learning tabs and the original campus lobby, match and results screens. New Swift files under `DYHTG-2026` are automatically included by the Xcode synchronized folder.
 
 For a physical device, choose your development team in Signing & Capabilities
 and replace the starter bundle identifier `com.example.DYHTG2026` with your own.
 
-No third-party dependencies are required.
+Xcode resolves the existing Supabase Swift dependency and the local AlgorithmArenaCore package. Indoor learning does not need a backend or GPS.
 
 ## Shared contracts
 
@@ -72,4 +73,4 @@ validates the complete match, arrivals, locked route choices,
 private submissions, gated feedback and exactly-once scoring (#7). Run the focused
 match reliability test with `node scripts/test_supabase_match.mjs`. The runbook
 also covers concurrency/privacy checks, Swift/server parity, organiser setup,
-recovery and demo reset (#8). The iOS adapter remains separate work.
+recovery and demo reset (#8). The existing iOS Supabase adapter remains in `DYHTG-2026/Live`; the learning expansion reuses it.

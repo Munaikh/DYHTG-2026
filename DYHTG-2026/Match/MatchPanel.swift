@@ -59,9 +59,9 @@ struct MatchPanel: View {
             Section {
                 Scoreboard(viewer: viewer, opponent: store.opponent)
             } header: {
-                Text("Score")
+                Text("Match points")
             } footer: {
-                Text(pointsSummary(viewer))
+                Text(pointsSummary(viewer) + " Walking speed earns no points. Learning XP is separate.")
             }
 
             if let feedback = store.snapshot?.viewer.feedback, !feedback.isEmpty {
@@ -179,7 +179,7 @@ struct MatchPanel: View {
             let place = course.placeName(viewer.arrivals.last?.nodeID ?? course.stops.start)
             return (store.challenges[id]?.slot.title ?? "Checkpoint", "Question Waiting", "You've checked in at \(place).")
         case .choosingRoute:
-            return ("Checkpoint 2", "Choose Your Route", "Standard or bonus. You can't change it later." + pendingSuffix(viewer))
+            return ("Checkpoint 2", "Choose Your Route", "Standard: 20 points. Bonus: 40 points. Choose before seeing the question." + pendingSuffix(viewer))
         case .finished:
             return ("Finish", "You've Finished", finishedDetail)
         case .departed, .atStart:

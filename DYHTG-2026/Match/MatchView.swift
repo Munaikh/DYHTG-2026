@@ -13,6 +13,7 @@ struct MatchView: View {
     @State private var detent = PresentationDetent.height(220)
     @State private var modal: MatchModal?
     @State private var reviewed: Set<ChallengeID> = []
+    @Environment(\.arenaReduceMotion) private var reduceMotion
     @Environment(\.scenePhase) private var scenePhase
 
     private var compactDetent: PresentationDetent {
@@ -64,7 +65,7 @@ struct MatchView: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.horizontal, 16)
                 .padding(.trailing, 56)
-                .animation(.snappy, value: readyFeedback?.id)
+                .animation(reduceMotion ? nil : .snappy, value: readyFeedback?.id)
             }
             .sheet(isPresented: $isPanelPresented) {
                 MatchPanel(
@@ -90,7 +91,7 @@ struct MatchView: View {
                 followLeg(viewer)
             }
             .onChange(of: store.snapshot?.viewer.navigation?.nextStop) {
-                withAnimation(.easeInOut(duration: 1.2)) { followLeg(viewer) }
+                withAnimation(reduceMotion ? nil : .easeInOut(duration: 1.2)) { followLeg(viewer) }
             }
             .task { await location.startUpdating() }
             .task(id: store.course.reference.version) { await paths.load(store.course) }
@@ -119,11 +120,12 @@ private struct ScoreBadge: View {
     let opponent: PlayerProgress?
 
     var body: some View {
-        HStack(spacing: 6) {
-            Text("You \(viewer.releasedScore)")
-            Text("·")
-                .foregroundStyle(.secondary)
-            Text("\(opponent?.nickname ?? "Other player") \(opponent?.releasedScore ?? 0)")
+        ViewThatFits(in: .horizontal) {
+            scoreLine
+            VStack(alignment: .leading, spacing: 4) {
+                Text("You: \(viewer.releasedScore) match points")
+                Text("\(opponent?.nickname ?? "Other player"): \(opponent?.releasedScore ?? 0)")
+            }
         }
         .font(.subheadline.weight(.semibold))
         .monospacedDigit()
@@ -131,8 +133,17 @@ private struct ScoreBadge: View {
         .padding(.vertical, 10)
         .floatingBackground()
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel("Score")
-        .accessibilityValue("You \(viewer.releasedScore), \(opponent?.nickname ?? "other player") \(opponent?.releasedScore ?? 0)")
+        .accessibilityLabel("Match score")
+        .accessibilityValue("You \(viewer.releasedScore), \(opponent?.nickname ?? "other player") \(opponent?.releasedScore ?? 0) points")
+    }
+
+    private var scoreLine: some View {
+        HStack(spacing: 6) {
+            Text("You \(viewer.releasedScore) pts")
+            Text("·")
+                .foregroundStyle(.secondary)
+            Text("\(opponent?.nickname ?? "Other player") \(opponent?.releasedScore ?? 0) pts")
+        }
     }
 }
 

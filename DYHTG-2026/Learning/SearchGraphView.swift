@@ -45,6 +45,9 @@ struct SearchGraphView: View {
                             if selectable.contains(node.id) { onSelect(node.id) }
                         }
                         .accessibilityAddTraits(selectable.contains(node.id) ? .isButton : [])
+                        .accessibilityAction {
+                            if selectable.contains(node.id) { onSelect(node.id) }
+                        }
                     }
                 }
             }
@@ -150,7 +153,7 @@ private struct NodeView: View {
                 shape
                 Text(node.label)
                     .font(.headline)
-                    .foregroundStyle(node.state == .current ? Color.white : node.state == .undiscovered ? Color.secondary : Color.primary)
+                    .foregroundStyle(node.state == .current ? Color(uiColor: .systemBackground) : node.state == .undiscovered ? Color.secondary : Color.primary)
             }
             .frame(width: size, height: size)
             .overlay {

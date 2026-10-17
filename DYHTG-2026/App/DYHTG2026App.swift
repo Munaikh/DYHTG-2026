@@ -14,9 +14,12 @@ struct DYHTG2026App: App {
         )
     }()
 
+    @State private var learning = LearningStore()
+
     var body: some Scene {
         WindowGroup {
-            RootView(store: store)
+            RootView(store: store, learning: learning)
+                .preferredColorScheme(learning.profile.preferences.appearance == "dark" ? .dark : learning.profile.preferences.appearance == "light" ? .light : nil)
         }
     }
 }
