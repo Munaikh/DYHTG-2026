@@ -6,6 +6,9 @@ on:
       - 'Packages/AlgorithmArenaCore/**'
       - 'contracts/**'
       - 'content/learning/**'
+      - 'content/duel/**'
+      - 'scripts/duel_prediction.mjs'
+      - 'scripts/verify_duel_variety.mjs'
       - 'scripts/verify_search_fixtures.py'
       - 'scripts/verify_learning_content.py'
       - 'scripts/test_learning_store.*'
@@ -19,6 +22,9 @@ on:
       - 'Packages/AlgorithmArenaCore/**'
       - 'contracts/**'
       - 'content/learning/**'
+      - 'content/duel/**'
+      - 'scripts/duel_prediction.mjs'
+      - 'scripts/verify_duel_variety.mjs'
       - 'scripts/verify_search_fixtures.py'
       - 'scripts/verify_learning_content.py'
       - 'scripts/test_learning_store.*'
@@ -45,5 +51,10 @@ jobs:
         run: bash scripts/test_campus_routes.sh
       - name: Verify cross-language search and course fixtures
         run: python3 scripts/verify_search_fixtures.py
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.22.0'
+      - name: Verify varied duels against an independent JS solver
+        run: node scripts/verify_duel_variety.mjs
       - name: Verify authored learning content independently
         run: python3 -B scripts/verify_learning_content.py

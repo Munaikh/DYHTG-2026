@@ -164,3 +164,17 @@ struct GraphLayout {
         self.rows = rows
     }
 }
+
+// All indoor algorithms reuse the existing graph renderer without broadening the
+// outdoor AlgorithmKind wire contract or changing its engine.
+extension SearchPresentation {
+    init(scenario: GraphScenario, studyAlgorithm: StudyAlgorithm, state: SearchState) {
+        self.init(scenario: scenario, algorithm: studyAlgorithm.graphDisplayAlgorithm, state: state)
+        switch studyAlgorithm {
+        case .bfs: indoorCostDisplay = .breadthFirst
+        case .dfs: indoorCostDisplay = .depthFirst
+        case .greedy: indoorCostDisplay = .greedy
+        case .dijkstra, .aStar: break
+        }
+    }
+}

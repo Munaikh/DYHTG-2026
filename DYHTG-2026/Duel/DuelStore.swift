@@ -31,7 +31,7 @@ final class DuelStore {
     var isCreator: Bool { snapshot != nil && snapshot?.creatorID == snapshot?.viewerID }
     var canAct: Bool { !isBusy && pending == nil && !isOffline }
 
-    func create(nickname: String, algorithm: AlgorithmKind) async {
+    func create(nickname: String, algorithm: StudyAlgorithm) async {
         await deliver(DuelCommand(action: .create, nickname: nickname, algorithm: algorithm))
     }
 

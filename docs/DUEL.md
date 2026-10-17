@@ -82,3 +82,86 @@ The three Swift tests passed against the hosted corpus, verifying Codable intero
 These backend checks do not establish visual, simulator, or physical-device acceptance of the SwiftUI client. The parent implementation validates those separately.
 
 For a separate player alongside one simulator, use `node scripts/duel_partner.mjs ROOMCODE --auto`. It joins with its own anonymous identity, readies itself, computes predictions from public costs, and waits for the human/simulator to continue each reveal. Omit `--auto` for interactive `ready`, `answer NODE`, `next`, `state`, and `quit` commands. It does not read private fixtures or store session tokens. Two real simulators remain the primary UI acceptance path.
+
+## Five-algorithm question rotation (v2)
+
+The new additive migration **20261017220000_duel_variety.sql** expands Plot Twist
+Duel to the five algorithms already taught in Learn: **BFS, DFS, Dijkstra, A*,
+and Greedy best-first**. This migration is prepared locally; deployment and hosted
+acceptance are still required. Apply it after the existing migrations, then build
+and update both players' apps. The existing room code, readiness, three-round
+structure, 100-point scoring, shared reveal and recovery flow remain intact.
+
+The public duel `algorithm` and reveal trace now use `StudyAlgorithm`, which is
+shared from Core with Progression. The outdoor `AlgorithmKind` remains exactly
+two cases. The same `StudySearch` implementation powers lessons and the new duel
+answer bank. Legacy Dijkstra/A* wire values and saved snapshots still decode.
+New `DuelTrace` uses the original trace JSON shape, extended to five algorithm IDs.
+
+There are **120 server-only questions: 24 per algorithm**, with eight variants in
+each of three round categories:
+
+1. Predict the next expansion at different decision boundaries.
+2. After a genuine connection closure, identify a predecessor in the new search.
+3. Reconstruct the first hop or final connection of the algorithm's resulting route.
+
+Graphs vary across four topology families, 7–9 nodes, algorithm-specific seeds,
+node labels, edge costs and decision boundaries. Stories and wording also vary.
+BFS/DFS questions use unit edges. A* estimates are half the exact remaining cost,
+validated as consistent/admissible for each graph including the changed network.
+DFS and Greedy route questions explicitly ask for the route the search finds;
+they do not claim it is shortest. Neighbour ordering and tie rules are displayed.
+The graph stays interactive for all question types; chips, tables, before/after
+comparison and algorithm-specific replay descriptions use the existing UI.
+
+Optional round keys `questionID`, `questionKind` and `focusNodeID` distinguish
+questions. V1 rounds omit them and default to next-expansion behavior. The public
+snapshot still contains no answer key, explanation, future trace or opponent
+prediction until both players submit. Final scores and learning rewards use the
+same validation and exactly-once path as before.
+
+### Reducing repetition
+
+At start, the server locks the room and assigns one question per category to a
+private `(room,generation)` deck. Both players receive the same fixed deck. It
+prefers questions unseen by **both** players, then content seen by only one, and
+then the least recently seen by either. History is keyed by authenticated user,
+so it also applies when creating a different room with the same account.
+Questions enter history only when their round is shown, not when future rounds
+are privately selected. Rematches get fresh decks. With the same pair, each
+category's eight questions is exhausted before repeating; subsequent selection
+uses oldest-seen content. Repetition is reduced rather than claimed impossible
+with a finite bank. A fresh anonymous identity has no prior history.
+
+Active pre-migration rooms without a v2 deck keep their original v1 questions,
+answers and receipts. Their next rematch uses v2. Never edit the v1 fixtures or
+rewrite a migration already deployed to a shared environment.
+
+### Authoring and verification
+
+```sh
+swiftc -module-cache-path /tmp/duel-variety-cache \
+  Packages/AlgorithmArenaCore/Sources/AlgorithmArenaCore/*.swift \
+  scripts/export_duel_variety.swift -o /tmp/export-duel-variety
+/tmp/export-duel-variety content/duel/v2/server
+# Only while this new migration is UNDEPLOYED:
+python3 scripts/build_duel_variety_migration.py
+
+swift test --package-path Packages/AlgorithmArenaCore
+bash scripts/test_duel_store.sh
+node scripts/verify_duel_variety.mjs
+npm install --prefix /tmp/arena-db --no-save @electric-sql/pglite@0.3.14
+PGLITE_MODULE=/tmp/arena-db/node_modules/@electric-sql/pglite/dist/index.js \
+  node scripts/test_duel_variety.mjs
+# After migration in a local Supabase stack:
+node scripts/test_supabase_duel.mjs
+```
+
+The independent JS solver checks all 120 solutions and route costs using only
+public graph/state data. The PostgreSQL test loads the entire migration chain,
+runs ten complete duels per algorithm (50 total), and checks identical questions,
+no disclosure before reveal, stale/duplicate submissions, scoring, rematch bank
+exhaustion, new-room history, inaccessible answer/history/deck tables, and v1
+compatibility. It uses temporary database users and makes no hosted changes.
+The production-store harness separately checks reconnection and pending-command
+recovery. Hosted Auth/PostgREST/concurrency tests still need the new migration.

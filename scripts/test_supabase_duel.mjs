@@ -44,8 +44,8 @@ for(const table of ['duel_rounds','duel_answers','duel_receipts','duel_players']
   assert(!privateRead.ok);
 }
 passed('answer bank, private predictions, receipts and player tables are not directly exposed');
-for(const algorithm of ['dijkstra','aStar']) {
-  const bank=JSON.parse(readFileSync(new URL(`../content/duel/v1/server/${algorithm}.json`,import.meta.url)));
+for(const algorithm of ['bfs','dfs','dijkstra','aStar','greedy']) {
+  const bank=JSON.parse(readFileSync(new URL(`../content/duel/v2/server/${algorithm}.json`,import.meta.url)));
   const create=cmd('create',null,{nickname:'Duel test host',algorithm});
   let s=await send(host,create); assert.equal(s.phase,'lobby');assert(!s.currentRound);hidden(s);
   assert.deepEqual(await send(host,create),s);
@@ -64,12 +64,15 @@ for(const algorithm of ['dijkstra','aStar']) {
   passed(`${algorithm}: capacity, membership, stale state, readiness and host start enforced`);
   for(let round=0;round<3;round++) {
     assert.equal(s.phase,'answering');assert.equal(s.roundIndex,round);hidden(s);
-    assert.deepEqual(s.currentRound,bank[round].round);
+    const document=bank.find(item=>item.id===s.currentRound.questionID);
+    assert(document,'Server must select an authored v2 question');
+    assert.equal(document.slot,round);
+    assert.deepEqual(s.currentRound,document.round);
     if(round===1){assert(s.currentRound.twist);assert(s.currentRound.previousScenario);}
     fail(await raw(host,cmd('submit',s,{answerNodeID:'not-a-choice'})),'invalidAnswer');
     fail(await raw(host,cmd('advance',s)),'invalidPhase');
-    const correct=bank[round].correctNodeID;
-    const wrong=bank[round].round.choices.find(x=>x!==correct);
+    const correct=document.correctNodeID;
+    const wrong=document.round.choices.find(x=>x!==correct);
     const hostPick=algorithm==='aStar'&&round===1?wrong:correct;
     const hostCommand=cmd('submit',s,{answerNodeID:hostPick});
     const guestCommand=cmd('submit',s,{answerNodeID:wrong});
@@ -89,7 +92,7 @@ for(const algorithm of ['dijkstra','aStar']) {
     fail(await raw(firstUser,cmd('submit',first,{answerNodeID:wrong})),'alreadySubmitted');
     s=await send(loser,cmd('submit',first,{answerNodeID:loserPick}));
     assert.equal(s.phase,'reveal');assert.equal(s.reveal.correctNodeID,correct);
-    assert.deepEqual(s.reveal.trace,bank[round].trace);
+    assert.deepEqual(s.reveal.trace,document.trace);
     assert.equal(s.reveal.answers.length,2);
     assert.equal(s.reveal.answers.find(x=>x.playerID===host.user.id).points,hostPick===correct?100:0);
     assert.equal(s.reveal.answers.find(x=>x.playerID===guest.user.id).points,0);
@@ -105,7 +108,7 @@ for(const algorithm of ['dijkstra','aStar']) {
     passed(`${algorithm} round ${round+1}: concurrent submissions, hidden answers/scores, exact scoring, refresh-session reconnect, shared reveal and mutual advance`);
   }
   assert.equal(s.phase,'finished');
-  assert.equal(s.players.find(x=>x.id===host.user.id).score,algorithm==='dijkstra'?300:200);
+  assert.equal(s.players.find(x=>x.id===host.user.id).score,algorithm==='aStar'?200:300);
   assert.equal(s.players.find(x=>x.id===guest.user.id).score,0);
   const hostResult=await read(host,s),guestResult=await read(guest,s);
   assert.deepEqual({...hostResult,viewerID:null},{...guestResult,viewerID:null});

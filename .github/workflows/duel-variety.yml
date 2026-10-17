@@ -1,0 +1,25 @@
+name: Duel variety
+on:
+  pull_request:
+    paths: ['supabase/**', 'content/duel/**', 'scripts/*duel*', 'scripts/duel-variety/**', '.github/workflows/duel-variety.yml']
+  push:
+    branches: [main]
+    paths: ['supabase/**', 'content/duel/**', 'scripts/*duel*', 'scripts/duel-variety/**', '.github/workflows/duel-variety.yml']
+permissions:
+  contents: read
+jobs:
+  database:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.22.0'
+      - name: Install isolated PostgreSQL test runtime
+        run: npm install --prefix "$RUNNER_TEMP/arena-db" --no-save @electric-sql/pglite@0.3.14
+      - name: Check independent public-only search predictions
+        run: node scripts/verify_duel_variety.mjs
+      - name: Test full migration chain, question rotation, privacy and scoring
+        env:
+          PGLITE_MODULE: ${{ runner.temp }}/arena-db/node_modules/@electric-sql/pglite/dist/index.js
+        run: node scripts/test_duel_variety.mjs

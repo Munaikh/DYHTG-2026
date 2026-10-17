@@ -4,7 +4,7 @@ import SwiftUI
 struct PlayHomeView: View {
     @Bindable var store: DuelStore
     @AppStorage("nickname") private var nickname = ""
-    @State private var algorithm = AlgorithmKind.dijkstra
+    @State private var algorithm = StudyAlgorithm.dijkstra
     @State private var joinCode = ""
     @State private var joining = false
     @State private var leaving = false
@@ -86,7 +86,7 @@ struct PlayHomeView: View {
         VStack(spacing: 24) {
             DuelHero()
             HStack(spacing: 0) {
-                fact("2", caption: "players")
+                fact("5", caption: "algorithms")
                 Spacer()
                 fact("3", caption: "rounds")
                 Spacer()
@@ -110,11 +110,12 @@ struct PlayHomeView: View {
                         if value.count > 20 { nickname = String(value.prefix(20)) }
                     }
                 Picker("Algorithm", selection: $algorithm) {
-                    Text("Dijkstra").tag(AlgorithmKind.dijkstra)
-                    Text("A*").tag(AlgorithmKind.aStar)
+                    ForEach(StudyAlgorithm.allCases) { kind in
+                        Label(kind.name, systemImage: kind.symbol).tag(kind)
+                    }
                 }
-                .pickerStyle(.segmented)
-                Text(algorithm == .dijkstra ? "Follow the cheapest known cost." : "Balance the cost so far with an estimate ahead.")
+                .pickerStyle(.menu)
+                Text(algorithm.rule)
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
                 ArenaGlassGroup(spacing: 12) {

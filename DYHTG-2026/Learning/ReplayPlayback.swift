@@ -7,11 +7,20 @@ import SwiftUI
 final class ReplayPlayback {
     let trace: SearchTrace
     let scenario: GraphScenario
+    let studyAlgorithm: StudyAlgorithm?
     private(set) var index = 0
     var isPlaying = false
 
     init(trace: SearchTrace, scenario: GraphScenario) {
         self.trace = trace
+        self.studyAlgorithm = nil
+        self.scenario = scenario
+    }
+
+    init(trace: DuelTrace, scenario: GraphScenario) {
+        self.trace = SearchTrace(scenarioID: trace.scenarioID,
+            algorithm: trace.algorithm.graphDisplayAlgorithm, steps: trace.steps, outcome: trace.outcome)
+        self.studyAlgorithm = trace.algorithm
         self.scenario = scenario
     }
 
@@ -20,6 +29,9 @@ final class ReplayPlayback {
 
     var presentation: SearchPresentation {
         var presentation = SearchPresentation(scenario: scenario, algorithm: trace.algorithm, state: step.state)
+        if let studyAlgorithm {
+            presentation = SearchPresentation(scenario: scenario, studyAlgorithm: studyAlgorithm, state: step.state)
+        }
         if case .expand(let id) = step.event { presentation.current = id }
         if case .relax(let from, _, _, _, _) = step.event { presentation.current = from }
         if index == lastIndex, case .route(let nodes, _) = trace.outcome { presentation.routeNodes = nodes }
@@ -38,11 +50,36 @@ final class ReplayPlayback {
     }
 
     var description: String {
-        StepDescription(scenario: scenario, algorithm: trace.algorithm).text(
+        if let studyAlgorithm, studyAlgorithm != .dijkstra && studyAlgorithm != .aStar {
+            return indoorDescription(studyAlgorithm)
+        }
+        return StepDescription(scenario: scenario, algorithm: trace.algorithm).text(
             for: step,
             previous: index > 0 ? trace.steps[index - 1].state : nil,
             outcome: trace.outcome
         )
+    }
+
+    private func indoorDescription(_ algorithm: StudyAlgorithm) -> String {
+        switch step.event {
+        case .initial: return "Start at \(scenario.source.rawValue). \(algorithm.rule)"
+        case .expand(let node): return "Visit \(node.rawValue). \(algorithm.rule)"
+        case .relax(let from, let to, _, _, let accepted):
+            let action: String
+            switch algorithm {
+            case .bfs: action = "Add it to the back of the queue. Its first discovery fixes its parent."
+            case .dfs: action = "Put it on top of the stack to follow this deeper branch."
+            case .greedy: action = "Add it to the frontier ordered by h, without ranking by cost so far."
+            case .dijkstra, .aStar: action = "Update its known route."
+            }
+            return "Check \(from.rawValue) → \(to.rawValue). " + (accepted ? action : "Keep the existing discovery; it is already visited or discovered.")
+        case .reachedGoal:
+            if case .route(let nodes, let cost) = trace.outcome {
+                return "Route: \(nodes.map(\.rawValue).joined(separator: " → ")). Edge cost \(cost). \(algorithm.caveat)"
+            }
+            return "Goal reached."
+        case .unreachable: return "No route remains in this network."
+        }
     }
 
     func move(to newIndex: Int, animated: Bool) {

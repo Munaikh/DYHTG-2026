@@ -1,11 +1,12 @@
 // Separate authenticated test player for simulator/manual testing. Never stores tokens.
 // Automatic predictions are calculated from the PUBLIC presented state, not answer banks.
 import {readFileSync} from 'node:fs';
+import {predictDuel} from './duel_prediction.mjs';
 import {randomUUID} from 'node:crypto';
 import {createInterface} from 'node:readline';
 const roomCode=process.argv[2];
 if(!roomCode || roomCode==='--help') {
-  console.log('Usage: node scripts/duel_partner.mjs ROOMCODE [--auto] [--local]\nCommands: ready, answer NODE, next, state, quit\n--auto readies, predicts using public g/h, and advances only after its opponent.');
+  console.log('Usage: node scripts/duel_partner.mjs ROOMCODE [--auto] [--local]\nCommands: ready, answer NODE, next, state, quit\n--auto readies, solves using the public graph/state, and advances only after its opponent.');
   process.exit(0);
 }
 if(!/^[A-Fa-f0-9]{6}$/.test(roomCode)) throw Error('Room code must contain six hex characters.');
@@ -79,11 +80,9 @@ while(!done){
         if(snapshot.phase==='lobby'&&!me.ready)await send('ready');
         if(snapshot.phase==='answering'&&!me.submitted){
           const round=snapshot.currentRound;
-          const candidates=round.presentedState.costs.filter(c=>round.choices.includes(c.nodeID)&&c.g!==undefined&&c.g!==null);
-          const priority=c=>c.g+(snapshot.algorithm==='aStar'?c.h:0);
-          candidates.sort((a,b)=>priority(a)-priority(b)||a.nodeID.localeCompare(b.nodeID));
-          console.log(`Test partner predicts ${candidates[0].nodeID} from public costs.`);
-          await send('submit',candidates[0].nodeID);
+          const prediction=predictDuel(snapshot.algorithm,round);
+          console.log(`Test partner predicts ${prediction} from the public graph and state.`);
+          await send('submit',prediction);
         }
         if(snapshot.phase==='reveal'&&!me.hasContinued&&opponent.hasContinued)await send('advance');
       }

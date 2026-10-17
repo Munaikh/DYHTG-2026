@@ -52,13 +52,13 @@ struct DuelRoundView: View {
             VStack(spacing: 16) {
                 if round.previousScenario != nil {
                     Picker("Network", selection: $showsBefore) {
-                        Text("Before closure").tag(true)
-                        Text("After closure").tag(false)
+                        Text("Before twist").tag(true)
+                        Text("After twist").tag(false)
                     }
                     .pickerStyle(.segmented)
                 }
                 HStack {
-                    Label(showsBefore ? "Original network" : "Choose the next node", systemImage: showsBefore ? "clock.arrow.circlepath" : "hand.tap")
+                    Label(showsBefore ? "Original network" : (round.questionKind?.title ?? "Choose the next node"), systemImage: showsBefore ? "clock.arrow.circlepath" : "hand.tap")
                         .font(.caption.weight(.semibold)).foregroundStyle(.secondary)
                     Spacer()
                     Button(showTable ? "Graph" : "Table", systemImage: showTable ? "point.3.connected.trianglepath.dotted" : "tablecells") {
@@ -75,15 +75,22 @@ struct DuelRoundView: View {
                                     selectable: canSelect ? round.choices : [], selection: selection,
                                     onSelect: { selection = $0 })
                 }
-                Text(snapshot.algorithm == .aStar ? "g: cost so far · h: estimate ahead · f = g + h" : "g: cheapest known cost from the start")
+                Text(snapshot.algorithm.rule)
                     .font(.caption).foregroundStyle(.secondary)
                     .frame(maxWidth: .infinity, alignment: .leading)
-                Text("If priorities tie, choose the earlier letter.")
+                Text(snapshot.algorithm.tieRule)
                     .font(.caption).foregroundStyle(.secondary)
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
             .arenaCard()
 
+            if let focus = round.focusNodeID {
+                Text("Focus node: \(focus.rawValue)").font(.caption.weight(.semibold))
+            }
+            if !round.presentedState.settled.isEmpty {
+                Text("Visited in order: " + round.presentedState.settled.map(\.rawValue).joined(separator: " → "))
+                    .font(.caption.monospaced()).foregroundStyle(.secondary)
+            }
             if store.viewer?.submitted == true {
                 VStack(spacing: 10) {
                     Label("Prediction locked", systemImage: "lock.fill").font(.headline)
@@ -140,15 +147,15 @@ struct DuelRoundView: View {
             let initial = SearchState(frontier: [previous.source], settled: [], costs: previous.nodes.map {
                 NodeCost(nodeID: $0.id, g: $0.id == previous.source ? 0 : nil, h: $0.heuristic, predecessor: nil)
             })
-            return SearchPresentation(scenario: previous, algorithm: snapshot.algorithm, state: initial)
+            return SearchPresentation(scenario: previous, studyAlgorithm: snapshot.algorithm, state: initial)
         }
-        return SearchPresentation(scenario: round.scenario, algorithm: snapshot.algorithm, state: round.presentedState)
+        return SearchPresentation(scenario: round.scenario, studyAlgorithm: snapshot.algorithm, state: round.presentedState)
     }
 
     private func revealContent(_ reveal: DuelReveal) -> some View {
         VStack(alignment: .leading, spacing: 18) {
             VStack(alignment: .leading, spacing: 16) {
-                Label("The next move: \(presentation.label(reveal.correctNodeID))", systemImage: "sparkles")
+                Label("Correct choice: \(presentation.label(reveal.correctNodeID))", systemImage: "sparkles")
                     .font(.title2.bold())
                 ForEach(reveal.answers) { answer in
                     HStack {

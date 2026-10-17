@@ -126,7 +126,9 @@ private func duel(
   let corpus = try ContractJSON.decoder().decode(
     Corpus.self, from: Data(contentsOf: URL(fileURLWithPath: path)))
   let finished = corpus.snapshots.filter { $0.phase == .finished }
-  #expect(Set(finished.map(\.algorithm)) == Set(AlgorithmKind.allCases))
+  let expected: Set<StudyAlgorithm> = corpus.snapshots.contains { $0.currentRound?.questionID != nil }
+    ? Set(StudyAlgorithm.allCases) : [.dijkstra, .aStar]
+  #expect(Set(finished.map(\.algorithm)) == expected)
   #expect(Set(finished.map(\.viewerID)).count >= 2)
 
   // The hosted fixture deliberately interleaves both players' server views.

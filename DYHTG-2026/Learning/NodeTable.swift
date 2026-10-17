@@ -10,7 +10,7 @@ struct NodeTable: View {
         Grid(alignment: .leading, horizontalSpacing: 14, verticalSpacing: 10) {
             GridRow {
                 Text("Node")
-                Text("g")
+                Text(presentation.indoorCostDisplay == nil ? "g" : "Value")
                 if showsEstimate {
                     Text("h")
                     Text("f")
@@ -28,7 +28,7 @@ struct NodeTable: View {
                 GridRow {
                     Text(node.label)
                         .fontWeight(.semibold)
-                    Text(node.g.map(String.init) ?? "∞")
+                    Text(presentation.indoorCostDisplay == nil ? node.g.map(String.init) ?? "∞" : presentation.costText(node))
                     if showsEstimate {
                         Text(node.h, format: .number)
                         Text(node.f.map(String.init) ?? "-")
@@ -49,7 +49,7 @@ struct NodeTable: View {
 
     private func accessibilityValue(_ node: NodeSummary) -> String {
         var parts = [node.state.title]
-        parts.append(node.g.map { "g \($0)" } ?? "g unknown")
+        parts.append(presentation.indoorCostDisplay == nil ? node.g.map { "g \($0)" } ?? "g unknown" : presentation.costText(node))
         if showsEstimate {
             parts.append("h \(node.h)")
             if let f = node.f { parts.append("f \(f)") }
