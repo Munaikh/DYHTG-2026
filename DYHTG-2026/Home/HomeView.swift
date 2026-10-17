@@ -3,6 +3,7 @@ import SwiftUI
 
 struct HomeView: View {
     let store: MatchStore
+    let battles: BattleStore
 
     @AppStorage("nickname") private var nickname = ""
     @State private var isJoining = false
@@ -37,6 +38,18 @@ struct HomeView: View {
                     Text("2-20 characters. Shown to the other player.")
                 }
 
+                Section("Explore More") {
+                    NavigationLink { BattlesView(store: battles) } label: {
+                        Label("Challenge a Friend", systemImage: "person.2.fill")
+                    }
+                    NavigationLink { PathfinderView(battles: battles) } label: {
+                        Label("Explore Pathfinder", systemImage: "map")
+                    }
+                    NavigationLink { ProfileView(store: battles) } label: {
+                        Label("Profile", systemImage: "person.crop.circle")
+                    }
+                }
+
                 Section {
                 } footer: {
                     Text("Pick Dijkstra or A*, then walk from the James McCune Smith Learning Hub to the Library. At each of three checkpoints, predict what the algorithm does next. Reasoning scores points; walking speed doesn't. Practice Solo pairs you with a simulated player.")
@@ -47,6 +60,7 @@ struct HomeView: View {
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Menu {
+                        NavigationLink { SettingsView() } label: { Label("Settings", systemImage: "gearshape") }
                         Button("Organiser Tools", systemImage: "person.badge.key") { isShowingOrganiserTools = true }
                     } label: {
                         Label("More", systemImage: "ellipsis")
@@ -104,5 +118,5 @@ struct HomeView: View {
 }
 
 #Preview {
-    HomeView(store: .preview())
+    HomeView(store: .preview(), battles: BattleStore())
 }

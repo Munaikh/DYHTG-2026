@@ -36,7 +36,7 @@ enable_signup = true
 enable_anonymous_sign_ins = true
 minimum_password_length = 8
 [auth.email]
-enable_signup = false
+enable_signup = true
 [auth.sms]
 enable_signup = false
 [auth.rate_limit]
