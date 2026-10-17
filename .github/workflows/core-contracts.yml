@@ -5,12 +5,14 @@ on:
     paths:
       - 'Packages/AlgorithmArenaCore/**'
       - 'contracts/**'
+      - 'scripts/verify_search_fixtures.py'
       - '.github/workflows/core-contracts.yml'
   push:
     branches: [main]
     paths:
       - 'Packages/AlgorithmArenaCore/**'
       - 'contracts/**'
+      - 'scripts/verify_search_fixtures.py'
       - '.github/workflows/core-contracts.yml'
 
 permissions:
@@ -25,3 +27,5 @@ jobs:
         run: swift --version
       - name: Test core, mock service, and checked-in JSON fixtures
         run: swift test --package-path Packages/AlgorithmArenaCore
+      - name: Verify cross-language search and course fixtures
+        run: python3 scripts/verify_search_fixtures.py

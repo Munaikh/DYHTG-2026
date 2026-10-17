@@ -7,8 +7,9 @@ The checked-in JSON under [`v1`](v1) is generated from the separate
 SwiftUI, Supabase, or third-party dependencies.
 
 **Status: implemented for review. Both developers must review this boundary before
-dependent integrations lock it.** This change does not wire the package into the
-Xcode project, implement the search engine, or implement server authority.
+dependent integrations lock it.** The search engine and dynamic campus graph
+builder are now implemented for #4; see [the routing API](../docs/SEARCH.md).
+Xcode integration and server authority remain separate work.
 
 ## Wire format and compatibility
 
@@ -62,9 +63,13 @@ walking graph and do not derive their source, goal, or state from a player's bra
 
 **This course is synthetic and is not for outdoor navigation.** Its coordinates
 are near (0, 0), its 500/575 m costs are illustrative, and the polylines are not
-surveyed measurements. Issue #4 must replace these with verified pedestrian
-geometry and validate measured costs, accessibility, and safe stopping areas.
-Do not promote a fixture to `surveyed` merely to enable the app.
+surveyed measurements. It remains unchanged for existing mock consumers. The
+additive [`courses/gilmorehill-jms-library`](v1/courses/gilmorehill-jms-library)
+directory contains a versioned `awaitingSurvey` candidate, pedestrian network,
+per-goal heuristics, dynamic selection graphs, routes and traces. Its coordinates
+and polylines are desktop estimates; the [survey record](../docs/COURSE_SURVEY.md)
+lists the outstanding checks. Do not promote a candidate to `surveyed` merely to
+enable the app. Live adapters must call `requireOutdoorReadiness()`.
 
 Arrival uses an explicit action. Suggested fixture thresholds are radius 25 m,
 maximum age 10 seconds, and maximum horizontal accuracy 20 m. They are course
@@ -84,13 +89,34 @@ equal-cost alternatives preserve the predecessor. `relax` records the previous
 cost, candidate cost, and whether the candidate was accepted. The final route is
 separate from the explored nodes. `unreachable` represents no final route.
 
-The hand-authored traces exercise a cheaper replacement and an explored branch
-that is absent from the final route. They are examples, not the engine or its
-complete correctness suite (#4). Practice and transfer questions are synthetic
+The original hand-authored traces exercise a cheaper replacement and an explored
+branch absent from the final route. Engine tests check those examples independently.
+New [`search`](v1/search) fixtures cover relaxation, ties, zero-cost cycles,
+parallel edges, unreachable goals, differing optimal routes and identical endpoints.
+Engine cost arrays are node-ID ordered; settled arrays retain expansion order.
+`relax` includes rejected equal-cost and already-settled neighbour attempts.
+Costs, heuristics and computed priorities must fit `0...9007199254740991` for exact
+server integers; invalid graphs, invalid A* heuristics and arithmetic overflow throw.
+Practice and transfer questions are synthetic
 content; the production learning bank and explanations are delivered in #5.
 Each question slot has a distinct graph so an earlier released replay cannot
 disclose a later scored question. Both players still get the same shared-checkpoint
 scenario, irrespective of branch.
+
+`CampusPathNetwork` contains paths and explicit junction connectivity, independent
+of game stops. Each selection generates an immutable `CampusRoutingGraph` with
+the snapped points, split edges, per-goal integer heuristics, and `GraphScenario`.
+Its scenario ID includes the network version and selected path/coordinate bits;
+changing selections changes the graph identity. Only declared junctions connect
+paths; visual crossings alone do not. Snapping distances are explicit, and the
+default maximum is 25 m. Routes start/end at snapped walking points without
+inventing connectors across buildings or gardens. See `courses/.../requests/`
+for two generated examples; these exports contain no scored challenge keys.
+
+`python3 scripts/verify_search_fixtures.py` independently reproduces all 22 new
+golden traces, validates every per-goal heuristic against exact shortest distances,
+and checks measured costs and dynamic route geometry. It runs in CI alongside
+the Swift tests. Both languages consume the published integer h values.
 
 ## Privacy and feedback
 

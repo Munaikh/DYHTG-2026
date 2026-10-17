@@ -1,0 +1,331 @@
+{
+  "edges" : [
+    {
+      "bidirectional" : true,
+      "costMetres" : 104,
+      "from" : "junction:06-fraser",
+      "id" : "path:fraser-library:0",
+      "polyline" : [
+        {
+          "latitude" : 55.87312,
+          "longitude" : -4.28955
+        },
+        {
+          "latitude" : 55.87312,
+          "longitude" : -4.28875
+        },
+        {
+          "latitude" : 55.8736,
+          "longitude" : -4.28875
+        }
+      ],
+      "to" : "junction:07-library"
+    },
+    {
+      "bidirectional" : true,
+      "costMetres" : 313,
+      "from" : "junction:02-lilybank-gardens",
+      "id" : "path:gardens-hetherington:0",
+      "polyline" : [
+        {
+          "latitude" : 55.87425,
+          "longitude" : -4.29275
+        },
+        {
+          "latitude" : 55.875,
+          "longitude" : -4.2926
+        },
+        {
+          "latitude" : 55.875,
+          "longitude" : -4.29045
+        },
+        {
+          "latitude" : 55.87415,
+          "longitude" : -4.29045
+        }
+      ],
+      "to" : "junction:04-hetherington"
+    },
+    {
+      "bidirectional" : true,
+      "costMetres" : 118,
+      "from" : "junction:02-lilybank-gardens",
+      "id" : "path:gardens-house:0",
+      "polyline" : [
+        {
+          "latitude" : 55.87425,
+          "longitude" : -4.29275
+        },
+        {
+          "latitude" : 55.87465,
+          "longitude" : -4.2926
+        },
+        {
+          "latitude" : 55.87468,
+          "longitude" : -4.29145
+        }
+      ],
+      "to" : "junction:03-lilybank-house"
+    },
+    {
+      "bidirectional" : true,
+      "costMetres" : 48,
+      "from" : "junction:04-hetherington",
+      "id" : "path:hetherington-rejoin:0",
+      "polyline" : [
+        {
+          "latitude" : 55.87415,
+          "longitude" : -4.29045
+        },
+        {
+          "latitude" : 55.87375,
+          "longitude" : -4.2902
+        }
+      ],
+      "to" : "junction:05-rejoin"
+    },
+    {
+      "bidirectional" : true,
+      "costMetres" : 151,
+      "from" : "junction:03-lilybank-house",
+      "id" : "path:house-rejoin:0",
+      "polyline" : [
+        {
+          "latitude" : 55.87468,
+          "longitude" : -4.29145
+        },
+        {
+          "latitude" : 55.8747,
+          "longitude" : -4.2909
+        },
+        {
+          "latitude" : 55.87415,
+          "longitude" : -4.29065
+        },
+        {
+          "latitude" : 55.87375,
+          "longitude" : -4.2902
+        }
+      ],
+      "to" : "junction:05-rejoin"
+    },
+    {
+      "bidirectional" : true,
+      "costMetres" : 21,
+      "from" : "junction:01-jms",
+      "id" : "path:jms-gardens:0",
+      "polyline" : [
+        {
+          "latitude" : 55.87312,
+          "longitude" : -4.2937
+        },
+        {
+          "latitude" : 55.873300129128566,
+          "longitude" : -4.293672707707793
+        }
+      ],
+      "to" : "selection:goal"
+    },
+    {
+      "bidirectional" : true,
+      "costMetres" : 58,
+      "from" : "selection:goal",
+      "id" : "path:jms-gardens:1",
+      "polyline" : [
+        {
+          "latitude" : 55.873300129128566,
+          "longitude" : -4.293672707707793
+        },
+        {
+          "latitude" : 55.87345,
+          "longitude" : -4.29365
+        },
+        {
+          "latitude" : 55.8738,
+          "longitude" : -4.293439999999999
+        }
+      ],
+      "to" : "selection:source"
+    },
+    {
+      "bidirectional" : true,
+      "costMetres" : 68,
+      "from" : "selection:source",
+      "id" : "path:jms-gardens:2",
+      "polyline" : [
+        {
+          "latitude" : 55.8738,
+          "longitude" : -4.293439999999999
+        },
+        {
+          "latitude" : 55.87395,
+          "longitude" : -4.29335
+        },
+        {
+          "latitude" : 55.87425,
+          "longitude" : -4.29275
+        }
+      ],
+      "to" : "junction:02-lilybank-gardens"
+    },
+    {
+      "bidirectional" : true,
+      "costMetres" : 88,
+      "from" : "junction:05-rejoin",
+      "id" : "path:rejoin-fraser:0",
+      "polyline" : [
+        {
+          "latitude" : 55.87375,
+          "longitude" : -4.2902
+        },
+        {
+          "latitude" : 55.87335,
+          "longitude" : -4.2901
+        },
+        {
+          "latitude" : 55.87312,
+          "longitude" : -4.28955
+        }
+      ],
+      "to" : "junction:06-fraser"
+    }
+  ],
+  "goal" : {
+    "coordinate" : {
+      "latitude" : 55.873300129128566,
+      "longitude" : -4.293672707707793
+    },
+    "distanceToPathMetres" : 0.16952463746005886,
+    "nodeID" : "selection:goal",
+    "pathID" : "jms-gardens",
+    "requested" : {
+      "latitude" : 55.8733,
+      "longitude" : -4.29367
+    }
+  },
+  "network" : {
+    "id" : "gilmorehill-jms-library",
+    "version" : "candidate-2026-10-17-1"
+  },
+  "scenario" : {
+    "edges" : [
+      {
+        "bidirectional" : true,
+        "cost" : 104,
+        "from" : "junction:06-fraser",
+        "to" : "junction:07-library"
+      },
+      {
+        "bidirectional" : true,
+        "cost" : 313,
+        "from" : "junction:02-lilybank-gardens",
+        "to" : "junction:04-hetherington"
+      },
+      {
+        "bidirectional" : true,
+        "cost" : 118,
+        "from" : "junction:02-lilybank-gardens",
+        "to" : "junction:03-lilybank-house"
+      },
+      {
+        "bidirectional" : true,
+        "cost" : 48,
+        "from" : "junction:04-hetherington",
+        "to" : "junction:05-rejoin"
+      },
+      {
+        "bidirectional" : true,
+        "cost" : 151,
+        "from" : "junction:03-lilybank-house",
+        "to" : "junction:05-rejoin"
+      },
+      {
+        "bidirectional" : true,
+        "cost" : 21,
+        "from" : "junction:01-jms",
+        "to" : "selection:goal"
+      },
+      {
+        "bidirectional" : true,
+        "cost" : 58,
+        "from" : "selection:goal",
+        "to" : "selection:source"
+      },
+      {
+        "bidirectional" : true,
+        "cost" : 68,
+        "from" : "selection:source",
+        "to" : "junction:02-lilybank-gardens"
+      },
+      {
+        "bidirectional" : true,
+        "cost" : 88,
+        "from" : "junction:05-rejoin",
+        "to" : "junction:06-fraser"
+      }
+    ],
+    "goal" : "selection:goal",
+    "id" : "23:gilmorehill-jms-library:22:candidate-2026-10-17-1:11:jms-gardens:16:404befd8adab9f56:16:c0112c7b890d5a5a:11:jms-gardens:16:404befc84c731992:16:c0112cb889cd54b9",
+    "nodes" : [
+      {
+        "heuristic" : 20,
+        "id" : "junction:01-jms",
+        "label" : "junction:01-jms"
+      },
+      {
+        "heuristic" : 120,
+        "id" : "junction:02-lilybank-gardens",
+        "label" : "junction:02-lilybank-gardens"
+      },
+      {
+        "heuristic" : 206,
+        "id" : "junction:03-lilybank-house",
+        "label" : "junction:03-lilybank-house"
+      },
+      {
+        "heuristic" : 222,
+        "id" : "junction:04-hetherington",
+        "label" : "junction:04-hetherington"
+      },
+      {
+        "heuristic" : 222,
+        "id" : "junction:05-rejoin",
+        "label" : "junction:05-rejoin"
+      },
+      {
+        "heuristic" : 257,
+        "id" : "junction:06-fraser",
+        "label" : "junction:06-fraser"
+      },
+      {
+        "heuristic" : 308,
+        "id" : "junction:07-library",
+        "label" : "junction:07-library"
+      },
+      {
+        "heuristic" : 0,
+        "id" : "selection:goal",
+        "label" : "Selected goal"
+      },
+      {
+        "heuristic" : 57,
+        "id" : "selection:source",
+        "label" : "Selected start"
+      }
+    ],
+    "source" : "selection:source"
+  },
+  "source" : {
+    "coordinate" : {
+      "latitude" : 55.8738,
+      "longitude" : -4.293439999999999
+    },
+    "distanceToPathMetres" : 1.1081339533130704e-10,
+    "nodeID" : "selection:source",
+    "pathID" : "jms-gardens",
+    "requested" : {
+      "latitude" : 55.8738,
+      "longitude" : -4.29344
+    }
+  }
+}

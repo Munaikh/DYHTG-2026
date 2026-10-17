@@ -1,0 +1,298 @@
+{
+  "algorithm" : "dijkstra",
+  "outcome" : {
+    "route" : {
+      "cost" : 2,
+      "nodeIDs" : [
+        "S",
+        "A",
+        "G"
+      ]
+    }
+  },
+  "scenarioID" : "fixture-search-parallel-v1",
+  "steps" : [
+    {
+      "event" : {
+        "initial" : {
+
+        }
+      },
+      "index" : 0,
+      "state" : {
+        "costs" : [
+          {
+            "h" : 1,
+            "nodeID" : "A"
+          },
+          {
+            "h" : 0,
+            "nodeID" : "G"
+          },
+          {
+            "g" : 0,
+            "h" : 2,
+            "nodeID" : "S"
+          }
+        ],
+        "frontier" : [
+          "S"
+        ],
+        "settled" : [
+
+        ]
+      }
+    },
+    {
+      "event" : {
+        "expand" : {
+          "nodeID" : "S"
+        }
+      },
+      "index" : 1,
+      "state" : {
+        "costs" : [
+          {
+            "h" : 1,
+            "nodeID" : "A"
+          },
+          {
+            "h" : 0,
+            "nodeID" : "G"
+          },
+          {
+            "g" : 0,
+            "h" : 2,
+            "nodeID" : "S"
+          }
+        ],
+        "frontier" : [
+
+        ],
+        "settled" : [
+          "S"
+        ]
+      }
+    },
+    {
+      "event" : {
+        "relax" : {
+          "accepted" : true,
+          "candidateCost" : 1,
+          "from" : "S",
+          "to" : "A"
+        }
+      },
+      "index" : 2,
+      "state" : {
+        "costs" : [
+          {
+            "g" : 1,
+            "h" : 1,
+            "nodeID" : "A",
+            "predecessor" : "S"
+          },
+          {
+            "h" : 0,
+            "nodeID" : "G"
+          },
+          {
+            "g" : 0,
+            "h" : 2,
+            "nodeID" : "S"
+          }
+        ],
+        "frontier" : [
+          "A"
+        ],
+        "settled" : [
+          "S"
+        ]
+      }
+    },
+    {
+      "event" : {
+        "relax" : {
+          "accepted" : false,
+          "candidateCost" : 5,
+          "from" : "S",
+          "previousCost" : 1,
+          "to" : "A"
+        }
+      },
+      "index" : 3,
+      "state" : {
+        "costs" : [
+          {
+            "g" : 1,
+            "h" : 1,
+            "nodeID" : "A",
+            "predecessor" : "S"
+          },
+          {
+            "h" : 0,
+            "nodeID" : "G"
+          },
+          {
+            "g" : 0,
+            "h" : 2,
+            "nodeID" : "S"
+          }
+        ],
+        "frontier" : [
+          "A"
+        ],
+        "settled" : [
+          "S"
+        ]
+      }
+    },
+    {
+      "event" : {
+        "expand" : {
+          "nodeID" : "A"
+        }
+      },
+      "index" : 4,
+      "state" : {
+        "costs" : [
+          {
+            "g" : 1,
+            "h" : 1,
+            "nodeID" : "A",
+            "predecessor" : "S"
+          },
+          {
+            "h" : 0,
+            "nodeID" : "G"
+          },
+          {
+            "g" : 0,
+            "h" : 2,
+            "nodeID" : "S"
+          }
+        ],
+        "frontier" : [
+
+        ],
+        "settled" : [
+          "S",
+          "A"
+        ]
+      }
+    },
+    {
+      "event" : {
+        "relax" : {
+          "accepted" : true,
+          "candidateCost" : 2,
+          "from" : "A",
+          "to" : "G"
+        }
+      },
+      "index" : 5,
+      "state" : {
+        "costs" : [
+          {
+            "g" : 1,
+            "h" : 1,
+            "nodeID" : "A",
+            "predecessor" : "S"
+          },
+          {
+            "g" : 2,
+            "h" : 0,
+            "nodeID" : "G",
+            "predecessor" : "A"
+          },
+          {
+            "g" : 0,
+            "h" : 2,
+            "nodeID" : "S"
+          }
+        ],
+        "frontier" : [
+          "G"
+        ],
+        "settled" : [
+          "S",
+          "A"
+        ]
+      }
+    },
+    {
+      "event" : {
+        "expand" : {
+          "nodeID" : "G"
+        }
+      },
+      "index" : 6,
+      "state" : {
+        "costs" : [
+          {
+            "g" : 1,
+            "h" : 1,
+            "nodeID" : "A",
+            "predecessor" : "S"
+          },
+          {
+            "g" : 2,
+            "h" : 0,
+            "nodeID" : "G",
+            "predecessor" : "A"
+          },
+          {
+            "g" : 0,
+            "h" : 2,
+            "nodeID" : "S"
+          }
+        ],
+        "frontier" : [
+
+        ],
+        "settled" : [
+          "S",
+          "A",
+          "G"
+        ]
+      }
+    },
+    {
+      "event" : {
+        "reachedGoal" : {
+          "nodeID" : "G"
+        }
+      },
+      "index" : 7,
+      "state" : {
+        "costs" : [
+          {
+            "g" : 1,
+            "h" : 1,
+            "nodeID" : "A",
+            "predecessor" : "S"
+          },
+          {
+            "g" : 2,
+            "h" : 0,
+            "nodeID" : "G",
+            "predecessor" : "A"
+          },
+          {
+            "g" : 0,
+            "h" : 2,
+            "nodeID" : "S"
+          }
+        ],
+        "frontier" : [
+
+        ],
+        "settled" : [
+          "S",
+          "A",
+          "G"
+        ]
+      }
+    }
+  ]
+}

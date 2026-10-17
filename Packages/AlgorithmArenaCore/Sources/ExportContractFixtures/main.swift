@@ -12,7 +12,7 @@ for path in documents.keys.sorted() {
     at: url.deletingLastPathComponent(), withIntermediateDirectories: true)
   try documents[path]!.write(to: url, options: .atomic)
 }
-print("Exported \(documents.count) synthetic contract fixtures to \(root.path)")
+print("Exported \(documents.count) development contract fixtures to \(root.path)")
 
 enum ExportError: Error {
   case usage  // Usage: swift run export-contract-fixtures <output-directory>
