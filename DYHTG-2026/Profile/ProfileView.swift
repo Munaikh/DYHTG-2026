@@ -17,11 +17,12 @@ private struct PlayerAvatar: View {
     let symbol: String
     let color: Color
     var size: CGFloat = 40
+    var foreground: Color = ArenaPalette.ink
 
     var body: some View {
         Image(systemName: symbol)
             .font(.system(size: size * 0.44, weight: .semibold))
-            .foregroundStyle(ArenaPalette.ink)
+            .foregroundStyle(foreground)
             .frame(width: size, height: size)
             .background(color, in: Circle())
     }
@@ -57,6 +58,7 @@ struct ProfileView: View {
     @State private var showingWelcome = false
     @FocusState private var nameFocused: Bool
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.colorScheme) private var colorScheme
 
     private let avatars: [(symbol: String, name: String)] = [
         ("person.crop.circle.fill", "Player"), ("bolt.fill", "Bolt"),
@@ -190,11 +192,17 @@ struct ProfileView: View {
             ArenaEyebrow(text: "Pick your player")
             LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 4), spacing: 14) {
                 ForEach(avatars, id: \.symbol) { item in
+                    let selected = draftAvatar == item.symbol
                     Button {
                         nameFocused = false
                         draftAvatar = item.symbol
                     } label: {
-                        PlayerAvatar(symbol: item.symbol, color: draftAvatar == item.symbol ? draftTint.color : ArenaPalette.canvas, size: 52)
+                        PlayerAvatar(
+                            symbol: item.symbol,
+                            color: selected ? draftTint.color : ArenaPalette.canvas,
+                            size: 52,
+                            foreground: !selected && colorScheme == .dark ? .white : ArenaPalette.ink
+                        )
                             .padding(4)
                             .overlay(Circle().strokeBorder(draftAvatar == item.symbol ? ArenaPalette.teal : .clear, lineWidth: 2))
                             .frame(maxWidth: .infinity)
