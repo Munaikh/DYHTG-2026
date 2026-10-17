@@ -1,10 +1,10 @@
-name: Supabase lobby
+name: Supabase match
 on:
   pull_request:
-    paths: ['supabase/**', 'scripts/test_supabase_lobby.mjs', '.github/workflows/supabase-lobby.yml']
+    paths: ['supabase/**', 'scripts/test_supabase_lobby.mjs', 'scripts/test_supabase_match.mjs', '.github/workflows/supabase-lobby.yml']
   push:
     branches: [main]
-    paths: ['supabase/**', 'scripts/test_supabase_lobby.mjs', '.github/workflows/supabase-lobby.yml']
+    paths: ['supabase/**', 'scripts/test_supabase_lobby.mjs', 'scripts/test_supabase_match.mjs', '.github/workflows/supabase-lobby.yml']
 permissions:
   contents: read
 jobs:
@@ -25,6 +25,8 @@ jobs:
         run: supabase test db
       - name: Test Auth, room concurrency, retries, snapshots and Realtime
         run: node scripts/test_supabase_lobby.mjs
+      - name: Smoke test authoritative match and scoring
+        run: node scripts/test_supabase_match.mjs
       - name: Check database security advisors
         run: supabase db advisors --local --type security --level warn --fail-on warn
       - name: Stop local services

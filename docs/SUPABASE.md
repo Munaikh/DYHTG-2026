@@ -1,9 +1,9 @@
-# Supabase lobby and player sessions (#6)
+# Supabase rooms, match rules and scoring (#6, #7)
 
 This backend implements contract v1 without changing the Foundation package or
 adding dependencies to the iOS target. The native `MatchService` adapter and Xcode
-configuration belong to owaini0. Match rules, arrival validation, actual start,
-departure, private answers and scoring belong to #7.
+configuration belong to owaini0. The backend now implements match rules, verified
+arrivals, departure, private answers and scoring.
 
 ## Project and configuration
 
@@ -22,6 +22,7 @@ Ports 56320–56322 keep this stack separate from other local Supabase projects.
 supabase start -x storage-api,imgproxy,mailpit,postgres-meta,studio,edge-runtime,logflare,vector,supavisor
 supabase test db
 node scripts/test_supabase_lobby.mjs
+node scripts/test_supabase_match.mjs
 supabase db advisors --local --type security --level warn --fail-on warn
 ```
 
@@ -115,10 +116,8 @@ transport 401/permission failures to authentication recovery, not command retrie
 - `confirmAlgorithm`: member and lobby only; must match the current selection.
 - `setReady`: member and lobby only; `true` requires that player's confirmation.
 - `start`: creator only; requires two confirmed/ready players and server-verified
-  shared-start arrivals. No client can write the arrival field. Until #7 wires
-  verified arrivals and the transition, it cannot start a match and returns
-  `arrivalRequired` (or `serviceUnavailable` if trusted test data has both arrivals).
-- Other game commands fail explicitly until #7 implements their authority checks.
+  shared-start arrivals. No client can write the arrival field. Starts both players
+  in the unscored opening prediction. Missing arrivals return `arrivalRequired`.
 
 Each match command checks membership, exact course and expected revision under the
 room lock. Every accepted state-changing lobby command increments the revision.
@@ -139,9 +138,10 @@ The lobby snapshot has no challenges, submissions, rewards or verified arrivals
 until the server validates them. `connection: online` is a lobby projection
 placeholder, not an authoritative network-presence signal. The adapter tracks
 its own disconnected/reconnecting state; loss of connectivity never calls `leave`.
-#7 must extend the snapshot projection with real match state and gated feedback.
+Match snapshots project each player's actual stage, released score, pending reward
+maximum and remaining points, plus viewer-only questions, submissions and feedback.
 
-## Database boundary and #7 handoff
+## Database boundary
 
 `private.arena_courses`, `arena_rooms`, `arena_players` and
 `arena_command_receipts` have RLS and no client table privileges. Only the
@@ -159,14 +159,16 @@ parameters or raw table write grants to extend this API.
 
 Only `arena_invalidations` is added to `supabase_realtime`. Clients refetch an
 authorised snapshot; no full room, receipt, answer, raw GPS, feedback or reward is
-replicated. Keep #7 submissions, answer keys, organiser proofs and unreleased
-feedback in non-exposed, non-published storage. Reuse the existing transaction,
-revision and receipt boundary when adding match transitions and the reward ledger.
+replicated. Submissions, answer keys, organiser proofs and rewards stay in the
+private schema. Match transitions reuse the lobby transaction, revision and
+receipt boundary. Submissions and the reward ledger reject UPDATE/DELETE.
 
 The only registered course is the versioned Gilmorehill survey candidate. It is
-marked `surveyed=false`; lobby creation is allowed, but this migration supplies
-no trusted GPS validation or outdoor readiness claim. #7 must enforce course
-readiness, exact start-node verification and all match prerequisites server-side.
+marked `surveyed=false`; lobby creation and organiser-approved demos are allowed.
+GPS arrivals require a surveyed course. The server checks the frozen coordinates,
+25 m radius, maximum 10-second fix age (future fixes fail), and accuracy from
+0 through 20 m. Invalid fixes return the contract error; the unsurveyed candidate
+returns `serviceUnavailable` for an otherwise valid GPS arrival.
 
 The hosted security scan reports the expected anonymous-access policy: anonymous
 Auth users are the product's players, and `arena_member_invalidations` additionally
@@ -178,7 +180,7 @@ flow unused by this anonymous-only app with email/SMS signup disabled; see
 The follow-up migration removes client execution grants from the default hosted
 `rls_auto_enable` helper where present, without changing its event-trigger role.
 
-## Verified deployment (17 October 2026)
+## Lobby foundation verification (17 October 2026)
 
 - Both migrations are applied in `gftmvsmamkpvqrvbhoze`; their checked-in versions
   match the hosted migration history.
@@ -199,3 +201,67 @@ acceptance remain separate from these backend results.
 - [Database functions and privileges](https://supabase.com/docs/guides/database/functions)
 - [Postgres Changes and RLS](https://supabase.com/docs/guides/realtime/postgres-changes)
 - [Explicit Data API grants](https://supabase.com/changelog/45329-breaking-change-tables-not-exposed-to-data-and-graphql-api-automatically)
+
+## Authoritative match commands (#7)
+
+Migration `20261017173114_authoritative_match_rules` is deployed to the dedicated
+`DYHTG-Hackathon` project. The hosted database has all 12 private challenge
+documents, no client grants on private tables, and only match-ID/revision
+invalidations in Realtime. The hosted security scan reports only the expected
+anonymous-player membership policy and intentional private-table default denial.
+
+Use the existing `arena_command` and contract-v1 `MatchAction` payloads. Every
+mutation checks identity, membership, course version, expected revision, phase
+and the viewer's progression, under the room lock.
+
+- `confirmArrival`: verifies the start in the lobby or the current walking target.
+  Arrival opens only the chosen checkpoint's question.
+- `start`: creator only; two ready, confirmed players with verified start arrivals.
+- `submitAnswer`: one immutable first answer per question. Uses the exact
+  Swift-exported server documents in `content/learning/v1/server`; clients send
+  an answer, never correctness or points. Wrong answers award zero and progress.
+- `chooseRoute`: after checkpoint one, locks standard or bonus. The middle
+  question appears only after locking AND arrival. Each route has three stops.
+- `finish`: verifies the finish after all three chosen checkpoint submissions;
+  adds 20 once. `confirmArrival` at the finish uses the same rules.
+- `leave`: records an incomplete result. Disconnect/background does not send it.
+
+Shared first/third questions release correctness, points, explanation, replay
+and both answers together only after both submissions. Until then, snapshots
+show pending feedback and the question's maximum possible reward, including for
+a wrong answer. A first submitter may immediately continue walking. Other
+feedback is immediate and self-only.
+
+The ledger yields maxima of 80 standard / 100 bonus. Practice and the final
+understanding check award zero. A finished player gets the understanding check
+immediately while waiting; its first node/reason answers are recorded separately.
+The room returns winner/draw only after both finish. Public state is identical
+for both viewers; pending shared awards remain hidden even on departure.
+Navigation contains only the next leg's authored edges, including the branch rejoin.
+
+### Organiser-approved demo arrivals
+
+An administrator provisions an organiser by setting trusted Auth `app_metadata`
+`arenaOrganiser: true`. This capability is read from `auth.users`, so revoking it
+takes effect immediately. User metadata and room creation grant no such access.
+The organiser calls:
+
+```json
+POST /rest/v1/rpc/arena_issue_arrival_approval
+{ "match_id": "<match ID>", "player_id": "<player ID>", "node_id": "<current target>" }
+```
+
+The response is `{ "approvalID": "<opaque UUID>", "expiresAt": "<UTC time>" }`.
+Pass that ID through `ArrivalEvidence.organiserApproval` in the player's command.
+Proofs expire in two minutes, bind the player/room/node, and are single use.
+Issuance allows 30/minute per organiser; accepted verifications allow 5/minute
+per player/match. Invalid tokens reveal no proof details. Both issuing and using
+a proof are recorded privately; the snapshot records `method: organiserApproval`.
+The app never receives an organiser password or privileged API key.
+
+The focused smoke test completes Dijkstra at 80/100 and an A* draw at 60/60,
+checks pending/released feedback, locked routes, duplicate deliveries, unscored
+understanding checks, restoration and departure. It provisions an organiser only
+on localhost using the local admin key in memory. Hosted development runs require
+`--remote`, client-safe environment configuration, and `ARENA_ORGANISER_TOKEN`.
+The test creates users/rooms; do not point it at a production project.
