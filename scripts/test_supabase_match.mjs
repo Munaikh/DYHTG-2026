@@ -19,8 +19,14 @@ const course = JSON.parse(readFileSync(new URL('../contracts/v1/courses/gilmoreh
 const bank = (algorithm,slot) => JSON.parse(readFileSync(new URL(`../content/learning/v1/server/${algorithm}/${slot}.json`,import.meta.url)));
 // Token-free wire corpus for the independent Swift decoder test.
 const wire = { receipts: [], snapshots: [], errors: [], reconnects: [] };
-const query = sql => JSON.parse(execFileSync('supabase', ['db', 'query', '--local', '-o', 'json', sql],
-  { encoding: 'utf8', maxBuffer: 4 * 1024 * 1024 })).rows;
+const query = sql => {
+  const result=JSON.parse(execFileSync('supabase', ['db', 'query', '--local', '-o', 'json', sql],
+    { encoding: 'utf8', maxBuffer: 4 * 1024 * 1024 }));
+  // CLI human mode returns an array; agent mode wraps it in { rows, ... }.
+  const rows=Array.isArray(result)?result:result.rows;
+  assert(Array.isArray(rows),'Supabase db query must return a JSON rows array');
+  return rows;
+};
 if (!remote) {
   const documents = query('select algorithm, slot, document from private.arena_challenges');
   assert.equal(documents.length, 12);
