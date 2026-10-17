@@ -4,6 +4,8 @@ import SwiftUI
 struct MatchPanel: View {
     @Bindable var store: MatchStore
     let location: LocationProvider
+    let paths: WalkingPaths
+    let showsDetails: Bool
     @Binding var headerHeight: CGFloat
     @Binding var modal: MatchModal?
     @Binding var reviewed: Set<ChallengeID>
@@ -25,7 +27,11 @@ struct MatchPanel: View {
                     .onGeometryChange(for: CGFloat.self) { $0.size.height } action: { height in
                         headerHeight = height
                     }
-                details(for: viewer)
+                if showsDetails {
+                    details(for: viewer)
+                } else {
+                    Spacer(minLength: 0)
+                }
             }
             .sheet(item: $modal) { modal in
                 content(for: modal)
@@ -237,7 +243,7 @@ struct MatchPanel: View {
         case .challenge(let id):
             ChallengeView(store: store, challengeID: id)
         case .routeChoice:
-            RouteChoiceSheet(course: course) { branch in
+            RouteChoiceSheet(course: course, paths: paths) { branch in
                 await store.perform(.chooseRoute(branch: branch))
             }
         case .organiser(let target):

@@ -6,6 +6,7 @@ struct CourseMapView: View {
     let course: CourseGraph
     let viewer: PlayerProgress
     let navigation: NavigationState?
+    let paths: WalkingPaths
     @Binding var position: MapCameraPosition
 
     private var stops: [NodeID] {
@@ -23,17 +24,20 @@ struct CourseMapView: View {
 
     var body: some View {
         Map(position: $position) {
-            MapPolyline(coordinates: course.coordinates(for: viewer.routeChoice ?? .standard))
-                .stroke(Color.accent.opacity(0.35), style: StrokeStyle(lineWidth: 5, lineCap: .round, lineJoin: .round))
+            MapPolyline(coordinates: paths.path(for: viewer.routeChoice ?? .standard, in: course))
+                .stroke(.white.opacity(0.8), style: StrokeStyle(lineWidth: 4, lineCap: .round, lineJoin: .round))
 
             if viewer.routeChoice == nil {
-                MapPolyline(coordinates: course.divergingCoordinates(for: .bonus))
-                    .stroke(Color.accent.opacity(0.35), style: StrokeStyle(lineWidth: 5, lineCap: .round, lineJoin: .round, dash: [2, 9]))
+                MapPolyline(coordinates: paths.bonusDetour(in: course))
+                    .stroke(.white.opacity(0.8), style: StrokeStyle(lineWidth: 4, lineCap: .round, lineJoin: .round, dash: [1, 8]))
             }
 
             if let navigation, let origin = viewer.arrivals.last?.nodeID {
-                MapPolyline(coordinates: course.coordinates(along: navigation.edgeIDs, from: origin))
-                    .stroke(Color.accent, style: StrokeStyle(lineWidth: 7, lineCap: .round, lineJoin: .round))
+                let leg = paths.path(from: origin, to: navigation.nextStop, in: course, branch: viewer.routeChoice)
+                MapPolyline(coordinates: leg)
+                    .stroke(.white, style: StrokeStyle(lineWidth: 10, lineCap: .round, lineJoin: .round))
+                MapPolyline(coordinates: leg)
+                    .stroke(Color.accent, style: StrokeStyle(lineWidth: 6, lineCap: .round, lineJoin: .round))
             }
 
             ForEach(stops, id: \.self) { stop in
@@ -44,7 +48,7 @@ struct CourseMapView: View {
 
             UserAnnotation()
         }
-        .mapStyle(.standard(elevation: .realistic, pointsOfInterest: .excludingAll))
+        .mapStyle(.hybrid(elevation: .realistic, pointsOfInterest: .excludingAll))
         .mapControls {
             MapUserLocationButton()
             MapPitchToggle()
