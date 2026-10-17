@@ -1,0 +1,579 @@
+{
+  "contractVersion" : 1,
+  "revision" : 10,
+  "room" : {
+    "algorithm" : "dijkstra",
+    "course" : {
+      "id" : "synthetic-course",
+      "version" : "fixture-1"
+    },
+    "creatorID" : "player-one",
+    "matchID" : "fixture-match",
+    "phase" : "active",
+    "players" : [
+      {
+        "algorithmConfirmed" : true,
+        "arrivals" : [
+          {
+            "method" : "location",
+            "nodeID" : "start"
+          },
+          {
+            "method" : "location",
+            "nodeID" : "first"
+          }
+        ],
+        "completedChallengeIDs" : [
+          "fixture-dijkstra-first-v1"
+        ],
+        "connection" : "online",
+        "id" : "player-one",
+        "nickname" : "Alex",
+        "pendingRewardMaximum" : 20,
+        "ready" : true,
+        "releasedScore" : 0,
+        "remainingAvailablePoints" : 60,
+        "routeChoice" : "standard",
+        "stage" : {
+          "walking" : {
+            "target" : "standard"
+          }
+        }
+      },
+      {
+        "algorithmConfirmed" : true,
+        "arrivals" : [
+          {
+            "method" : "location",
+            "nodeID" : "start"
+          },
+          {
+            "method" : "location",
+            "nodeID" : "first"
+          }
+        ],
+        "completedChallengeIDs" : [
+
+        ],
+        "connection" : "online",
+        "id" : "player-two",
+        "nickname" : "Sam",
+        "pendingRewardMaximum" : 0,
+        "ready" : true,
+        "releasedScore" : 0,
+        "remainingAvailablePoints" : 100,
+        "stage" : {
+          "challenge" : {
+            "challengeID" : "fixture-dijkstra-first-v1"
+          }
+        }
+      }
+    ],
+    "roomCode" : "ARENA1"
+  },
+  "serverTime" : "2026-10-17T12:00:00Z",
+  "viewer" : {
+    "availableChallenges" : [
+
+    ],
+    "feedback" : [
+      {
+        "released" : {
+          "feedback" : {
+            "answers" : [
+              {
+                "answer" : {
+                  "node" : {
+                    "nodeID" : "R"
+                  }
+                },
+                "awardedPoints" : 0,
+                "isCorrect" : true,
+                "playerID" : "player-one"
+              }
+            ],
+            "challengeID" : "fixture-dijkstra-practice-v1",
+            "correctAnswer" : {
+              "node" : {
+                "nodeID" : "R"
+              }
+            },
+            "explanation" : "Use the smallest tentative distance from the source, not closeness to the goal.",
+            "trace" : {
+              "algorithm" : "dijkstra",
+              "outcome" : {
+                "route" : {
+                  "cost" : 7,
+                  "nodeIDs" : [
+                    "P",
+                    "Q",
+                    "U"
+                  ]
+                }
+              },
+              "scenarioID" : "fixture-scenario-practice-v1",
+              "steps" : [
+                {
+                  "event" : {
+                    "initial" : {
+
+                    }
+                  },
+                  "index" : 0,
+                  "state" : {
+                    "costs" : [
+                      {
+                        "g" : 0,
+                        "h" : 6,
+                        "nodeID" : "P"
+                      },
+                      {
+                        "h" : 4,
+                        "nodeID" : "Q"
+                      },
+                      {
+                        "h" : 7,
+                        "nodeID" : "R"
+                      },
+                      {
+                        "h" : 0,
+                        "nodeID" : "U"
+                      }
+                    ],
+                    "frontier" : [
+                      "P"
+                    ],
+                    "settled" : [
+
+                    ]
+                  }
+                },
+                {
+                  "event" : {
+                    "expand" : {
+                      "nodeID" : "P"
+                    }
+                  },
+                  "index" : 1,
+                  "state" : {
+                    "costs" : [
+                      {
+                        "g" : 0,
+                        "h" : 6,
+                        "nodeID" : "P"
+                      },
+                      {
+                        "h" : 4,
+                        "nodeID" : "Q"
+                      },
+                      {
+                        "h" : 7,
+                        "nodeID" : "R"
+                      },
+                      {
+                        "h" : 0,
+                        "nodeID" : "U"
+                      }
+                    ],
+                    "frontier" : [
+
+                    ],
+                    "settled" : [
+                      "P"
+                    ]
+                  }
+                },
+                {
+                  "event" : {
+                    "relax" : {
+                      "accepted" : true,
+                      "candidateCost" : 3,
+                      "from" : "P",
+                      "to" : "Q"
+                    }
+                  },
+                  "index" : 2,
+                  "state" : {
+                    "costs" : [
+                      {
+                        "g" : 0,
+                        "h" : 6,
+                        "nodeID" : "P"
+                      },
+                      {
+                        "g" : 3,
+                        "h" : 4,
+                        "nodeID" : "Q",
+                        "predecessor" : "P"
+                      },
+                      {
+                        "h" : 7,
+                        "nodeID" : "R"
+                      },
+                      {
+                        "h" : 0,
+                        "nodeID" : "U"
+                      }
+                    ],
+                    "frontier" : [
+                      "Q"
+                    ],
+                    "settled" : [
+                      "P"
+                    ]
+                  }
+                },
+                {
+                  "event" : {
+                    "relax" : {
+                      "accepted" : true,
+                      "candidateCost" : 1,
+                      "from" : "P",
+                      "to" : "R"
+                    }
+                  },
+                  "index" : 3,
+                  "state" : {
+                    "costs" : [
+                      {
+                        "g" : 0,
+                        "h" : 6,
+                        "nodeID" : "P"
+                      },
+                      {
+                        "g" : 3,
+                        "h" : 4,
+                        "nodeID" : "Q",
+                        "predecessor" : "P"
+                      },
+                      {
+                        "g" : 1,
+                        "h" : 7,
+                        "nodeID" : "R",
+                        "predecessor" : "P"
+                      },
+                      {
+                        "h" : 0,
+                        "nodeID" : "U"
+                      }
+                    ],
+                    "frontier" : [
+                      "R",
+                      "Q"
+                    ],
+                    "settled" : [
+                      "P"
+                    ]
+                  }
+                },
+                {
+                  "event" : {
+                    "expand" : {
+                      "nodeID" : "R"
+                    }
+                  },
+                  "index" : 4,
+                  "state" : {
+                    "costs" : [
+                      {
+                        "g" : 0,
+                        "h" : 6,
+                        "nodeID" : "P"
+                      },
+                      {
+                        "g" : 3,
+                        "h" : 4,
+                        "nodeID" : "Q",
+                        "predecessor" : "P"
+                      },
+                      {
+                        "g" : 1,
+                        "h" : 7,
+                        "nodeID" : "R",
+                        "predecessor" : "P"
+                      },
+                      {
+                        "h" : 0,
+                        "nodeID" : "U"
+                      }
+                    ],
+                    "frontier" : [
+                      "Q"
+                    ],
+                    "settled" : [
+                      "P",
+                      "R"
+                    ]
+                  }
+                },
+                {
+                  "event" : {
+                    "relax" : {
+                      "accepted" : true,
+                      "candidateCost" : 8,
+                      "from" : "R",
+                      "to" : "U"
+                    }
+                  },
+                  "index" : 5,
+                  "state" : {
+                    "costs" : [
+                      {
+                        "g" : 0,
+                        "h" : 6,
+                        "nodeID" : "P"
+                      },
+                      {
+                        "g" : 3,
+                        "h" : 4,
+                        "nodeID" : "Q",
+                        "predecessor" : "P"
+                      },
+                      {
+                        "g" : 1,
+                        "h" : 7,
+                        "nodeID" : "R",
+                        "predecessor" : "P"
+                      },
+                      {
+                        "g" : 8,
+                        "h" : 0,
+                        "nodeID" : "U",
+                        "predecessor" : "R"
+                      }
+                    ],
+                    "frontier" : [
+                      "Q",
+                      "U"
+                    ],
+                    "settled" : [
+                      "P",
+                      "R"
+                    ]
+                  }
+                },
+                {
+                  "event" : {
+                    "expand" : {
+                      "nodeID" : "Q"
+                    }
+                  },
+                  "index" : 6,
+                  "state" : {
+                    "costs" : [
+                      {
+                        "g" : 0,
+                        "h" : 6,
+                        "nodeID" : "P"
+                      },
+                      {
+                        "g" : 3,
+                        "h" : 4,
+                        "nodeID" : "Q",
+                        "predecessor" : "P"
+                      },
+                      {
+                        "g" : 1,
+                        "h" : 7,
+                        "nodeID" : "R",
+                        "predecessor" : "P"
+                      },
+                      {
+                        "g" : 8,
+                        "h" : 0,
+                        "nodeID" : "U",
+                        "predecessor" : "R"
+                      }
+                    ],
+                    "frontier" : [
+                      "U"
+                    ],
+                    "settled" : [
+                      "P",
+                      "R",
+                      "Q"
+                    ]
+                  }
+                },
+                {
+                  "event" : {
+                    "relax" : {
+                      "accepted" : true,
+                      "candidateCost" : 7,
+                      "from" : "Q",
+                      "previousCost" : 8,
+                      "to" : "U"
+                    }
+                  },
+                  "index" : 7,
+                  "state" : {
+                    "costs" : [
+                      {
+                        "g" : 0,
+                        "h" : 6,
+                        "nodeID" : "P"
+                      },
+                      {
+                        "g" : 3,
+                        "h" : 4,
+                        "nodeID" : "Q",
+                        "predecessor" : "P"
+                      },
+                      {
+                        "g" : 1,
+                        "h" : 7,
+                        "nodeID" : "R",
+                        "predecessor" : "P"
+                      },
+                      {
+                        "g" : 7,
+                        "h" : 0,
+                        "nodeID" : "U",
+                        "predecessor" : "Q"
+                      }
+                    ],
+                    "frontier" : [
+                      "U"
+                    ],
+                    "settled" : [
+                      "P",
+                      "R",
+                      "Q"
+                    ]
+                  }
+                },
+                {
+                  "event" : {
+                    "expand" : {
+                      "nodeID" : "U"
+                    }
+                  },
+                  "index" : 8,
+                  "state" : {
+                    "costs" : [
+                      {
+                        "g" : 0,
+                        "h" : 6,
+                        "nodeID" : "P"
+                      },
+                      {
+                        "g" : 3,
+                        "h" : 4,
+                        "nodeID" : "Q",
+                        "predecessor" : "P"
+                      },
+                      {
+                        "g" : 1,
+                        "h" : 7,
+                        "nodeID" : "R",
+                        "predecessor" : "P"
+                      },
+                      {
+                        "g" : 7,
+                        "h" : 0,
+                        "nodeID" : "U",
+                        "predecessor" : "Q"
+                      }
+                    ],
+                    "frontier" : [
+
+                    ],
+                    "settled" : [
+                      "P",
+                      "R",
+                      "Q",
+                      "U"
+                    ]
+                  }
+                },
+                {
+                  "event" : {
+                    "reachedGoal" : {
+                      "nodeID" : "U"
+                    }
+                  },
+                  "index" : 9,
+                  "state" : {
+                    "costs" : [
+                      {
+                        "g" : 0,
+                        "h" : 6,
+                        "nodeID" : "P"
+                      },
+                      {
+                        "g" : 3,
+                        "h" : 4,
+                        "nodeID" : "Q",
+                        "predecessor" : "P"
+                      },
+                      {
+                        "g" : 1,
+                        "h" : 7,
+                        "nodeID" : "R",
+                        "predecessor" : "P"
+                      },
+                      {
+                        "g" : 7,
+                        "h" : 0,
+                        "nodeID" : "U",
+                        "predecessor" : "Q"
+                      }
+                    ],
+                    "frontier" : [
+
+                    ],
+                    "settled" : [
+                      "P",
+                      "R",
+                      "Q",
+                      "U"
+                    ]
+                  }
+                }
+              ]
+            },
+            "workedSteps" : [
+              "g(Q) = 3",
+              "g(R) = 1",
+              "Expand R."
+            ]
+          }
+        }
+      },
+      {
+        "pending" : {
+          "challengeID" : "fixture-dijkstra-first-v1"
+        }
+      }
+    ],
+    "navigation" : {
+      "edgeIDs" : [
+        "first-standard"
+      ],
+      "nextStop" : "standard"
+    },
+    "playerID" : "player-one",
+    "submissions" : [
+      {
+        "acceptedAt" : "2026-10-17T12:00:00Z",
+        "answer" : {
+          "node" : {
+            "nodeID" : "R"
+          }
+        },
+        "challengeID" : "fixture-dijkstra-practice-v1",
+        "commandID" : "00000000-0000-4000-8000-000000000002"
+      },
+      {
+        "acceptedAt" : "2026-10-17T12:00:00Z",
+        "answer" : {
+          "node" : {
+            "nodeID" : "B"
+          }
+        },
+        "challengeID" : "fixture-dijkstra-first-v1",
+        "commandID" : "00000000-0000-4000-8000-000000000001"
+      }
+    ]
+  }
+}

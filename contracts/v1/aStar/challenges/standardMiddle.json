@@ -1,0 +1,99 @@
+{
+  "action" : {
+    "enterCost" : {
+      "nodeID" : "V"
+    }
+  },
+  "algorithm" : "aStar",
+  "contentVersion" : "fixture-1",
+  "feedbackGate" : "immediate",
+  "id" : "fixture-aStar-standardMiddle-v1",
+  "maximumPoints" : 20,
+  "presentedState" : {
+    "costs" : [
+      {
+        "g" : 0,
+        "h" : 8,
+        "nodeID" : "M"
+      },
+      {
+        "g" : 4,
+        "h" : 5,
+        "nodeID" : "N",
+        "predecessor" : "M"
+      },
+      {
+        "g" : 2,
+        "h" : 9,
+        "nodeID" : "O",
+        "predecessor" : "M"
+      },
+      {
+        "h" : 0,
+        "nodeID" : "V"
+      }
+    ],
+    "frontier" : [
+      "N",
+      "O"
+    ],
+    "settled" : [
+      "M"
+    ]
+  },
+  "prompt" : "Via O, g = 2 and the edge to V costs 9. What is the candidate cost to V?",
+  "scenario" : {
+    "edges" : [
+      {
+        "bidirectional" : false,
+        "cost" : 4,
+        "from" : "M",
+        "to" : "N"
+      },
+      {
+        "bidirectional" : false,
+        "cost" : 2,
+        "from" : "M",
+        "to" : "O"
+      },
+      {
+        "bidirectional" : false,
+        "cost" : 5,
+        "from" : "N",
+        "to" : "V"
+      },
+      {
+        "bidirectional" : false,
+        "cost" : 9,
+        "from" : "O",
+        "to" : "V"
+      }
+    ],
+    "goal" : "V",
+    "id" : "fixture-scenario-standardMiddle-v1",
+    "nodes" : [
+      {
+        "heuristic" : 8,
+        "id" : "M",
+        "label" : "M"
+      },
+      {
+        "heuristic" : 5,
+        "id" : "N",
+        "label" : "N"
+      },
+      {
+        "heuristic" : 9,
+        "id" : "O",
+        "label" : "O"
+      },
+      {
+        "heuristic" : 0,
+        "id" : "V",
+        "label" : "V"
+      }
+    ],
+    "source" : "M"
+  },
+  "slot" : "standardMiddle"
+}

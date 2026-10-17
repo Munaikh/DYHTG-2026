@@ -1,0 +1,15 @@
+{
+  "action" : {
+    "joinRoom" : {
+      "code" : "ARENA1",
+      "nickname" : "Sam"
+    }
+  },
+  "contractVersion" : 1,
+  "id" : "00000000-0000-4000-8000-000000000101",
+  "scope" : {
+    "roomEntry" : {
+
+    }
+  }
+}

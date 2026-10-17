@@ -1,0 +1,24 @@
+{
+  "action" : {
+    "submitAnswer" : {
+      "answer" : {
+        "node" : {
+          "nodeID" : "A"
+        }
+      },
+      "challengeID" : "fixture-aStar-first-v1"
+    }
+  },
+  "contractVersion" : 1,
+  "id" : "00000000-0000-4000-8000-000000000001",
+  "scope" : {
+    "match" : {
+      "course" : {
+        "id" : "synthetic-course",
+        "version" : "fixture-1"
+      },
+      "expectedRevision" : 8,
+      "matchID" : "fixture-match"
+    }
+  }
+}

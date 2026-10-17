@@ -1,0 +1,27 @@
+name: Core contracts
+
+on:
+  pull_request:
+    paths:
+      - 'Packages/AlgorithmArenaCore/**'
+      - 'contracts/**'
+      - '.github/workflows/core-contracts.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'Packages/AlgorithmArenaCore/**'
+      - 'contracts/**'
+      - '.github/workflows/core-contracts.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  contracts:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Show Swift toolchain
+        run: swift --version
+      - name: Test core, mock service, and checked-in JSON fixtures
+        run: swift test --package-path Packages/AlgorithmArenaCore

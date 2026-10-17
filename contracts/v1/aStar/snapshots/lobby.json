@@ -1,0 +1,78 @@
+{
+  "contractVersion" : 1,
+  "revision" : 1,
+  "room" : {
+    "algorithm" : "aStar",
+    "course" : {
+      "id" : "synthetic-course",
+      "version" : "fixture-1"
+    },
+    "creatorID" : "player-one",
+    "matchID" : "fixture-match",
+    "phase" : "lobby",
+    "players" : [
+      {
+        "algorithmConfirmed" : true,
+        "arrivals" : [
+          {
+            "method" : "location",
+            "nodeID" : "start"
+          }
+        ],
+        "completedChallengeIDs" : [
+
+        ],
+        "connection" : "online",
+        "id" : "player-one",
+        "nickname" : "Alex",
+        "pendingRewardMaximum" : 0,
+        "ready" : true,
+        "releasedScore" : 0,
+        "remainingAvailablePoints" : 100,
+        "stage" : {
+          "atStart" : {
+
+          }
+        }
+      },
+      {
+        "algorithmConfirmed" : false,
+        "arrivals" : [
+          {
+            "method" : "location",
+            "nodeID" : "start"
+          }
+        ],
+        "completedChallengeIDs" : [
+
+        ],
+        "connection" : "online",
+        "id" : "player-two",
+        "nickname" : "Sam",
+        "pendingRewardMaximum" : 0,
+        "ready" : false,
+        "releasedScore" : 0,
+        "remainingAvailablePoints" : 100,
+        "stage" : {
+          "atStart" : {
+
+          }
+        }
+      }
+    ],
+    "roomCode" : "ARENA1"
+  },
+  "serverTime" : "2026-10-17T12:00:00Z",
+  "viewer" : {
+    "availableChallenges" : [
+
+    ],
+    "feedback" : [
+
+    ],
+    "playerID" : "player-one",
+    "submissions" : [
+
+    ]
+  }
+}

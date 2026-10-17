@@ -1,0 +1,102 @@
+{
+  "action" : {
+    "selectNode" : {
+      "options" : [
+        "Q",
+        "R"
+      ]
+    }
+  },
+  "algorithm" : "dijkstra",
+  "contentVersion" : "fixture-1",
+  "feedbackGate" : "immediate",
+  "id" : "fixture-dijkstra-practice-v1",
+  "maximumPoints" : 0,
+  "presentedState" : {
+    "costs" : [
+      {
+        "g" : 0,
+        "h" : 6,
+        "nodeID" : "P"
+      },
+      {
+        "g" : 3,
+        "h" : 4,
+        "nodeID" : "Q",
+        "predecessor" : "P"
+      },
+      {
+        "g" : 1,
+        "h" : 7,
+        "nodeID" : "R",
+        "predecessor" : "P"
+      },
+      {
+        "h" : 0,
+        "nodeID" : "U"
+      }
+    ],
+    "frontier" : [
+      "R",
+      "Q"
+    ],
+    "settled" : [
+      "P"
+    ]
+  },
+  "prompt" : "Which frontier node is expanded next?",
+  "scenario" : {
+    "edges" : [
+      {
+        "bidirectional" : false,
+        "cost" : 3,
+        "from" : "P",
+        "to" : "Q"
+      },
+      {
+        "bidirectional" : false,
+        "cost" : 1,
+        "from" : "P",
+        "to" : "R"
+      },
+      {
+        "bidirectional" : false,
+        "cost" : 4,
+        "from" : "Q",
+        "to" : "U"
+      },
+      {
+        "bidirectional" : false,
+        "cost" : 7,
+        "from" : "R",
+        "to" : "U"
+      }
+    ],
+    "goal" : "U",
+    "id" : "fixture-scenario-practice-v1",
+    "nodes" : [
+      {
+        "heuristic" : 6,
+        "id" : "P",
+        "label" : "P"
+      },
+      {
+        "heuristic" : 4,
+        "id" : "Q",
+        "label" : "Q"
+      },
+      {
+        "heuristic" : 7,
+        "id" : "R",
+        "label" : "R"
+      },
+      {
+        "heuristic" : 0,
+        "id" : "U",
+        "label" : "U"
+      }
+    ],
+    "source" : "P"
+  },
+  "slot" : "practice"
+}

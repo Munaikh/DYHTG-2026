@@ -1,0 +1,108 @@
+{
+  "action" : {
+    "selectRoute" : {
+      "options" : [
+        {
+          "id" : "via-a",
+          "text" : "D → E → H"
+        },
+        {
+          "id" : "via-b",
+          "text" : "D → F → H"
+        }
+      ]
+    }
+  },
+  "algorithm" : "aStar",
+  "contentVersion" : "fixture-1",
+  "feedbackGate" : "afterBothSubmissions",
+  "id" : "fixture-aStar-third-v1",
+  "maximumPoints" : 20,
+  "presentedState" : {
+    "costs" : [
+      {
+        "g" : 0,
+        "h" : 8,
+        "nodeID" : "D"
+      },
+      {
+        "g" : 5,
+        "h" : 4,
+        "nodeID" : "E",
+        "predecessor" : "D"
+      },
+      {
+        "g" : 2,
+        "h" : 9,
+        "nodeID" : "F",
+        "predecessor" : "D"
+      },
+      {
+        "h" : 0,
+        "nodeID" : "H"
+      }
+    ],
+    "frontier" : [
+      "E",
+      "F"
+    ],
+    "settled" : [
+      "D"
+    ]
+  },
+  "prompt" : "Which route has the lower total cost?",
+  "scenario" : {
+    "edges" : [
+      {
+        "bidirectional" : false,
+        "cost" : 5,
+        "from" : "D",
+        "to" : "E"
+      },
+      {
+        "bidirectional" : false,
+        "cost" : 2,
+        "from" : "D",
+        "to" : "F"
+      },
+      {
+        "bidirectional" : false,
+        "cost" : 4,
+        "from" : "E",
+        "to" : "H"
+      },
+      {
+        "bidirectional" : false,
+        "cost" : 11,
+        "from" : "F",
+        "to" : "H"
+      }
+    ],
+    "goal" : "H",
+    "id" : "fixture-scenario-third-v1",
+    "nodes" : [
+      {
+        "heuristic" : 8,
+        "id" : "D",
+        "label" : "D"
+      },
+      {
+        "heuristic" : 4,
+        "id" : "E",
+        "label" : "E"
+      },
+      {
+        "heuristic" : 9,
+        "id" : "F",
+        "label" : "F"
+      },
+      {
+        "heuristic" : 0,
+        "id" : "H",
+        "label" : "H"
+      }
+    ],
+    "source" : "D"
+  },
+  "slot" : "third"
+}

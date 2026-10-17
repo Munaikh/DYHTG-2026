@@ -1,0 +1,112 @@
+{
+  "action" : {
+    "transfer" : {
+      "nodeOptions" : [
+        "Y",
+        "Z"
+      ],
+      "reasons" : [
+        {
+          "id" : "priority",
+          "text" : "It has the smallest g + h."
+        },
+        {
+          "id" : "heuristic-only",
+          "text" : "It has the smallest h alone."
+        }
+      ]
+    }
+  },
+  "algorithm" : "aStar",
+  "contentVersion" : "fixture-1",
+  "feedbackGate" : "immediate",
+  "id" : "fixture-aStar-learningCheck-v1",
+  "maximumPoints" : 0,
+  "presentedState" : {
+    "costs" : [
+      {
+        "g" : 0,
+        "h" : 6,
+        "nodeID" : "X"
+      },
+      {
+        "g" : 4,
+        "h" : 3,
+        "nodeID" : "Y",
+        "predecessor" : "X"
+      },
+      {
+        "g" : 2,
+        "h" : 7,
+        "nodeID" : "Z",
+        "predecessor" : "X"
+      },
+      {
+        "h" : 0,
+        "nodeID" : "T"
+      }
+    ],
+    "frontier" : [
+      "Y",
+      "Z"
+    ],
+    "settled" : [
+      "X"
+    ]
+  },
+  "prompt" : "On this new graph, choose the next node and explain why. This does not affect your score.",
+  "scenario" : {
+    "edges" : [
+      {
+        "bidirectional" : false,
+        "cost" : 4,
+        "from" : "X",
+        "to" : "Y"
+      },
+      {
+        "bidirectional" : false,
+        "cost" : 2,
+        "from" : "X",
+        "to" : "Z"
+      },
+      {
+        "bidirectional" : false,
+        "cost" : 3,
+        "from" : "Y",
+        "to" : "T"
+      },
+      {
+        "bidirectional" : false,
+        "cost" : 9,
+        "from" : "Z",
+        "to" : "T"
+      }
+    ],
+    "goal" : "T",
+    "id" : "fixture-scenario-learningCheck-v1",
+    "nodes" : [
+      {
+        "heuristic" : 6,
+        "id" : "X",
+        "label" : "X"
+      },
+      {
+        "heuristic" : 3,
+        "id" : "Y",
+        "label" : "Y"
+      },
+      {
+        "heuristic" : 7,
+        "id" : "Z",
+        "label" : "Z"
+      },
+      {
+        "heuristic" : 0,
+        "id" : "T",
+        "label" : "T"
+      }
+    ],
+    "source" : "X"
+  },
+  "slot" : "learningCheck"
+}
