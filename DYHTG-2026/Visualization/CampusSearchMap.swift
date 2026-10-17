@@ -26,8 +26,11 @@ struct CampusSearchMap: View {
     private var presentation: SearchPresentation? { playback?.presentation }
     private var routeColor: Color { colorScheme == .dark ? ArenaPalette.mint : ArenaPalette.teal }
     private var activeEdge: CourseEdge? {
-        guard let pair = playback?.highlightedEdge else { return nil }
-        return experiment?.edges(for: [pair.from, pair.to]).first
+        guard let pair = playback?.highlightedEdge, let cost = playback?.highlightedEdgeCost else { return nil }
+        return experiment?.graph.edges.filter {
+            (($0.from == pair.from && $0.to == pair.to) || ($0.bidirectional && $0.to == pair.from && $0.from == pair.to))
+                && $0.costMetres == cost
+        }.min { $0.id < $1.id }
     }
     private var predecessorEdges: [CourseEdge] {
         guard let playback, let experiment else { return [] }
@@ -69,7 +72,7 @@ struct CampusSearchMap: View {
                 placeContent
                 endpointContent
             }
-            .mapStyle(.standard(elevation: .realistic, emphasis: .automatic, pointsOfInterest: .including([.university])))
+            .mapStyle(.standard(elevation: .realistic, emphasis: .automatic, pointsOfInterest: .including([.university, .library])))
             .mapControlVisibility(.hidden)
             .safeAreaInset(edge: .bottom, spacing: 0) {
                 Color.clear.frame(height: bottomInset).allowsHitTesting(false)
@@ -150,8 +153,7 @@ struct CampusSearchMap: View {
     private var placeContent: some MapContent {
         if let experiment {
             ForEach(experiment.places.filter {
-                $0.id != experiment.scenario.source && $0.id != experiment.scenario.goal
-                    && !isUnderEndpoint($0.coordinate)
+                !isUnderEndpoint($0.coordinate)
             }) { place in
                 Annotation(place.name, coordinate: place.coordinate.location) {
                     Button {
@@ -247,11 +249,11 @@ struct CampusSearchMap: View {
     }
 
     private var startMapCoordinate: Coordinate {
-        experiment?.graph.source.coordinate ?? start.coordinate
+        start.coordinate
     }
 
     private var destinationMapCoordinate: Coordinate {
-        experiment?.graph.goal.coordinate ?? destination.coordinate
+        destination.coordinate
     }
 
     private func isUnderEndpoint(_ coordinate: Coordinate) -> Bool {

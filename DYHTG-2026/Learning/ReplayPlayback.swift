@@ -31,6 +31,12 @@ final class ReplayPlayback {
         return (from, to)
     }
 
+    var highlightedEdgeCost: Int? {
+        guard case .relax(let from, _, _, let candidateCost, _) = step.event,
+              let fromCost = step.state.costs.first(where: { $0.nodeID == from })?.g else { return nil }
+        return candidateCost - fromCost
+    }
+
     var description: String {
         StepDescription(scenario: scenario, algorithm: trace.algorithm).text(
             for: step,

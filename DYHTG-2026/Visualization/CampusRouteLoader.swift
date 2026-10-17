@@ -50,21 +50,27 @@ final class CampusRouteLoader {
             guard try CourseGeometry.distance(from: selectedSource.coordinate, to: selectedGoal.coordinate) >= 6 else {
                 throw LoadError.samePoint
             }
-            let landmarks = Array(CampusMapPoint.landmarks.prefix(7))
+            // A live Apple place result can refine a known landmark. Use that
+            // location for directions too, instead of duplicating the place.
+            let landmarks = CampusMapPoint.landmarks.prefix(7).map { landmark in
+                if selectedSource.isAppleMapsPlace && selectedSource.id == landmark.id { return selectedSource }
+                if selectedGoal.isAppleMapsPlace && selectedGoal.id == landmark.id { return selectedGoal }
+                return landmark
+            }
             let source = normalized(selectedSource, role: "source", landmarks: landmarks)
             let goal = normalized(selectedGoal, role: "goal", landmarks: landmarks)
-            let course = try GilmorehillCourse.candidate()
-            var selectedNodes = landmarks.map(Self.courseNode)
-            for point in [source, goal] where !selectedNodes.contains(where: { $0.id.rawValue == point.id }) {
-                selectedNodes.append(Self.courseNode(point))
+            // The direct walk establishes the endpoint entrances. Additional walks
+            // sample campus corridors; their shared geometry determines junctions.
+            var requests: [(id: EdgeID, from: CampusMapPoint, to: CampusMapPoint)] = [
+                ("selected-journey", source, goal)
+            ]
+            requests += Self.connections.compactMap { id, fromID, toID in
+                guard let from = landmarks.first(where: { $0.id == fromID }),
+                      let to = landmarks.first(where: { $0.id == toID }) else { return nil }
+                return (EdgeID(rawValue: id), from, to)
             }
-            var requests: [(id: EdgeID, from: CampusMapPoint, to: CampusMapPoint)] = course.edges.compactMap { edge in
-                guard let from = landmarks.first(where: { $0.id == edge.from.rawValue }),
-                      let to = landmarks.first(where: { $0.id == edge.to.rawValue }) else { return nil }
-                return (edge.id, from, to)
-            }
-            // Two independent links give each selected pin a genuine route choice
-            // through the existing network instead of a single fixed corridor.
+            // Sample two nearby corridors for custom places. Overlapping paths
+            // become shared segments, not duplicate building-to-building edges.
             for point in [source, goal] where !landmarks.contains(where: { $0.id == point.id }) {
                 let nearest = landmarks.sorted {
                     (try? CourseGeometry.distance(from: point.coordinate, to: $0.coordinate)) ?? .infinity
@@ -109,20 +115,24 @@ final class CampusRouteLoader {
                try CourseGeometry.distance(from: startEntrance, to: goalEntrance) < 4 {
                 throw LoadError.sameEntrance
             }
-            let nodes = selectedNodes.map { node in
-                CourseNode(id: node.id, name: node.name,
-                    coordinate: anchors[node.id.rawValue] ?? node.coordinate, stoppingNote: node.stoppingNote)
+            guard let sourceEntrance = anchors[source.id], let goalEntrance = anchors[goal.id] else {
+                throw LoadError.unconnectedPin
             }
+            let network = try WalkingJunctionNetwork(paths: paths,
+                source: .init(id: NodeID(rawValue: source.id), name: "Start entrance", coordinate: sourceEntrance,
+                    stoppingNote: "Apple Maps walking access for the selected start."),
+                goal: .init(id: NodeID(rawValue: goal.id), name: "Destination entrance", coordinate: goalEntrance,
+                    stoppingNote: "Apple Maps walking access for the selected destination."))
             let pinGap = try [source, goal].map { point in
                 try CourseGeometry.distance(from: point.coordinate, to: anchors[point.id] ?? point.coordinate)
             }.max() ?? 0
-            let baseline = try CampusLabExperiment(from: source, to: goal, nodes: nodes, paths: paths,
+            let baseline = try CampusLabExperiment(from: source, to: goal, nodes: network.nodes, paths: network.paths,
                 unavailablePathCount: unavailable, selectedPinGapMetres: pinGap)
             guard CampusLabExperiment.routeCost(baseline.dijkstra) != nil else { throw LoadError.unconnectedPin }
             experiment = closedPathID == nil ? baseline : try CampusLabExperiment(
-                from: source, to: goal, nodes: nodes, paths: paths, closedPathID: closedPathID,
+                from: source, to: goal, nodes: network.nodes, paths: network.paths, closedPathID: closedPathID,
                 unavailablePathCount: unavailable, selectedPinGapMetres: pinGap)
-            status = "\(paths.count) walking connections ready"
+            status = "\(network.nodes.count - 2) path junctions · \(network.paths.count) walking connections"
         } catch {
             guard generation == token, !Task.isCancelled else { return }
             errorMessage = (error as? LoadError)?.message ?? "Walking paths could not be loaded. Check your connection and try again."
@@ -159,13 +169,21 @@ final class CampusRouteLoader {
         if let junction = landmarks.first(where: {
             $0.coordinate == point.coordinate
         }) { return junction }
-        return CampusMapPoint(id: "selected-\(role)", name: point.name, coordinate: point.coordinate)
+        return CampusMapPoint(id: "selected-\(role)", name: point.name, coordinate: point.coordinate,
+            address: point.address, isAppleMapsPlace: point.isAppleMapsPlace)
     }
 
-    private static func courseNode(_ point: CampusMapPoint) -> CourseNode {
-        .init(id: NodeID(rawValue: point.id), name: point.name, coordinate: point.coordinate,
-            stoppingNote: "Selected campus location; MapKit may choose a nearby walking entrance.")
-    }
+    // These place pairs sample footways; they do not define the displayed graph.
+    // WalkingJunctionNetwork derives topology from their shared route geometry.
+    private static let connections = [
+        ("jms-gardens", "01-jms", "02-lilybank-gardens"),
+        ("gardens-house", "02-lilybank-gardens", "03-lilybank-house"),
+        ("house-rejoin", "03-lilybank-house", "05-rejoin"),
+        ("gardens-hetherington", "02-lilybank-gardens", "04-hetherington"),
+        ("hetherington-rejoin", "04-hetherington", "05-rejoin"),
+        ("rejoin-fraser", "05-rejoin", "06-fraser"),
+        ("fraser-library", "06-fraser", "07-library")
+    ]
 
     private enum LoadError: Error {
         case outsideCampus, samePoint, sameEntrance, noWalkingPaths, unconnectedPin, serviceSlow

@@ -308,7 +308,8 @@ struct VisualizeHomeView: View {
     private func experimentDetails(_ experiment: CampusLabExperiment, playback: ReplayPlayback) -> some View {
         VStack(alignment: .leading, spacing: 16) {
             DisclosureGroup {
-                SearchGraphView(presentation: playback.presentation, highlightedEdge: playback.highlightedEdge)
+                SearchGraphView(presentation: playback.presentation, highlightedEdge: playback.highlightedEdge,
+                    highlightedEdgeCost: playback.highlightedEdgeCost)
                     .frame(minHeight: 320)
                     .padding(.top, 12)
                     .accessibilityIdentifier("visualize.graph")

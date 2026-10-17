@@ -27,7 +27,7 @@ struct CampusLabExperiment {
         nodes: [CourseNode], paths: [PedestrianPath],
         closedPathID: EdgeID? = nil, unavailablePathCount: Int = 0, selectedPinGapMetres: Double = 0
     ) throws {
-        let reference = CourseReference(id: "gilmorehill-mapkit", version: "walking-1")
+        let reference = CourseReference(id: "gilmorehill-mapkit", version: "junctions-2")
         let sourceID = NodeID(rawValue: source.id)
         let goalID = NodeID(rawValue: goal.id)
         let baseline = try RoutedCampusGraph(
@@ -36,23 +36,30 @@ struct CampusLabExperiment {
             reference: reference, nodes: nodes,
             paths: paths.filter { $0.id != closedPathID }, source: sourceID, goal: goalID)
         let orderedNodes = nodes.sorted { $0.id < $1.id }
-        let places = orderedNodes.enumerated().map { index, node in
-            CampusLabPlace(id: node.id, letter: String(UnicodeScalar(65 + index)!),
-                name: node.name, coordinate: node.coordinate)
+        var junctionNumber = 0
+        let places = orderedNodes.map { node in
+            let letter: String
+            if node.id == sourceID { letter = "S" }
+            else if node.id == goalID { letter = "G" }
+            else { junctionNumber += 1; letter = String(junctionNumber) }
+            return CampusLabPlace(id: node.id, letter: letter,
+                name: node.id == sourceID || node.id == goalID ? node.name : "Path junction \(letter)",
+                coordinate: node.coordinate)
         }
-        // A staggered grid makes up to nine real-campus vertices legible without
-        // changing any distance, heuristic, or MapKit edge geometry.
-        let positions: [ScenarioPosition] = [
-            .init(x: 0.08, y: 0.12), .init(x: 0.50, y: 0.12), .init(x: 0.92, y: 0.12),
-            .init(x: 0.08, y: 0.50), .init(x: 0.50, y: 0.50), .init(x: 0.92, y: 0.50),
-            .init(x: 0.08, y: 0.88), .init(x: 0.50, y: 0.88), .init(x: 0.92, y: 0.88),
-        ]
+        // A schematic layout separates nearby junctions without changing the
+        // routing graph or its physical geometry. It grows with the network.
+        let columns = min(4, max(2, Int(ceil(sqrt(Double(nodes.count))))))
+        let rows = max(2, Int(ceil(Double(nodes.count) / Double(columns))))
+        let positions = orderedNodes.indices.map { index in
+            ScenarioPosition(x: 0.08 + 0.84 * Double(index % columns) / Double(columns - 1),
+                y: 0.12 + 0.76 * Double(index / columns) / Double(rows - 1))
+        }
         scenario = GraphScenario(
             id: current.graph.scenario.id,
             nodes: current.graph.scenario.nodes.map { node in
                 let index = places.firstIndex { $0.id == node.id }!
                 return .init(id: node.id, label: places[index].letter, heuristic: node.heuristic,
-                    position: positions[index % positions.count])
+                    position: positions[index])
             }, edges: current.graph.scenario.edges,
             source: current.graph.scenario.source, goal: current.graph.scenario.goal)
         graph = current.graph
@@ -67,9 +74,9 @@ struct CampusLabExperiment {
         routeTitle = "\(source.name) → \(goal.name)"
         maxSnapDistanceMetres = max(current.maximumEndpointGapMetres, selectedPinGapMetres)
         heuristicScale = current.heuristicScale
-        var notes = ["Apple Maps walking paths · shortest route through this learning network."]
+        var notes = ["Numbered nodes are shared walking-path junctions. S and G mark the walking entrances. Apple Maps provides the paths; the algorithm finds the shortest route through this sampled network."]
         if maxSnapDistanceMetres >= 2 {
-            notes.append("Pins connect at nearby mapped entrances, up to \(Int(ceil(maxSnapDistanceMetres))) m away. Gaps are not drawn or counted.")
+            notes.append("Place pins stay at their map locations. Walking paths use nearby entrances, up to \(Int(ceil(maxSnapDistanceMetres))) m away. Gaps are not drawn or counted.")
         }
         if unavailablePathCount > 0 {
             notes.append("\(unavailablePathCount) unavailable \(unavailablePathCount == 1 ? "connection is" : "connections are") excluded.")

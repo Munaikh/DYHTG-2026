@@ -6,7 +6,7 @@ struct CampusEndpointSheet: Identifiable {
     var id: String { role.rawValue }
 }
 
-/// Campus landmarks are instant and work offline; map placement covers any other point.
+/// Verified Apple place records are instant; typed searches resolve live campus POIs.
 struct CampusEndpointPicker: View {
     let role: SelectedEndpoint
     let current: CampusMapPoint
@@ -14,9 +14,13 @@ struct CampusEndpointPicker: View {
     let chooseOnMap: () -> Void
     @Environment(\.dismiss) private var dismiss
     @State private var query = ""
+    @State private var search = CampusPlaceSearch()
+
+    private var searchText: String { query.trimmingCharacters(in: .whitespacesAndNewlines) }
 
     private var matches: [CampusMapPoint] {
-        CampusMapPoint.landmarks.filter { query.isEmpty || $0.name.localizedCaseInsensitiveContains(query) }
+        if searchText.count >= 2 { return search.results }
+        return CampusMapPoint.landmarks.filter { searchText.isEmpty || $0.name.localizedCaseInsensitiveContains(searchText) }
     }
 
     var body: some View {
@@ -46,8 +50,23 @@ struct CampusEndpointPicker: View {
                     .buttonStyle(.plain)
                     .accessibilityIdentifier("visualize.chooseOnMap")
 
-                    ArenaEyebrow(text: "Campus landmarks")
-                    if matches.isEmpty {
+                    ArenaEyebrow(text: searchText.count >= 2 ? "Apple Maps results" : "Campus places")
+                    if search.isSearching {
+                        HStack(spacing: 12) {
+                            ProgressView()
+                            Text("Searching Apple Maps…").font(.subheadline).foregroundStyle(.secondary)
+                        }
+                        .accessibilityIdentifier("visualize.placeSearch.loading")
+                    }
+                    if let error = search.errorMessage, searchText.count >= 2 {
+                        VStack(alignment: .leading, spacing: 12) {
+                            Text(error).font(.subheadline).foregroundStyle(.secondary)
+                            Button("Try again") { Task { await search.search(searchText) } }
+                                .buttonStyle(ArenaCompactButtonStyle())
+                        }
+                        .arenaCard()
+                        .accessibilityIdentifier("visualize.placeSearch.error")
+                    } else if matches.isEmpty && !search.isSearching {
                         ContentUnavailableView.search(text: query)
                     } else {
                         VStack(spacing: 0) {
@@ -61,9 +80,14 @@ struct CampusEndpointPicker: View {
                                             .font(.body)
                                             .foregroundStyle(LearnStyle.teal)
                                             .frame(width: 28)
-                                        Text(point.name)
-                                            .font(.subheadline.weight(.medium))
-                                            .foregroundStyle(.primary)
+                                        VStack(alignment: .leading, spacing: 4) {
+                                            Text(point.name)
+                                                .font(.subheadline.weight(.medium))
+                                                .foregroundStyle(.primary)
+                                            if let address = point.address {
+                                                Text(address).font(.caption).foregroundStyle(.secondary)
+                                            }
+                                        }
                                         Spacer(minLength: 6)
                                         if current.id == point.id {
                                             Image(systemName: "checkmark.circle.fill").foregroundStyle(LearnStyle.teal)
@@ -82,11 +106,19 @@ struct CampusEndpointPicker: View {
                         }
                         .background(ArenaPalette.surface, in: .rect(cornerRadius: 22))
                     }
+                    Label("Places from Apple Maps", systemImage: "map")
+                        .font(.caption).foregroundStyle(.secondary)
+                    Text("Place pins mark the building. Walking paths connect to its mapped entrance.")
+                        .font(.caption).foregroundStyle(.secondary)
                 }
                 .padding(20)
             }
             .background(ArenaPalette.canvas)
-            .searchable(text: $query, prompt: "Find a campus landmark")
+            .searchable(text: $query, prompt: "Search Apple Maps on campus")
+            .task(id: searchText) {
+                await search.search(searchText, debounce: .milliseconds(300))
+            }
+            .onDisappear { search.cancel() }
             .navigationTitle(role == .source ? "Choose your start" : "Choose destination")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {

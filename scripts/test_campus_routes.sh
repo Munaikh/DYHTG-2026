@@ -15,6 +15,7 @@ xcrun swiftc -disable-sandbox -swift-version 6 -parse-as-library \
   -I "$TASK_BUILD_DIR" -L "$TASK_BUILD_DIR" -lAlgorithmArenaCore \
   -Xlinker -rpath -Xlinker "$TASK_BUILD_DIR" \
   "$TASK_REPO_ROOT/DYHTG-2026/Visualization/CampusMapPoint.swift" \
+  "$TASK_REPO_ROOT/DYHTG-2026/Visualization/CampusPlaceSearch.swift" \
   "$TASK_REPO_ROOT/DYHTG-2026/Visualization/CampusLabExperiment.swift" \
   "$TASK_REPO_ROOT/DYHTG-2026/Visualization/CampusRouteLoader.swift" \
   "$TASK_REPO_ROOT/scripts/test_campus_routes.swift" \

@@ -6,12 +6,13 @@ struct SearchGraphView: View {
     var selectable: [NodeID] = []
     var selection: NodeID?
     var highlightedEdge: (from: NodeID, to: NodeID)?
+    var highlightedEdgeCost: Int?
     var onSelect: (NodeID) -> Void = { _ in }
     private let nodeSize: CGFloat = 46
 
     var body: some View {
         let layout = GraphLayout(scenario: presentation.scenario)
-        let height: CGFloat = layout.rows > 2 ? 370 : 300
+        let height: CGFloat = max(layout.rows > 2 ? 370 : 300, CGFloat((presentation.nodes.count + 2) / 3) * 110 + 40)
         GeometryReader { proxy in
             let drawing = GraphDrawing(layout: layout, scenario: presentation.scenario,
                                        size: proxy.size, isAStar: presentation.algorithm == .aStar,
@@ -21,13 +22,13 @@ struct SearchGraphView: View {
                 ForEach(Array(presentation.scenario.edges.enumerated()), id: \.offset) { index, edge in
                     if let path = drawing.edges[index] {
                         EdgeView(path: path,
-                                 directed: !edge.bidirectional, emphasis: emphasis(for: edge),
+                                 directed: !edge.bidirectional, emphasis: emphasis(for: edge, at: index),
                                  nodeRadius: nodeSize / 2)
                     }
                 }
                 ForEach(Array(presentation.scenario.edges.enumerated()), id: \.offset) { index, edge in
                     if let point = drawing.edgeLabels[index] {
-                        EdgeCostLabel(cost: edge.cost, highlighted: emphasis(for: edge) != .normal)
+                        EdgeCostLabel(cost: edge.cost, highlighted: emphasis(for: edge, at: index) != .normal)
                             .position(point)
                     }
                 }
@@ -56,15 +57,29 @@ struct SearchGraphView: View {
         .accessibilityLabel("Search graph")
     }
 
-    private func emphasis(for edge: ScenarioEdge) -> EdgeView.Emphasis {
+    private func emphasis(for edge: ScenarioEdge, at index: Int) -> EdgeView.Emphasis {
+        let peers = presentation.scenario.edges.indices.filter { other in
+            let candidate = presentation.scenario.edges[other]
+            return (candidate.from == edge.from && candidate.to == edge.to)
+                || (candidate.bidirectional && edge.bidirectional && candidate.from == edge.to && candidate.to == edge.from)
+        }
+        let cheapest = peers.min {
+            let first = presentation.scenario.edges[$0].cost, second = presentation.scenario.edges[$1].cost
+            return first == second ? $0 < $1 : first < second
+        }
         let key = "\(edge.from.rawValue)>\(edge.to.rawValue)"
         let reverse = "\(edge.to.rawValue)>\(edge.from.rawValue)"
-        if presentation.routeEdges.contains(key) || (edge.bidirectional && presentation.routeEdges.contains(reverse)) {
+        if cheapest == index,
+           presentation.routeEdges.contains(key) || (edge.bidirectional && presentation.routeEdges.contains(reverse)) {
             return .route
         }
         if let highlightedEdge,
            (highlightedEdge.from == edge.from && highlightedEdge.to == edge.to)
             || (edge.bidirectional && highlightedEdge.from == edge.to && highlightedEdge.to == edge.from) {
+            if let highlightedEdgeCost {
+                return edge.cost == highlightedEdgeCost
+                    && peers.first(where: { presentation.scenario.edges[$0].cost == highlightedEdgeCost }) == index ? .active : .normal
+            }
             return .active
         }
         return .normal
@@ -144,9 +159,21 @@ private struct GraphDrawing {
             let blocked = others.contains { center in
                 (1..<24).contains { step in direct.point(CGFloat(step) / 24).distance(to: center) < 38 }
             }
-            if blocked {
+            let parallel = scenario.edges.indices.filter { other in
+                let candidate = scenario.edges[other]
+                return (candidate.from == edge.from && candidate.to == edge.to)
+                    || (candidate.from == edge.to && candidate.to == edge.from)
+            }
+            if blocked || parallel.count > 1 {
                 let middle = direct.point(0.5), normal = direct.normal(0.5)
-                let offsets: [CGFloat] = [-100, 100, -150, 150]
+                let offsets: [CGFloat]
+                if parallel.count > 1 {
+                    let rank = CGFloat(parallel.firstIndex(of: index)!) - CGFloat(parallel.count - 1) / 2
+                    let offset = rank * 100 * (edge.from < edge.to ? 1 : -1)
+                    offsets = offset == 0 ? [0, 25, -25] : [offset, offset * 1.5, offset * 2]
+                } else {
+                    offsets = [-100, 100, -150, 150]
+                }
                 let candidates = offsets.map { offset in
                     GraphEdgePath(from: from, to: to,
                                   control: CGPoint(x: middle.x + normal.x * offset, y: middle.y + normal.y * offset))
