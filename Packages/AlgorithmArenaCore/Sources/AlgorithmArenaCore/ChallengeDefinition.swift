@@ -95,9 +95,13 @@ public struct ReleasedFeedback: Codable, Equatable, Sendable {
   public let trace: SearchTrace
   /// Only answers authorised for this viewer; middle/practice/check are self-only.
   public let answers: [ReleasedAnswer]
+  /// Optional replay indices for each worked step, in workedSteps order.
+  /// Indices refer to trace.steps, including steps after the question state.
+  public let workedStepTraceIndices: [[Int]]?
   public init(
     challengeID: ChallengeID, correctAnswer: SubmittedAnswer, explanation: String,
-    workedSteps: [String], trace: SearchTrace, answers: [ReleasedAnswer]
+    workedSteps: [String], trace: SearchTrace, answers: [ReleasedAnswer],
+    workedStepTraceIndices: [[Int]]? = nil
   ) {
     self.challengeID = challengeID
     self.correctAnswer = correctAnswer
@@ -105,6 +109,7 @@ public struct ReleasedFeedback: Codable, Equatable, Sendable {
     self.workedSteps = workedSteps
     self.trace = trace
     self.answers = answers
+    self.workedStepTraceIndices = workedStepTraceIndices
   }
 }
 

@@ -1,0 +1,144 @@
+{
+  "action" : {
+    "selectRoute" : {
+      "options" : [
+        {
+          "id" : "via-side",
+          "text" : "S → B → G"
+        },
+        {
+          "id" : "via-middle",
+          "text" : "S → A → C → G"
+        }
+      ]
+    }
+  },
+  "algorithm" : "dijkstra",
+  "contentVersion" : "2026-10-17.1",
+  "feedbackGate" : "afterBothSubmissions",
+  "id" : "learning-dijkstra-third-v1",
+  "maximumPoints" : 20,
+  "presentedState" : {
+    "costs" : [
+      {
+        "h" : 3,
+        "nodeID" : "A"
+      },
+      {
+        "h" : 1,
+        "nodeID" : "B"
+      },
+      {
+        "h" : 2,
+        "nodeID" : "C"
+      },
+      {
+        "h" : 0,
+        "nodeID" : "G"
+      },
+      {
+        "g" : 0,
+        "h" : 2,
+        "nodeID" : "S"
+      }
+    ],
+    "frontier" : [
+      "S"
+    ],
+    "settled" : [
+
+    ]
+  },
+  "prompt" : "Which of these routes has the lower total edge cost? The search may expand nodes that are absent from the final route.",
+  "scenario" : {
+    "edges" : [
+      {
+        "bidirectional" : false,
+        "cost" : 2,
+        "from" : "S",
+        "to" : "A"
+      },
+      {
+        "bidirectional" : false,
+        "cost" : 1,
+        "from" : "S",
+        "to" : "B"
+      },
+      {
+        "bidirectional" : false,
+        "cost" : 2,
+        "from" : "A",
+        "to" : "C"
+      },
+      {
+        "bidirectional" : false,
+        "cost" : 10,
+        "from" : "B",
+        "to" : "G"
+      },
+      {
+        "bidirectional" : false,
+        "cost" : 3,
+        "from" : "C",
+        "to" : "G"
+      },
+      {
+        "bidirectional" : false,
+        "cost" : 9,
+        "from" : "A",
+        "to" : "G"
+      }
+    ],
+    "goal" : "G",
+    "id" : "learning-dijkstra-third-graph-v1",
+    "nodes" : [
+      {
+        "heuristic" : 2,
+        "id" : "S",
+        "label" : "S",
+        "position" : {
+          "x" : 0.05,
+          "y" : 0.5
+        }
+      },
+      {
+        "heuristic" : 3,
+        "id" : "A",
+        "label" : "A",
+        "position" : {
+          "x" : 0.3,
+          "y" : 0.15
+        }
+      },
+      {
+        "heuristic" : 1,
+        "id" : "B",
+        "label" : "B",
+        "position" : {
+          "x" : 0.4,
+          "y" : 0.8
+        }
+      },
+      {
+        "heuristic" : 2,
+        "id" : "C",
+        "label" : "C",
+        "position" : {
+          "x" : 0.7,
+          "y" : 0.2
+        }
+      },
+      {
+        "heuristic" : 0,
+        "id" : "G",
+        "label" : "G",
+        "position" : {
+          "x" : 0.95,
+          "y" : 0.5
+        }
+      }
+    ],
+    "source" : "S"
+  },
+  "slot" : "third"
+}

@@ -1,0 +1,118 @@
+{
+  "action" : {
+    "selectNode" : {
+      "options" : [
+        "Q",
+        "R"
+      ]
+    }
+  },
+  "algorithm" : "aStar",
+  "contentVersion" : "2026-10-17.1",
+  "feedbackGate" : "immediate",
+  "id" : "learning-aStar-practice-v1",
+  "maximumPoints" : 0,
+  "presentedState" : {
+    "costs" : [
+      {
+        "g" : 0,
+        "h" : 6,
+        "nodeID" : "P"
+      },
+      {
+        "g" : 6,
+        "h" : 1,
+        "nodeID" : "Q",
+        "predecessor" : "P"
+      },
+      {
+        "g" : 2,
+        "h" : 6,
+        "nodeID" : "R",
+        "predecessor" : "P"
+      },
+      {
+        "h" : 0,
+        "nodeID" : "T"
+      }
+    ],
+    "frontier" : [
+      "Q",
+      "R"
+    ],
+    "settled" : [
+      "P"
+    ]
+  },
+  "prompt" : "g is cost so far; h estimates the remaining cost; f = g + h is the selection priority. Expand the frontier node with the lowest f. h is not a confirmed walking cost. Which frontier node expands next? This prediction is unscored.",
+  "scenario" : {
+    "edges" : [
+      {
+        "bidirectional" : false,
+        "cost" : 6,
+        "from" : "P",
+        "to" : "Q"
+      },
+      {
+        "bidirectional" : false,
+        "cost" : 2,
+        "from" : "P",
+        "to" : "R"
+      },
+      {
+        "bidirectional" : false,
+        "cost" : 2,
+        "from" : "Q",
+        "to" : "T"
+      },
+      {
+        "bidirectional" : false,
+        "cost" : 8,
+        "from" : "R",
+        "to" : "T"
+      }
+    ],
+    "goal" : "T",
+    "id" : "learning-aStar-practice-graph-v1",
+    "nodes" : [
+      {
+        "heuristic" : 6,
+        "id" : "P",
+        "label" : "P",
+        "position" : {
+          "x" : 0.05,
+          "y" : 0.5
+        }
+      },
+      {
+        "heuristic" : 1,
+        "id" : "Q",
+        "label" : "Q",
+        "position" : {
+          "x" : 0.35,
+          "y" : 0.15
+        }
+      },
+      {
+        "heuristic" : 6,
+        "id" : "R",
+        "label" : "R",
+        "position" : {
+          "x" : 0.8,
+          "y" : 0.7
+        }
+      },
+      {
+        "heuristic" : 0,
+        "id" : "T",
+        "label" : "T",
+        "position" : {
+          "x" : 0.95,
+          "y" : 0.5
+        }
+      }
+    ],
+    "source" : "P"
+  },
+  "slot" : "practice"
+}

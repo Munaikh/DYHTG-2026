@@ -1,0 +1,628 @@
+{
+  "correctAnswer" : {
+    "cost" : {
+      "value" : 5
+    }
+  },
+  "definition" : {
+    "action" : {
+      "enterCost" : {
+        "nodeID" : "E"
+      }
+    },
+    "algorithm" : "aStar",
+    "contentVersion" : "2026-10-17.1",
+    "feedbackGate" : "immediate",
+    "id" : "learning-aStar-standardMiddle-v1",
+    "maximumPoints" : 20,
+    "presentedState" : {
+      "costs" : [
+        {
+          "g" : 0,
+          "h" : 5,
+          "nodeID" : "C"
+        },
+        {
+          "g" : 3,
+          "h" : 4,
+          "nodeID" : "D",
+          "predecessor" : "C"
+        },
+        {
+          "g" : 9,
+          "h" : 3,
+          "nodeID" : "E",
+          "predecessor" : "C"
+        },
+        {
+          "h" : 0,
+          "nodeID" : "H"
+        }
+      ],
+      "frontier" : [
+        "E"
+      ],
+      "settled" : [
+        "C",
+        "D"
+      ]
+    },
+    "prompt" : "Relax D → E. Add the cost so far to the edge cost and compare with the existing tentative cost. What updated g(E) should be kept?",
+    "scenario" : {
+      "edges" : [
+        {
+          "bidirectional" : false,
+          "cost" : 3,
+          "from" : "C",
+          "to" : "D"
+        },
+        {
+          "bidirectional" : false,
+          "cost" : 9,
+          "from" : "C",
+          "to" : "E"
+        },
+        {
+          "bidirectional" : false,
+          "cost" : 2,
+          "from" : "D",
+          "to" : "E"
+        },
+        {
+          "bidirectional" : false,
+          "cost" : 3,
+          "from" : "E",
+          "to" : "H"
+        },
+        {
+          "bidirectional" : false,
+          "cost" : 11,
+          "from" : "D",
+          "to" : "H"
+        }
+      ],
+      "goal" : "H",
+      "id" : "learning-aStar-standardMiddle-graph-v1",
+      "nodes" : [
+        {
+          "heuristic" : 5,
+          "id" : "C",
+          "label" : "C",
+          "position" : {
+            "x" : 0.05,
+            "y" : 0.5
+          }
+        },
+        {
+          "heuristic" : 4,
+          "id" : "D",
+          "label" : "D",
+          "position" : {
+            "x" : 0.35,
+            "y" : 0.15
+          }
+        },
+        {
+          "heuristic" : 3,
+          "id" : "E",
+          "label" : "E",
+          "position" : {
+            "x" : 0.8,
+            "y" : 0.7
+          }
+        },
+        {
+          "heuristic" : 0,
+          "id" : "H",
+          "label" : "H",
+          "position" : {
+            "x" : 0.95,
+            "y" : 0.5
+          }
+        }
+      ],
+      "source" : "C"
+    },
+    "slot" : "standardMiddle"
+  },
+  "explanation" : "Relaxation adds the current node's g to the outgoing edge cost. Replace a tentative cost only when this candidate is cheaper. A* uses the same relaxation for g; h is added only for selection priority.",
+  "presentedStepIndex" : 4,
+  "routes" : {
+
+  },
+  "trace" : {
+    "algorithm" : "aStar",
+    "outcome" : {
+      "route" : {
+        "cost" : 8,
+        "nodeIDs" : [
+          "C",
+          "D",
+          "E",
+          "H"
+        ]
+      }
+    },
+    "scenarioID" : "learning-aStar-standardMiddle-graph-v1",
+    "steps" : [
+      {
+        "event" : {
+          "initial" : {
+
+          }
+        },
+        "index" : 0,
+        "state" : {
+          "costs" : [
+            {
+              "g" : 0,
+              "h" : 5,
+              "nodeID" : "C"
+            },
+            {
+              "h" : 4,
+              "nodeID" : "D"
+            },
+            {
+              "h" : 3,
+              "nodeID" : "E"
+            },
+            {
+              "h" : 0,
+              "nodeID" : "H"
+            }
+          ],
+          "frontier" : [
+            "C"
+          ],
+          "settled" : [
+
+          ]
+        }
+      },
+      {
+        "event" : {
+          "expand" : {
+            "nodeID" : "C"
+          }
+        },
+        "index" : 1,
+        "state" : {
+          "costs" : [
+            {
+              "g" : 0,
+              "h" : 5,
+              "nodeID" : "C"
+            },
+            {
+              "h" : 4,
+              "nodeID" : "D"
+            },
+            {
+              "h" : 3,
+              "nodeID" : "E"
+            },
+            {
+              "h" : 0,
+              "nodeID" : "H"
+            }
+          ],
+          "frontier" : [
+
+          ],
+          "settled" : [
+            "C"
+          ]
+        }
+      },
+      {
+        "event" : {
+          "relax" : {
+            "accepted" : true,
+            "candidateCost" : 3,
+            "from" : "C",
+            "to" : "D"
+          }
+        },
+        "index" : 2,
+        "state" : {
+          "costs" : [
+            {
+              "g" : 0,
+              "h" : 5,
+              "nodeID" : "C"
+            },
+            {
+              "g" : 3,
+              "h" : 4,
+              "nodeID" : "D",
+              "predecessor" : "C"
+            },
+            {
+              "h" : 3,
+              "nodeID" : "E"
+            },
+            {
+              "h" : 0,
+              "nodeID" : "H"
+            }
+          ],
+          "frontier" : [
+            "D"
+          ],
+          "settled" : [
+            "C"
+          ]
+        }
+      },
+      {
+        "event" : {
+          "relax" : {
+            "accepted" : true,
+            "candidateCost" : 9,
+            "from" : "C",
+            "to" : "E"
+          }
+        },
+        "index" : 3,
+        "state" : {
+          "costs" : [
+            {
+              "g" : 0,
+              "h" : 5,
+              "nodeID" : "C"
+            },
+            {
+              "g" : 3,
+              "h" : 4,
+              "nodeID" : "D",
+              "predecessor" : "C"
+            },
+            {
+              "g" : 9,
+              "h" : 3,
+              "nodeID" : "E",
+              "predecessor" : "C"
+            },
+            {
+              "h" : 0,
+              "nodeID" : "H"
+            }
+          ],
+          "frontier" : [
+            "D",
+            "E"
+          ],
+          "settled" : [
+            "C"
+          ]
+        }
+      },
+      {
+        "event" : {
+          "expand" : {
+            "nodeID" : "D"
+          }
+        },
+        "index" : 4,
+        "state" : {
+          "costs" : [
+            {
+              "g" : 0,
+              "h" : 5,
+              "nodeID" : "C"
+            },
+            {
+              "g" : 3,
+              "h" : 4,
+              "nodeID" : "D",
+              "predecessor" : "C"
+            },
+            {
+              "g" : 9,
+              "h" : 3,
+              "nodeID" : "E",
+              "predecessor" : "C"
+            },
+            {
+              "h" : 0,
+              "nodeID" : "H"
+            }
+          ],
+          "frontier" : [
+            "E"
+          ],
+          "settled" : [
+            "C",
+            "D"
+          ]
+        }
+      },
+      {
+        "event" : {
+          "relax" : {
+            "accepted" : true,
+            "candidateCost" : 5,
+            "from" : "D",
+            "previousCost" : 9,
+            "to" : "E"
+          }
+        },
+        "index" : 5,
+        "state" : {
+          "costs" : [
+            {
+              "g" : 0,
+              "h" : 5,
+              "nodeID" : "C"
+            },
+            {
+              "g" : 3,
+              "h" : 4,
+              "nodeID" : "D",
+              "predecessor" : "C"
+            },
+            {
+              "g" : 5,
+              "h" : 3,
+              "nodeID" : "E",
+              "predecessor" : "D"
+            },
+            {
+              "h" : 0,
+              "nodeID" : "H"
+            }
+          ],
+          "frontier" : [
+            "E"
+          ],
+          "settled" : [
+            "C",
+            "D"
+          ]
+        }
+      },
+      {
+        "event" : {
+          "relax" : {
+            "accepted" : true,
+            "candidateCost" : 14,
+            "from" : "D",
+            "to" : "H"
+          }
+        },
+        "index" : 6,
+        "state" : {
+          "costs" : [
+            {
+              "g" : 0,
+              "h" : 5,
+              "nodeID" : "C"
+            },
+            {
+              "g" : 3,
+              "h" : 4,
+              "nodeID" : "D",
+              "predecessor" : "C"
+            },
+            {
+              "g" : 5,
+              "h" : 3,
+              "nodeID" : "E",
+              "predecessor" : "D"
+            },
+            {
+              "g" : 14,
+              "h" : 0,
+              "nodeID" : "H",
+              "predecessor" : "D"
+            }
+          ],
+          "frontier" : [
+            "E",
+            "H"
+          ],
+          "settled" : [
+            "C",
+            "D"
+          ]
+        }
+      },
+      {
+        "event" : {
+          "expand" : {
+            "nodeID" : "E"
+          }
+        },
+        "index" : 7,
+        "state" : {
+          "costs" : [
+            {
+              "g" : 0,
+              "h" : 5,
+              "nodeID" : "C"
+            },
+            {
+              "g" : 3,
+              "h" : 4,
+              "nodeID" : "D",
+              "predecessor" : "C"
+            },
+            {
+              "g" : 5,
+              "h" : 3,
+              "nodeID" : "E",
+              "predecessor" : "D"
+            },
+            {
+              "g" : 14,
+              "h" : 0,
+              "nodeID" : "H",
+              "predecessor" : "D"
+            }
+          ],
+          "frontier" : [
+            "H"
+          ],
+          "settled" : [
+            "C",
+            "D",
+            "E"
+          ]
+        }
+      },
+      {
+        "event" : {
+          "relax" : {
+            "accepted" : true,
+            "candidateCost" : 8,
+            "from" : "E",
+            "previousCost" : 14,
+            "to" : "H"
+          }
+        },
+        "index" : 8,
+        "state" : {
+          "costs" : [
+            {
+              "g" : 0,
+              "h" : 5,
+              "nodeID" : "C"
+            },
+            {
+              "g" : 3,
+              "h" : 4,
+              "nodeID" : "D",
+              "predecessor" : "C"
+            },
+            {
+              "g" : 5,
+              "h" : 3,
+              "nodeID" : "E",
+              "predecessor" : "D"
+            },
+            {
+              "g" : 8,
+              "h" : 0,
+              "nodeID" : "H",
+              "predecessor" : "E"
+            }
+          ],
+          "frontier" : [
+            "H"
+          ],
+          "settled" : [
+            "C",
+            "D",
+            "E"
+          ]
+        }
+      },
+      {
+        "event" : {
+          "expand" : {
+            "nodeID" : "H"
+          }
+        },
+        "index" : 9,
+        "state" : {
+          "costs" : [
+            {
+              "g" : 0,
+              "h" : 5,
+              "nodeID" : "C"
+            },
+            {
+              "g" : 3,
+              "h" : 4,
+              "nodeID" : "D",
+              "predecessor" : "C"
+            },
+            {
+              "g" : 5,
+              "h" : 3,
+              "nodeID" : "E",
+              "predecessor" : "D"
+            },
+            {
+              "g" : 8,
+              "h" : 0,
+              "nodeID" : "H",
+              "predecessor" : "E"
+            }
+          ],
+          "frontier" : [
+
+          ],
+          "settled" : [
+            "C",
+            "D",
+            "E",
+            "H"
+          ]
+        }
+      },
+      {
+        "event" : {
+          "reachedGoal" : {
+            "nodeID" : "H"
+          }
+        },
+        "index" : 10,
+        "state" : {
+          "costs" : [
+            {
+              "g" : 0,
+              "h" : 5,
+              "nodeID" : "C"
+            },
+            {
+              "g" : 3,
+              "h" : 4,
+              "nodeID" : "D",
+              "predecessor" : "C"
+            },
+            {
+              "g" : 5,
+              "h" : 3,
+              "nodeID" : "E",
+              "predecessor" : "D"
+            },
+            {
+              "g" : 8,
+              "h" : 0,
+              "nodeID" : "H",
+              "predecessor" : "E"
+            }
+          ],
+          "frontier" : [
+
+          ],
+          "settled" : [
+            "C",
+            "D",
+            "E",
+            "H"
+          ]
+        }
+      }
+    ]
+  },
+  "workedStepTraceIndices" : [
+    [
+      4,
+      5
+    ],
+    [
+      5
+    ],
+    [
+      5
+    ]
+  ],
+  "workedSteps" : [
+    "Candidate g(E) = 3 + 2 = 5.",
+    "5 < 9: replace 9 with 5, using predecessor D.",
+    "g(E) = 5; h = 3; f = 5 + 3 = 8. The requested cost is g, not f."
+  ]
+}
