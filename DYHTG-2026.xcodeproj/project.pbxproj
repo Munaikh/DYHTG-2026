@@ -8,8 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		473E31671392A80D708283FD /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1DB8CF0AD31C04948635F115 /* Foundation.framework */; };
-		F2040AF83A51456F77327938 /* AlgorithmArenaCore in Frameworks */ = {isa = PBXBuildFile; productRef = CCB71D5D98E77B3AD5ECEFF4 /* AlgorithmArenaCore */; };
 		75E57638B2080B737A2637D7 /* AlgorithmArenaFixtures in Frameworks */ = {isa = PBXBuildFile; productRef = C61610FEDE2C01C9587217F7 /* AlgorithmArenaFixtures */; };
+		F2040AF83A51456F77327938 /* AlgorithmArenaCore in Frameworks */ = {isa = PBXBuildFile; productRef = CCB71D5D98E77B3AD5ECEFF4 /* AlgorithmArenaCore */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -369,13 +369,13 @@
 /* End XCLocalSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		CCB71D5D98E77B3AD5ECEFF4 /* AlgorithmArenaCore */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = AlgorithmArenaCore;
-		};
 		C61610FEDE2C01C9587217F7 /* AlgorithmArenaFixtures */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = AlgorithmArenaFixtures;
+		};
+		CCB71D5D98E77B3AD5ECEFF4 /* AlgorithmArenaCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = AlgorithmArenaCore;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
