@@ -63,20 +63,8 @@ final class SupabaseMatchService: MatchService {
         do {
             return try await client.rpc(function, params: params).execute().value
         } catch let error as PostgrestError {
-            throw Self.serviceError(from: error)
+            throw error.matchServiceError
         }
-    }
-
-    private static func serviceError(from error: PostgrestError) -> any Error {
-        if let data = error.message.data(using: .utf8),
-            let decoded = try? ContractJSON.decoder().decode(MatchServiceError.self, from: data)
-        {
-            return decoded
-        }
-        if error.code == "PGRST301" || error.code == "42501" {
-            return MatchServiceError(code: .unauthenticated, message: error.message)
-        }
-        return error
     }
 
     private static func invalidation(from change: AnyAction) -> SnapshotInvalidation? {

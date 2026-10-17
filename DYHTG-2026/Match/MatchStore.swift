@@ -72,6 +72,15 @@ final class MatchStore {
         return snapshot.room.creatorID == snapshot.viewer.playerID
     }
 
+    func arrivalRequest(for node: NodeID) -> ArrivalRequest? {
+        guard mode == .live, let snapshot else { return nil }
+        return ArrivalRequest(
+            matchID: snapshot.room.matchID.rawValue,
+            playerID: snapshot.viewer.playerID.rawValue,
+            nodeID: node.rawValue
+        )
+    }
+
     func feedback(for id: ChallengeID) -> FeedbackAvailability? {
         snapshot?.viewer.feedback.first { $0.challengeID == id }
     }

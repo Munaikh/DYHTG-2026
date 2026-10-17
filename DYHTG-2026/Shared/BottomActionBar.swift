@@ -20,6 +20,7 @@ private struct BottomActionBar<Actions: View>: ViewModifier {
         VStack(spacing: 12) {
             actions
         }
+        .dynamicTypeSize(...DynamicTypeSize.accessibility1)
         .controlSize(.large)
         .padding(.horizontal, 20)
         .padding(.top, 12)
