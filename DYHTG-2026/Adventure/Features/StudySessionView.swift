@@ -221,7 +221,7 @@ struct StudySessionView: View {
         }
         .padding(.horizontal, 20).padding(.top, 12).padding(.bottom, 8)
         .frame(maxWidth: 650).frame(maxWidth: .infinity)
-        .background(.regularMaterial)
+        .arenaControlDock()
     }
 
     private var nextTitle: String {
@@ -319,26 +319,29 @@ struct StudyReplayView: View {
     }
 
     private var controls: some View {
-        VStack(spacing: 6) {
-            HStack(spacing: 12) {
-                Button("Previous", systemImage: "backward.frame") { playing = false; move(-1) }
-                    .buttonStyle(ArenaActionStyle(prominent: false)).disabled(index == 0)
-                    .accessibilityIdentifier("study.replay.previous")
-                Button(playing ? "Pause" : "Play", systemImage: playing ? "pause.fill" : "play.fill") {
-                    if index == lastIndex { index = 0 }
-                    playing.toggle()
-                }
-                .buttonStyle(ArenaActionStyle()).accessibilityIdentifier("study.replay.play")
-                Button("Next", systemImage: "forward.frame") { playing = false; move(1) }
-                    .buttonStyle(ArenaActionStyle(prominent: false)).disabled(index == lastIndex)
-                    .accessibilityIdentifier("study.replay.next")
-            }.labelStyle(.iconOnly)
-            Button("Restart", systemImage: "arrow.counterclockwise") { playing = false; index = 0 }
-                .font(.subheadline.weight(.semibold)).frame(maxWidth: .infinity, minHeight: 44)
-                .accessibilityIdentifier("study.replay.restart")
+        ArenaGlassGroup(spacing: 12) {
+            VStack(spacing: 12) {
+                HStack(spacing: 12) {
+                    Button("Previous", systemImage: "backward.frame") { playing = false; move(-1) }
+                        .buttonStyle(ArenaActionStyle(prominent: false)).disabled(index == 0)
+                        .accessibilityIdentifier("study.replay.previous")
+                    Button(playing ? "Pause" : "Play", systemImage: playing ? "pause.fill" : "play.fill") {
+                        if index == lastIndex { index = 0 }
+                        playing.toggle()
+                    }
+                    .buttonStyle(ArenaActionStyle()).accessibilityIdentifier("study.replay.play")
+                    Button("Next", systemImage: "forward.frame") { playing = false; move(1) }
+                        .buttonStyle(ArenaActionStyle(prominent: false)).disabled(index == lastIndex)
+                        .accessibilityIdentifier("study.replay.next")
+                }.labelStyle(.iconOnly)
+                Button("Restart", systemImage: "arrow.counterclockwise") { playing = false; index = 0 }
+                    .buttonStyle(ArenaActionStyle(prominent: false))
+                    .accessibilityIdentifier("study.replay.restart")
+            }
         }
         .padding(.horizontal, 20).padding(.top, 12).padding(.bottom, 4)
-        .frame(maxWidth: 650).frame(maxWidth: .infinity).background(.regularMaterial)
+        .frame(maxWidth: 650).frame(maxWidth: .infinity)
+        .arenaControlDock()
     }
 
     private var description: String {

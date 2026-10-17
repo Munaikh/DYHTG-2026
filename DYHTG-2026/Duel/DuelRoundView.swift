@@ -65,6 +65,7 @@ struct DuelRoundView: View {
                         showTable.toggle()
                     }
                     .font(.caption.weight(.semibold))
+                    .buttonStyle(ArenaCompactButtonStyle())
                     .frame(minHeight: 44)
                 }
                 if showTable {

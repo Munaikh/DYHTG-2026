@@ -30,19 +30,30 @@ private struct PlayerAvatar: View {
 
 /// A single profile entry point reused by all three tabs.
 struct ProfileButton: View {
+    var floating = false
     @AppStorage("battleAvatar") private var avatar = "person.crop.circle.fill"
     @AppStorage("profileTint") private var tint = ProfileTint.mint.rawValue
     @State private var showingProfile = false
 
     var body: some View {
-        Button { showingProfile = true } label: {
-            PlayerAvatar(symbol: avatar, color: (ProfileTint(rawValue: tint) ?? .mint).color, size: 32)
+        Group {
+            if floating {
+                profileAction.buttonStyle(ArenaCompactButtonStyle(shape: .circle))
+            } else {
+                profileAction
+            }
         }
         .accessibilityLabel("Edit profile")
         .accessibilityIdentifier("profile.open")
         .sheet(isPresented: $showingProfile) {
             NavigationStack { ProfileView() }
-                .tint(ArenaPalette.teal)
+                .tint(LearnStyle.teal)
+        }
+    }
+
+    private var profileAction: some View {
+        Button { showingProfile = true } label: {
+            PlayerAvatar(symbol: avatar, color: (ProfileTint(rawValue: tint) ?? .mint).color, size: 32)
         }
     }
 }
@@ -117,7 +128,7 @@ struct ProfileView: View {
                 .accessibilityIdentifier("profile.save")
                 .padding(.horizontal, 20)
                 .padding(.vertical, 12)
-                .background(.bar)
+                .arenaControlDock()
         }
         .onAppear {
             guard !loaded else { return }

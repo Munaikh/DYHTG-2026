@@ -50,7 +50,7 @@ struct MatchView: View {
                         }
                         .padding(.horizontal, 14)
                         .padding(.vertical, 10)
-                        .floatingBackground()
+                        .background(.regularMaterial, in: .capsule)
                         .accessibilityElement(children: .combine)
                     }
                     if let challenge = readyFeedback {
@@ -129,7 +129,7 @@ private struct ScoreBadge: View {
         .monospacedDigit()
         .padding(.horizontal, 14)
         .padding(.vertical, 10)
-        .floatingBackground()
+        .background(.regularMaterial, in: .capsule)
         .accessibilityElement(children: .ignore)
         .accessibilityLabel("Score")
         .accessibilityValue("You \(viewer.releasedScore), \(opponent?.nickname ?? "other player") \(opponent?.releasedScore ?? 0)")
@@ -150,21 +150,7 @@ private struct FeedbackBanner: View {
                     .foregroundStyle(.secondary)
             }
             .foregroundStyle(Color.primary)
-            .padding(.horizontal, 14)
-            .padding(.vertical, 10)
-            .floatingBackground()
         }
-        .buttonStyle(.plain)
-    }
-}
-
-private extension View {
-    @ViewBuilder
-    func floatingBackground() -> some View {
-        if #available(iOS 26, *) {
-            glassEffect(.regular.interactive(), in: .capsule)
-        } else {
-            background(.regularMaterial, in: .capsule)
-        }
+        .buttonStyle(ArenaCompactButtonStyle())
     }
 }

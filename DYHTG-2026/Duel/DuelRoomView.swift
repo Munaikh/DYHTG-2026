@@ -44,6 +44,7 @@ struct DuelRoomView: View {
                             .font(.title3)
                             .frame(width: 44, height: 44)
                     }
+                    .buttonStyle(ArenaCompactButtonStyle())
                     .tint(.white)
                     .accessibilityLabel("Share room code")
                 }
@@ -150,18 +151,23 @@ struct DuelRoomView: View {
                     .font(.subheadline).foregroundStyle(.secondary)
             }
             .arenaCard()
-            if store.isCreator && snapshot.phase == .finished {
-                Button("Play Again") { Task { await store.perform(.rematch) } }
-                    .buttonStyle(ArenaActionStyle())
-                    .disabled(!store.canAct)
-                    .accessibilityIdentifier("duel.rematch")
-            } else if snapshot.phase == .finished {
+            if !store.isCreator && snapshot.phase == .finished {
                 Text("Your host can start a rematch in this room.")
                     .font(.footnote).foregroundStyle(.secondary)
             }
-            Button("Back to Play") { store.closeResult() }
-                .buttonStyle(ArenaActionStyle(prominent: false))
-                .disabled(store.isBusy || store.pending != nil)
+            ArenaGlassGroup(spacing: 12) {
+                VStack(spacing: 12) {
+                    if store.isCreator && snapshot.phase == .finished {
+                        Button("Play Again") { Task { await store.perform(.rematch) } }
+                            .buttonStyle(ArenaActionStyle())
+                            .disabled(!store.canAct)
+                            .accessibilityIdentifier("duel.rematch")
+                    }
+                    Button("Back to Play") { store.closeResult() }
+                        .buttonStyle(ArenaActionStyle(prominent: false))
+                        .disabled(store.isBusy || store.pending != nil)
+                }
+            }
         }
     }
 

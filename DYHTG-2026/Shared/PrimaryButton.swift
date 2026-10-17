@@ -23,7 +23,7 @@ struct PrimaryButton: View {
             .foregroundStyle(isEnabled ? Color.white : Color(.tertiaryLabel))
             .frame(maxWidth: .infinity)
         }
-        .buttonStyle(.borderedProminent)
-        .tint(.primaryFill)
+        .buttonStyle(ArenaActionStyle())
+        .disabled(isBusy)
     }
 }

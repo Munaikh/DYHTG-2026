@@ -83,11 +83,11 @@ struct HomeView: View {
                         Text("Join with Code")
                             .frame(maxWidth: .infinity)
                     }
-                    .buttonStyle(.bordered)
+                    .buttonStyle(ArenaCompactButtonStyle())
                     .disabled(isCreating)
 
                     Button("Practice Solo") { createRoom(mode: .practice) }
-                        .buttonStyle(.borderless)
+                        .buttonStyle(ArenaCompactButtonStyle())
                         .disabled(isCreating)
                 }
                 .disabled(!nicknameIsValid)

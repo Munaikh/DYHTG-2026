@@ -18,7 +18,7 @@ struct AdventureCard<Content: View>: View {
     var body: some View { content.arenaCard() }
 }
 
-struct AdventureButtonStyle: ButtonStyle {
+struct AdventureButtonStyle: PrimitiveButtonStyle {
     var secondary = false
     var large = false
     func makeBody(configuration: Configuration) -> some View {

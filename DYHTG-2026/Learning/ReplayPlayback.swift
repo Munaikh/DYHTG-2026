@@ -78,27 +78,29 @@ struct ReplayControls: View {
             .accessibilityLabel("Step")
             .accessibilityValue("\(playback.index + 1) of \(playback.trace.steps.count)")
 
-            HStack {
-                control("Restart", systemImage: "backward.end.fill") { playback.move(to: 0, animated: !reduceMotion) }
+            ArenaGlassGroup {
+                HStack {
+                    control("Restart", systemImage: "backward.end.fill") { playback.move(to: 0, animated: !reduceMotion) }
+                        .disabled(playback.index == 0)
+                    Spacer()
+                    control("Previous Step", systemImage: "backward.frame.fill") {
+                        playback.move(to: playback.index - 1, animated: !reduceMotion)
+                    }
                     .disabled(playback.index == 0)
-                Spacer()
-                control("Previous Step", systemImage: "backward.frame.fill") {
-                    playback.move(to: playback.index - 1, animated: !reduceMotion)
+                    Spacer()
+                    control(playback.isPlaying ? "Pause" : "Play", systemImage: playback.isPlaying ? "pause.fill" : "play.fill") {
+                        playback.isPlaying.toggle()
+                    }
+                    .font(.title)
+                    Spacer()
+                    control("Next Step", systemImage: "forward.frame.fill") {
+                        playback.move(to: playback.index + 1, animated: !reduceMotion)
+                    }
+                    .disabled(playback.index == playback.lastIndex)
                 }
-                .disabled(playback.index == 0)
-                Spacer()
-                control(playback.isPlaying ? "Pause" : "Play", systemImage: playback.isPlaying ? "pause.fill" : "play.fill") {
-                    playback.isPlaying.toggle()
-                }
-                .font(.title)
-                Spacer()
-                control("Next Step", systemImage: "forward.frame.fill") {
-                    playback.move(to: playback.index + 1, animated: !reduceMotion)
-                }
-                .disabled(playback.index == playback.lastIndex)
+                .font(.title3)
+                .padding(.horizontal, 12)
             }
-            .font(.title3)
-            .padding(.horizontal, 12)
         }
         .task(id: playback.isPlaying) {
             await playback.play(animated: !reduceMotion)
@@ -108,7 +110,7 @@ struct ReplayControls: View {
     private func control(_ title: String, systemImage: String, action: @escaping () -> Void) -> some View {
         Button(title, systemImage: systemImage, action: action)
             .labelStyle(.iconOnly)
-            .buttonStyle(.borderless)
+            .buttonStyle(ArenaCompactButtonStyle())
             .frame(minWidth: 44, minHeight: 44)
     }
 }

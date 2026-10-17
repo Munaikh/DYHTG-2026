@@ -17,8 +17,10 @@ private struct BottomActionBar<Actions: View>: ViewModifier {
     }
 
     private var stack: some View {
-        VStack(spacing: 12) {
-            actions
+        ArenaGlassGroup {
+            VStack(spacing: 12) {
+                actions
+            }
         }
         .dynamicTypeSize(...DynamicTypeSize.accessibility1)
         .controlSize(.large)

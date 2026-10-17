@@ -111,7 +111,7 @@ struct LabStepCard: View {
             relaxationText(from: from, to: to, old: old, candidate: candidate, accepted: accepted)
         case .reachedGoal:
             if case .route(let nodes, let cost) = playback.trace.outcome {
-                "\(nodes.map(letter).joined(separator: " → ")) costs \(cost) m through the current campus model."
+                "\(nodes.map(letter).joined(separator: " → ")) costs \(cost) m through the connected walking network."
             } else {
                 "The goal has been reached."
             }
@@ -167,7 +167,7 @@ struct LabComparison: View {
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .accessibilityIdentifier("visualize.comparison")
-                Text(comparisonText)
+                Text(comparisonText + (experiment.heuristicScale < 0.99 ? " The distance estimate is scaled to stay a lower bound when map entrances differ from pins." : ""))
                     .font(.caption)
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
@@ -200,10 +200,10 @@ struct LabComparison: View {
             return "Both exhaust their reachable frontier. A heuristic cannot create a missing connection."
         }
         if aStar == dijkstra {
-            return "Equal work on this network. A* uses straight-line estimates; that does not guarantee fewer expansions on every journey."
+            return "Equal work on this network. A* uses distance estimates; that does not guarantee fewer expansions on every journey."
         }
         if aStar < dijkstra {
-            return "A* expanded \(dijkstra - aStar) fewer nodes here using straight-line estimates. Both found the same shortest cost."
+            return "A* expanded \(dijkstra - aStar) fewer nodes here using distance estimates. Both found the same shortest cost."
         }
         return "Both found the same shortest cost. Expansion counts depend on the network, heuristic, and tie order."
     }
@@ -216,7 +216,7 @@ struct LabSearchTable: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
-            Text(presentation.algorithm == .aStar ? "g = distance so far · h = straight-line estimate · f = g + h" : "g = best known distance from the start")
+            Text(presentation.algorithm == .aStar ? "g = distance so far · h = remaining-distance estimate · f = g + h" : "g = best known distance from the start")
                 .font(.caption)
                 .foregroundStyle(.secondary)
             ForEach(experiment.places) { place in

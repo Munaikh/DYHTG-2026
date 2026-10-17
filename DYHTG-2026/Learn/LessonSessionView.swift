@@ -32,7 +32,7 @@ struct LessonSessionView: View {
                     Text("Your progress is safe. Try opening the lesson again.")
                 } actions: {
                     Button("Try again") { self.lesson = try? LessonCatalog.lesson(for: algorithm) }
-                        .buttonStyle(.borderedProminent)
+                        .buttonStyle(ArenaActionStyle())
                 }
             }
         }
@@ -108,7 +108,7 @@ struct LessonSessionView: View {
                 lessonAction(lesson)
                     .padding(.horizontal, 20)
                     .padding(.vertical, 12)
-                    .background(.regularMaterial)
+                    .arenaControlDock()
             }
         }
     }

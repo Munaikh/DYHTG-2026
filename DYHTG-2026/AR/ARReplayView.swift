@@ -59,8 +59,8 @@ struct ARReplayView: View {
             }
             .labelStyle(.iconOnly)
             .font(.body.weight(.semibold))
-            .frame(width: 44, height: 44)
-            .modifier(FloatingCircle())
+            .buttonStyle(ArenaCompactButtonStyle(shape: .circle))
+            .controlSize(.large)
             .padding(.leading, 16)
         }
         .overlay(alignment: .bottom) {
@@ -83,7 +83,7 @@ struct ARReplayView: View {
             ReplayControls(playback: playback)
         }
         .padding(16)
-        .modifier(FloatingPanel())
+        .background(.regularMaterial, in: .rect(cornerRadius: 28))
         .padding(.horizontal, 12)
         .padding(.bottom, 8)
     }
@@ -104,26 +104,6 @@ struct ARReplayView: View {
             access = await AVCaptureDevice.requestAccess(for: .video) ? .granted : .denied
         default:
             access = .denied
-        }
-    }
-}
-
-private struct FloatingCircle: ViewModifier {
-    func body(content: Content) -> some View {
-        if #available(iOS 26, *) {
-            content.glassEffect(.regular.interactive(), in: .circle)
-        } else {
-            content.background(.regularMaterial, in: .circle)
-        }
-    }
-}
-
-private struct FloatingPanel: ViewModifier {
-    func body(content: Content) -> some View {
-        if #available(iOS 26, *) {
-            content.glassEffect(.regular, in: .rect(cornerRadius: 28))
-        } else {
-            content.background(.regularMaterial, in: .rect(cornerRadius: 28))
         }
     }
 }

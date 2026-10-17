@@ -1,243 +1,389 @@
 import AlgorithmArenaCore
 import SwiftUI
 
+/// A persistent map with an in-page sheet keeps the main tabs available during exploration.
 struct VisualizeHomeView: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
-    @State private var journey: LabJourney = .library
-    @State private var disruption: LabDisruption = .none
+    @Environment(\.scenePhase) private var scenePhase
+    @State private var loader = CampusRouteLoader()
+    @State private var start = CampusMapPoint.start
+    @State private var destination = CampusMapPoint.defaultDestination
     @State private var algorithm: AlgorithmKind = .dijkstra
-    @State private var showGraph = false
-    @State private var speed = 1.0
-    @State private var experiment: CampusLabExperiment?
     @State private var playback: ReplayPlayback?
-    @State private var errorMessage: String?
+    @State private var selection: SelectedEndpoint?
+    @State private var destinationSheet: CampusEndpointSheet?
+    @State private var expanded = false
+    @GestureState private var sheetDrag: CGFloat = 0
+    @State private var speed = 1.0
+    @State private var retry = 0
+    @State private var cameraRequest = 0
+    @State private var closedPathID: EdgeID?
+    @State private var selectionError: String?
 
     var body: some View {
         NavigationStack {
-            ScrollView {
-                VStack(alignment: .leading, spacing: 18) {
-                    introduction
-                    if let experiment, let playback {
-                        experimentContent(experiment, playback: playback)
-                    } else if let errorMessage {
-                        ContentUnavailableView {
-                            Label("Search unavailable", systemImage: "map")
-                        } description: {
-                            Text(errorMessage)
-                        } actions: {
-                            Button("Try again", action: loadExperiment)
-                                .buttonStyle(.borderedProminent)
-                        }
-                    } else {
-                        ProgressView("Preparing campus model")
-                            .frame(maxWidth: .infinity, minHeight: 300)
+            GeometryReader { geometry in
+                let restingHeight = selection != nil ? 146.0 : expanded ? geometry.size.height * 0.86 : min(282, geometry.size.height * 0.48)
+                let sheetHeight = min(max(restingHeight - sheetDrag, 140), geometry.size.height * 0.9)
+                ZStack(alignment: .bottom) {
+                    CampusSearchMap(
+                        experiment: loader.experiment,
+                        playback: playback,
+                        start: start,
+                        destination: destination,
+                        selection: selection,
+                        cameraRequest: cameraRequest,
+                        bottomInset: sheetHeight + 8,
+                        showsControls: !expanded || selection != nil,
+                        onSelect: selectCoordinate
+                    )
+                    .ignoresSafeArea(edges: .top)
+                    VStack {
+                        mapHeader
+                        Spacer(minLength: 0)
                     }
+                    .padding(.horizontal, 16)
+                    .padding(.top, 8)
+
+                    routeSheet(height: sheetHeight)
+                        .padding(.horizontal, 8)
+                        .padding(.bottom, 6)
                 }
-                .padding(.horizontal, 20)
-                .padding(.top, 12)
-                .padding(.bottom, 24)
+                .animation(reduceMotion ? nil : .spring(response: 0.38, dampingFraction: 0.86), value: expanded)
+                .animation(reduceMotion ? nil : .spring(response: 0.35), value: selection)
             }
-            .background(Color(.systemGroupedBackground))
-            .navigationTitle("Visualize")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .topBarLeading) { ProfileButton() }
-                ToolbarItem(placement: .topBarTrailing) {
-                    Menu {
-                        Picker("Journey", selection: $journey) {
-                            ForEach(LabJourney.allCases) { route in
-                                Text(route.title).tag(route)
-                            }
-                        }
-                    } label: {
-                        Label("Choose journey", systemImage: "map")
+            .toolbar(.hidden, for: .navigationBar)
+            .background(ArenaPalette.ink)
+            .tint(LearnStyle.teal)
+            .sheet(item: $destinationSheet) { sheet in
+                CampusEndpointPicker(
+                    role: sheet.role,
+                    current: sheet.role == .source ? start : destination,
+                    choose: { point in setEndpoint(point, role: sheet.role) },
+                    chooseOnMap: {
+                        playback?.isPlaying = false
+                        selectionError = nil
+                        selection = sheet.role
                     }
-                    .accessibilityIdentifier("visualize.journey")
+                )
+            }
+            .task(id: requestID + String(scenePhase == .active)) {
+                guard scenePhase == .active else { return }
+                playback?.isPlaying = false
+                playback = nil
+                await loader.load(from: start, to: destination, closedPathID: closedPathID)
+                guard !Task.isCancelled, let experiment = loader.experiment else { return }
+                playback = ReplayPlayback(trace: experiment.trace(for: algorithm), scenario: experiment.scenario)
+                cameraRequest += 1
+            }
+            .onChange(of: algorithm) { _, _ in resetPlayback() }
+            .onChange(of: scenePhase) { _, phase in
+                if phase != .active {
+                    playback?.isPlaying = false
+                    loader.cancel()
                 }
             }
-            .safeAreaInset(edge: .bottom, spacing: 0) {
-                if let playback {
-                    LabPlaybackControls(playback: playback, speed: $speed, reduceMotion: reduceMotion)
-                }
+            .onDisappear {
+                playback?.isPlaying = false
+                loader.cancel()
             }
-            .tint(.teal)
-            .onAppear { if experiment == nil { loadExperiment() } }
-            .onDisappear { playback?.isPlaying = false }
-            .onChange(of: journey) { _, _ in loadExperiment() }
-            .onChange(of: disruption) { _, _ in loadExperiment() }
-            .onChange(of: algorithm) { _, _ in resetAlgorithm() }
             .task(id: playbackTaskID) { await play() }
         }
     }
 
-    private var introduction: some View {
-        VStack(alignment: .leading, spacing: 7) {
-            HStack {
-                Label("CAMPUS LAB", systemImage: "point.3.connected.trianglepath.dotted")
-                    .font(.caption2.weight(.heavy))
-                    .tracking(1.5)
-                    .foregroundStyle(ArenaPalette.mint)
-                Spacer()
-                Image(systemName: "location.magnifyingglass")
-                    .font(.title3)
-                    .foregroundStyle(ArenaPalette.mint)
-            }
-            Text("See the search.")
-                .font(.system(.title, design: .rounded, weight: .bold))
-                .foregroundStyle(.white)
-            Text(journey.routeLabel)
-                .font(.subheadline)
-                .foregroundStyle(.white.opacity(0.78))
+    private var mapHeader: some View {
+        HStack {
+            Spacer()
+            ProfileButton(floating: true)
         }
-        .padding(20)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(ArenaPalette.ink, in: .rect(cornerRadius: 24))
     }
 
-    private func experimentContent(_ experiment: CampusLabExperiment, playback: ReplayPlayback) -> some View {
-        VStack(alignment: .leading, spacing: 18) {
-            Picker("Search algorithm", selection: $algorithm) {
-                Text("Dijkstra").tag(AlgorithmKind.dijkstra)
-                Text("A*").tag(AlgorithmKind.aStar)
-            }
-            .pickerStyle(.segmented)
-            .accessibilityIdentifier("visualize.algorithm")
-
-            VStack(spacing: 0) {
-                HStack {
-                    Text(showGraph ? "\(experiment.place(experiment.scenario.source)?.letter ?? "") start · \(experiment.place(experiment.scenario.goal)?.letter ?? "") goal · metres" : "Gilmorehill, Glasgow")
-                        .font(.caption.weight(.semibold))
-                        .foregroundStyle(.secondary)
-                    Spacer(minLength: 6)
-                    Picker("View", selection: $showGraph) {
-                        Image(systemName: "map").accessibilityLabel("Map").tag(false)
-                        Image(systemName: "point.3.connected.trianglepath.dotted").accessibilityLabel("Graph").tag(true)
+    private func routeSheet(height: CGFloat) -> some View {
+        VStack(spacing: 0) {
+            sheetHandle
+            if selection != nil {
+                VStack(alignment: .leading, spacing: 5) {
+                    Text(selectionError ?? "Tap a path or place on campus.")
+                        .font(.subheadline).foregroundStyle(.secondary)
+                    Button("Cancel") { selection = nil; selectionError = nil }
+                        .font(.subheadline.weight(.semibold))
+                        .accessibilityIdentifier("visualize.pin.cancel")
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.horizontal, 20)
+                .padding(.bottom, 20)
+            } else {
+                ScrollViewReader { scroll in
+                    ScrollView {
+                        VStack(alignment: .leading, spacing: 16) {
+                            endpointControls.id("route-controls")
+                            if loader.isLoading {
+                                HStack(spacing: 12) {
+                                    ProgressView().tint(LearnStyle.teal)
+                                    VStack(alignment: .leading, spacing: 3) {
+                                        Text("Connecting walking paths").font(.subheadline.bold())
+                                        Text(loader.status).font(.caption).foregroundStyle(.secondary)
+                                    }
+                                }
+                                .frame(maxWidth: .infinity, minHeight: 52, alignment: .leading)
+                                .accessibilityIdentifier("visualize.loading")
+                            } else if let error = loader.errorMessage {
+                                errorCard(error)
+                            } else if let experiment = loader.experiment, let playback {
+                                searchAction(playback)
+                                LabTransport(playback: playback, speed: $speed, reduceMotion: reduceMotion)
+                                LabStepCard(experiment: experiment, playback: playback)
+                                LabLegend(isGraph: false)
+                                experimentDetails(experiment, playback: playback)
+                            }
+                        }
+                        .padding(.horizontal, 20)
+                        .padding(.top, 4)
+                        .padding(.bottom, 28)
+                        .contentShape(Rectangle())
                     }
-                    .pickerStyle(.segmented)
-                    .frame(width: 110)
-                    .accessibilityIdentifier("visualize.view")
+                    .frame(height: max(height - 64, 1))
+                    .contentShape(Rectangle())
+                    .scrollIndicators(.hidden)
+                    .accessibilityIdentifier("visualize.sheet.scroll")
+                    .onChange(of: expanded) { _, isExpanded in
+                        if !isExpanded { scroll.scrollTo("route-controls", anchor: .top) }
+                    }
                 }
-                .padding(12)
-                if showGraph {
-                    SearchGraphView(presentation: playback.presentation, highlightedEdge: playback.highlightedEdge)
-                        .padding(.vertical, 12)
-                        .frame(minHeight: 270)
-                        .accessibilityIdentifier("visualize.graph")
-                } else {
-                    CampusSearchMap(experiment: experiment, playback: playback)
-                        .id("\(journey.rawValue)-\(disruption.rawValue)")
-                        .frame(height: 290)
-                        .accessibilityIdentifier("visualize.map")
-                }
-                LabLegend(isGraph: showGraph)
-                    .padding(12)
             }
-            .background(Color(.secondarySystemGroupedBackground), in: .rect(cornerRadius: 22))
-            .clipShape(.rect(cornerRadius: 22))
+        }
+        .frame(maxWidth: .infinity)
+        .frame(height: height, alignment: .top)
+        .background(.regularMaterial, in: .rect(cornerRadius: 30))
+        .overlay {
+            RoundedRectangle(cornerRadius: 30)
+                .strokeBorder(Color.primary.opacity(0.05), lineWidth: 0.5)
+                .allowsHitTesting(false)
+        }
+        .clipShape(.rect(cornerRadius: 30))
+        .contentShape(.rect(cornerRadius: 30))
+        .shadow(color: .black.opacity(0.1), radius: 18, y: 4)
+    }
 
-            LabStepCard(experiment: experiment, playback: playback)
+    private var sheetHandle: some View {
+        VStack(spacing: 8) {
+            Capsule().fill(.secondary.opacity(0.35)).frame(width: 34, height: 5)
+                .padding(.top, 10)
+            HStack {
+                Text(selection == .source ? "Set your start" : selection == .goal ? "Set destination" : "Campus routes")
+                    .font(.system(.title2, design: .default, weight: .bold))
+                Spacer()
+                if let playback, playback.index == playback.lastIndex,
+                   let cost = CampusLabExperiment.routeCost(playback.trace), selection == nil {
+                    Text("\(cost) m")
+                        .font(.subheadline.weight(.bold))
+                        .monospacedDigit()
+                        .foregroundStyle(LearnStyle.teal)
+                }
+                if selection == nil {
+                    Button {
+                        expanded.toggle()
+                    } label: {
+                        Image(systemName: expanded ? "chevron.down" : "chevron.up")
+                            .font(.system(size: 12, weight: .bold))
+                            .foregroundStyle(.secondary)
+                            .frame(width: 30, height: 30)
+                            .background(.quaternary, in: Circle())
+                    }
+                    .accessibilityLabel(expanded ? "Show more map" : "Show search details")
+                    .accessibilityIdentifier("visualize.sheet.expand")
+                }
+            }
+            .padding(.horizontal, 20)
+            .padding(.bottom, 8)
+        }
+        .frame(height: 64)
+        .contentShape(Rectangle())
+        .gesture(DragGesture(minimumDistance: 8)
+            .updating($sheetDrag) { value, state, _ in state = value.translation.height }
+            .onEnded { value in
+                guard selection == nil else { return }
+                withAnimation(reduceMotion ? nil : .spring(response: 0.35)) {
+                    if value.predictedEndTranslation.height < -45 { expanded = true }
+                    if value.predictedEndTranslation.height > 45 { expanded = false }
+                }
+            })
+    }
 
-            twistCard
-
-            LabComparison(experiment: experiment, isComplete: playback.index == playback.lastIndex)
-
-            DisclosureGroup {
-                LabSearchTable(experiment: experiment, presentation: playback.presentation)
-                    .padding(.top, 10)
+    private var endpointControls: some View {
+        HStack(spacing: 12) {
+            VStack(spacing: 0) {
+                endpointRow(start, role: .source)
+                Divider().padding(.leading, 39)
+                endpointRow(destination, role: .goal)
+            }
+            Button {
+                playback?.isPlaying = false
+                let oldStart = start
+                start = destination
+                destination = oldStart
+                closedPathID = nil
             } label: {
-                Label("Node costs & campus places", systemImage: "tablecells")
+                Image(systemName: "arrow.up.arrow.down")
+                    .font(.body.weight(.semibold))
+                    .frame(width: 40, height: 64)
+                    .background(ArenaPalette.surface, in: Capsule())
+            }
+            .accessibilityLabel("Swap start and destination")
+            .accessibilityIdentifier("visualize.swap")
+        }
+    }
+
+    private func endpointRow(_ point: CampusMapPoint, role: SelectedEndpoint) -> some View {
+        Button {
+            playback?.isPlaying = false
+            destinationSheet = CampusEndpointSheet(role: role)
+        } label: {
+            HStack(spacing: 11) {
+                Image(systemName: role == .source ? "circle.inset.filled" : "flag.checkered")
+                    .font(.system(size: 14, weight: .bold))
+                    .foregroundStyle(role == .source ? ArenaPalette.teal : ArenaPalette.ink)
+                    .frame(width: 28, height: 28)
+                    .background(role == .source ? ArenaPalette.mint : ArenaPalette.amber, in: Circle())
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(role == .source ? "START" : "DESTINATION")
+                        .font(.system(size: 9, weight: .bold)).tracking(1.3).foregroundStyle(.secondary)
+                    Text(point.name).font(.subheadline.weight(.semibold)).foregroundStyle(.primary)
+                        .lineLimit(1)
+                }
+                Spacer(minLength: 2)
+                Image(systemName: "chevron.right").font(.caption2.bold()).foregroundStyle(.secondary)
+            }
+            .frame(minHeight: 43)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityIdentifier(role == .source ? "visualize.start" : "visualize.destination")
+    }
+
+    private func searchAction(_ playback: ReplayPlayback) -> some View {
+        ArenaGlassGroup {
+            HStack(spacing: 12) {
+                Menu {
+                    Picker("Search algorithm", selection: $algorithm) {
+                        Text("Dijkstra").tag(AlgorithmKind.dijkstra)
+                        Text("A*").tag(AlgorithmKind.aStar)
+                    }
+                } label: {
+                    HStack(spacing: 7) {
+                        Image(systemName: "point.3.connected.trianglepath.dotted")
+                        Text(algorithm == .dijkstra ? "Dijkstra" : "A*")
+                        Image(systemName: "chevron.down").font(.system(size: 9, weight: .bold))
+                    }
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(.primary)
+                    .frame(height: 28)
+                }
+                .buttonStyle(ArenaCompactButtonStyle())
+                .controlSize(.large)
+                .accessibilityIdentifier("visualize.algorithm")
+                Button { playback.isPlaying.toggle() } label: {
+                    Label(playback.isPlaying ? "Pause" : playback.index == playback.lastIndex ? "Replay" : "Explore route",
+                          systemImage: playback.isPlaying ? "pause.fill" : "play.fill")
+                        .font(.subheadline.weight(.semibold))
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(ArenaActionStyle())
+                .accessibilityIdentifier("visualize.play")
+            }
+        }
+    }
+
+    private func errorCard(_ error: String) -> some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Label("Paths unavailable", systemImage: "wifi.exclamationmark").font(.headline)
+            Text(error).font(.subheadline).foregroundStyle(.secondary)
+            Button("Try again") { retry += 1 }
+                .buttonStyle(ArenaActionStyle())
+                .accessibilityIdentifier("visualize.retry")
+        }
+        .arenaCard()
+    }
+
+    private func experimentDetails(_ experiment: CampusLabExperiment, playback: ReplayPlayback) -> some View {
+        VStack(alignment: .leading, spacing: 16) {
+            DisclosureGroup {
+                SearchGraphView(presentation: playback.presentation, highlightedEdge: playback.highlightedEdge)
+                    .frame(minHeight: 320)
+                    .padding(.top, 12)
+                    .accessibilityIdentifier("visualize.graph")
+                LabSearchTable(experiment: experiment, presentation: playback.presentation)
+                    .padding(.top, 12)
+            } label: {
+                Label("Inside the algorithm", systemImage: "point.3.connected.trianglepath.dotted")
                     .font(.subheadline.weight(.semibold))
             }
-            .padding(16)
-            .background(Color(.secondarySystemGroupedBackground), in: .rect(cornerRadius: 18))
-
-            Text("An educational campus model with estimated paths and metre costs; outdoor survey pending.")
-                .font(.caption)
-                .foregroundStyle(.secondary)
+            .arenaCard()
+            LabComparison(experiment: experiment, isComplete: playback.index == playback.lastIndex)
+            if closedPathID != nil || experiment.dijkstra.outcome.routeNodeIDs != nil {
+                pathChallenge(experiment: experiment, route: experiment.dijkstra.outcome.routeNodeIDs ?? [])
+            }
+            Label("Walking geometry from Apple Maps", systemImage: "map.fill")
+                .font(.caption.weight(.semibold))
+            Text(experiment.geometryNote)
+                .font(.caption).foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)
         }
     }
 
-    private var twistCard: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            HStack(alignment: .top) {
-                Image(systemName: "bolt.shield.fill")
-                    .font(.title2)
-                    .foregroundStyle(.teal)
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("Change the world")
-                        .font(.headline)
-                    Text(disruption == .none ? "Close a path. Watch the algorithm adapt." : disruption.explanation)
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
-                }
-            }
-            if disruption == .none {
-                Button {
-                    disruption = .detour
-                } label: {
-                    Label("Close the Gardens path", systemImage: "bolt.fill")
-                        .frame(maxWidth: .infinity, minHeight: 32)
-                }
-                .buttonStyle(.borderedProminent)
-                .accessibilityIdentifier("visualize.twist")
-            } else {
-                Text(showGraph ? "Switch to Map to see the original route and closed path." : "Dashed mint = original route · red = closed path")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                Button("Reopen all paths") { disruption = .none }
-                    .buttonStyle(.bordered)
+    @ViewBuilder private func pathChallenge(experiment: CampusLabExperiment, route: [NodeID]) -> some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Label("Change the world", systemImage: "bolt.shield.fill")
+                .font(.headline).foregroundStyle(LearnStyle.teal)
+            Text(closedPathID == nil ? "Remove one network connection and see how the search adapts." : "One connection is removed from the graph. The dashed line remembers your original route.")
+                .font(.subheadline).foregroundStyle(.secondary)
+            if closedPathID != nil {
+                Button("Restore connection") { closedPathID = nil }
+                    .buttonStyle(ArenaActionStyle(prominent: false))
                     .accessibilityIdentifier("visualize.restore")
+            } else if let edge = experiment.edges(for: route).dropFirst().first ?? experiment.edges(for: route).first {
+                Button("Remove a connection") { closedPathID = edge.id }
+                    .buttonStyle(ArenaActionStyle(prominent: false))
+                    .accessibilityIdentifier("visualize.twist")
             }
-            Menu {
-                Picker("Campus conditions", selection: $disruption) {
-                    ForEach(LabDisruption.allCases) { condition in
-                        Text(condition.title).tag(condition)
-                    }
-                }
-            } label: {
-                Label("Try another condition", systemImage: "slider.horizontal.3")
-                    .font(.subheadline)
-                    .frame(minHeight: 32)
-            }
-            .accessibilityIdentifier("visualize.conditions")
         }
-        .padding(18)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color.teal.opacity(0.07), in: .rect(cornerRadius: 22))
+        .arenaCard()
     }
 
+    private func selectCoordinate(_ coordinate: Coordinate) {
+        guard let selection else { return }
+        guard CampusMapPoint.contains(coordinate) else {
+            selectionError = "Choose a point within Gilmorehill campus."
+            return
+        }
+        setEndpoint(.init(id: UUID().uuidString, name: selection == .source ? "Dropped start pin" : "Dropped destination pin", coordinate: coordinate), role: selection)
+        self.selection = nil
+        selectionError = nil
+        expanded = false
+    }
+
+    private func setEndpoint(_ point: CampusMapPoint, role: SelectedEndpoint) {
+        playback?.isPlaying = false
+        if role == .source { start = point } else { destination = point }
+        closedPathID = nil
+    }
+
+    private var requestID: String {
+        "\(start.coordinate.latitude),\(start.coordinate.longitude):\(destination.coordinate.latitude),\(destination.coordinate.longitude):\(closedPathID?.rawValue ?? "open"):\(retry)"
+    }
     private var playbackTaskID: String {
-        "\(journey.rawValue)-\(disruption.rawValue)-\(algorithm.rawValue)-\(playback?.isPlaying ?? false)-\(speed)-\(reduceMotion)"
+        "\(requestID):\(algorithm.rawValue):\(playback?.isPlaying ?? false):\(speed):\(scenePhase)"
     }
-
-    private func loadExperiment() {
+    private func resetPlayback() {
         playback?.isPlaying = false
-        do {
-            let next = try CampusLabExperiment(journey: journey, disruption: disruption)
-            experiment = next
-            playback = ReplayPlayback(trace: next.trace(for: algorithm), scenario: next.scenario)
-            errorMessage = nil
-        } catch {
-            experiment = nil
-            playback = nil
-            errorMessage = "The campus model couldn't be prepared. Try restoring the default experiment."
-        }
-    }
-
-    private func resetAlgorithm() {
-        playback?.isPlaying = false
-        guard let experiment else { loadExperiment(); return }
+        guard let experiment = loader.experiment else { return }
         playback = ReplayPlayback(trace: experiment.trace(for: algorithm), scenario: experiment.scenario)
     }
-
-    @MainActor
-    private func play() async {
-        guard let playback, playback.isPlaying else { return }
+    @MainActor private func play() async {
+        guard let playback, playback.isPlaying, scenePhase == .active else { return }
         if playback.index == playback.lastIndex { playback.move(to: 0, animated: !reduceMotion) }
         while playback.index < playback.lastIndex {
-            do { try await Task.sleep(for: .seconds(1.25 / speed)) }
-            catch { return }
+            do { try await Task.sleep(for: .seconds(0.85 / speed)) } catch { return }
             guard !Task.isCancelled, playback.isPlaying else { return }
             playback.move(to: playback.index + 1, animated: !reduceMotion)
         }
@@ -245,82 +391,66 @@ struct VisualizeHomeView: View {
     }
 }
 
-private struct LabPlaybackControls: View {
+private struct LabTransport: View {
     @Bindable var playback: ReplayPlayback
     @Binding var speed: Double
     let reduceMotion: Bool
 
     var body: some View {
-        VStack(spacing: 4) {
-            HStack {
-                Text("Step \(playback.index + 1) / \(playback.trace.steps.count)")
-                    .font(.caption.weight(.semibold))
-                    .monospacedDigit()
-                Spacer()
-                Menu {
-                    Picker("Playback speed", selection: $speed) {
-                        Text("0.5× · Take your time").tag(0.5)
-                        Text("1× · Normal").tag(1.0)
-                        Text("2× · Fast").tag(2.0)
+        ArenaGlassGroup {
+            VStack(spacing: 12) {
+                HStack(spacing: 9) {
+                    Button {
+                        playback.isPlaying = false
+                        playback.move(to: 0, animated: !reduceMotion)
+                    } label: {
+                        Image(systemName: "arrow.counterclockwise").frame(width: 20, height: 26)
                     }
-                } label: {
-                    Text("\(speed.formatted())×")
-                        .font(.caption.weight(.bold))
-                        .frame(minWidth: 44, minHeight: 32)
-                }
-                .accessibilityLabel("Playback speed, \(speed.formatted()) times")
-                .accessibilityHint("Changes presentation pace, not algorithm performance")
-                .accessibilityIdentifier("visualize.speed")
-            }
-            Slider(value: Binding(
-                get: { Double(playback.index) },
-                set: { value in
-                    playback.isPlaying = false
-                    playback.move(to: Int(value.rounded()), animated: false)
-                }
-            ), in: 0...Double(max(playback.lastIndex, 1)), step: 1)
-            .accessibilityLabel("Search step")
-            .accessibilityValue("\(playback.index + 1) of \(playback.trace.steps.count)")
-            .accessibilityIdentifier("visualize.scrubber")
-            HStack(spacing: 12) {
-                stepButton("Restart search", symbol: "arrow.counterclockwise", index: 0)
-                    .accessibilityIdentifier("visualize.restart")
-                stepButton("Previous step", symbol: "backward.frame.fill", index: playback.index - 1)
-                    .disabled(playback.index == 0)
-                Button {
-                    playback.isPlaying.toggle()
-                } label: {
-                    Label(playback.isPlaying ? "Pause" : playback.index == playback.lastIndex ? "Replay search" : "Run search",
-                          systemImage: playback.isPlaying ? "pause.fill" : "play.fill")
-                        .font(.subheadline.weight(.semibold))
-                        .frame(maxWidth: .infinity, minHeight: 34)
-                }
-                .buttonStyle(.borderedProminent)
-                .accessibilityIdentifier("visualize.play")
-                stepButton("Next step", symbol: "forward.frame.fill", index: playback.index + 1)
+                    .buttonStyle(ArenaCompactButtonStyle())
+                    .accessibilityLabel("Restart search").accessibilityIdentifier("visualize.restart")
+                    Spacer()
+                    Text("Step \(playback.index + 1) of \(playback.trace.steps.count)")
+                        .font(.caption.weight(.medium)).monospacedDigit().foregroundStyle(.secondary)
+                    Spacer()
+                    Button {
+                        playback.isPlaying = false
+                        playback.move(to: playback.index + 1, animated: !reduceMotion)
+                    } label: {
+                        Image(systemName: "forward.frame.fill").frame(width: 20, height: 26)
+                    }
+                    .buttonStyle(ArenaCompactButtonStyle())
                     .disabled(playback.index == playback.lastIndex)
-                    .accessibilityIdentifier("visualize.next")
+                    .accessibilityLabel("Next step").accessibilityIdentifier("visualize.next")
+                }
+                HStack {
+                    Text("Search replay")
+                        .font(.caption.weight(.medium)).foregroundStyle(.secondary)
+                    Spacer()
+                    Menu {
+                        Picker("Playback speed", selection: $speed) {
+                            Text("0.5×").tag(0.5)
+                            Text("1×").tag(1.0)
+                            Text("2×").tag(2.0)
+                            Text("4×").tag(4.0)
+                        }
+                    } label: { Text("\(speed.formatted())×").font(.caption.bold()) }
+                    .accessibilityIdentifier("visualize.speed")
+                }
+                Slider(value: Binding(get: { Double(playback.index) }, set: {
+                    playback.isPlaying = false
+                    playback.move(to: Int($0.rounded()), animated: false)
+                }), in: 0...Double(max(1, playback.lastIndex)), step: 1)
+                .disabled(playback.lastIndex == 0)
+                .accessibilityLabel("Search step")
+                .accessibilityIdentifier("visualize.scrubber")
             }
         }
-        .padding(.horizontal, 20)
-        .padding(.top, 5)
-        .padding(.bottom, 10)
-        .background(.bar)
-    }
-
-    private func stepButton(_ title: String, symbol: String, index: Int) -> some View {
-        Button {
-            playback.isPlaying = false
-            playback.move(to: index, animated: !reduceMotion)
-        } label: {
-            Image(systemName: symbol)
-                .font(.body.weight(.semibold))
-                .frame(minWidth: 44, minHeight: 44)
-        }
-        .accessibilityLabel(title)
     }
 }
 
-#Preview {
-    VisualizeHomeView()
+private extension SearchOutcome {
+    var routeNodeIDs: [NodeID]? {
+        guard case .route(let nodes, _) = self else { return nil }
+        return nodes
+    }
 }

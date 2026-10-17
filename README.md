@@ -12,7 +12,7 @@ iPad, using **Swift 6** and the Supabase Swift SDK.
 | --- | --- |
 | **Learn** | A Home dashboard with 15 lessons and 15 practice puzzles across five algorithms, trace replays, hints, XP, and quests. Original Dijkstra/A* guided lessons remain as Duel warm-ups. Progress saves on the device; no room or nickname is required. |
 | **Play** | **Plot Twist Duel**: two players, three prediction rounds, private answers, shared animated reveals, and server-authoritative scores. A bridge closes in round two; a different network tests understanding in round three. |
-| **Visualize** | A campus search laboratory with map/graph views, two prepared journeys, Dijkstra/A* selection, play/pause/step/scrub controls, adjustable playback speed, and a node-cost table. Close a path to trigger a detour or disconnect the destination, then compare route costs and expanded-node counts. |
+| **Visualize** | A map-first campus route lab. Pick any two Gilmorehill points or landmarks; MapKit walking paths connect them to the campus network. A scrollable route sheet controls Dijkstra/A* replay, step/scrub/speed, the refined graph, costs, and comparisons. Remove a network connection to explore rerouting. Native map controls, 3D, and a traced route keep the map central. |
 
 Plot Twist Duel awards 100 points for each correct prediction, with no speed
 bonus. Both players submit before answers or new scores are revealed, and both
@@ -20,9 +20,11 @@ continue before the next round starts. The host can start a rematch after the
 results. [Duel contract, content, recovery, and backend runbook](docs/DUEL.md).
 
 Learn and search calculations run locally. Play needs a network connection and
-uses anonymous Supabase sessions. Map tiles come from MapKit. The campus paths
-are an educational model awaiting an outdoor survey; Visualize does not request
-location permission or provide walking directions.
+uses anonymous Supabase sessions. Visualize uses MapKit tiles and live walking geometry, cached for the session. Search runs locally over the connected learning network; it does not claim the shortest walk across every campus footway. Pins connect at nearby mapped entrances, unavailable connections are excluded, and no straight-line routes are invented. The page does not request location permission or provide turn-by-turn navigation.
+
+The route sheet keeps endpoints and the primary action compact; drag its handle or tap the chevron to explore the algorithm. iOS 26 uses native Liquid Glass for map controls with standard-material fallbacks on earlier versions. Graph content keeps the shared app palette and graph component.
+
+Validate the production MapKit adapter lifecycle with `bash scripts/test_campus_routes.sh`; its injected provider covers dynamic pins, cached geometry, stale requests, failures, and cancellation without depending on Apple servers.
 
 ## Welcome and profile
 
@@ -162,3 +164,7 @@ as `scripts/test_supabase_lobby.mjs` and `scripts/test_supabase_match.mjs`.
 The rebased Pathfinder branch also retains experimental friend-battle and road-search
 source. Those routes are not exposed by the active three-tab shell; its older
 [expansion notes](docs/EXPANSION.md) are historical, not current setup requirements.
+
+### Native controls
+
+On iOS 26+, shared actions use SwiftUI's native `glass` and `glassProminent` button styles. Neighboring actions share `ArenaGlassGroup` / `GlassEffectContainer`; native tabs, toolbars and modal sheets keep their system presentation. Learning cards, graphs, answer choices and status panels retain solid or standard-material surfaces. `ArenaActionStyle`, `ArenaCompactButtonStyle` and `arenaControlDock()` keep earlier iOS versions functional without simulated glass. Follow the [Apple Liquid Glass guidance](https://developer.apple.com/documentation/SwiftUI/Applying-Liquid-Glass-to-custom-views) when adding new controls.

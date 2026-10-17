@@ -9,14 +9,14 @@ struct OnboardingView: View {
     private let subtitles = [
         "Explore five algorithms through short lessons and puzzles. Earn XP, complete quests, and make each step click.",
         "Challenge a friend in Plot Twist Duel. Three rounds. One bridge closure. Can you adapt?",
-        "Watch algorithms explore a campus. Close a path, try a detour, and compare the results."
+        "Choose two campus points. Watch a search follow real walking paths, then compare algorithms."
     ]
 
     var body: some View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 24) {
-                    ArenaEyebrow(text: tabs[page], color: ArenaPalette.teal)
+                    ArenaEyebrow(text: tabs[page], color: LearnStyle.teal)
                     OnboardingDemo(page: page)
                         .frame(height: 250)
                         .foregroundStyle(.white)
@@ -48,25 +48,27 @@ struct OnboardingView: View {
                         }
                     }
                     .accessibilityLabel("Welcome screen \(page + 1) of 3")
-                    HStack(spacing: 12) {
-                        if page > 0 {
-                            Button("Back") { move(-1) }
-                                .buttonStyle(ArenaActionStyle(prominent: false))
-                                .frame(maxWidth: 90)
-                                .accessibilityIdentifier("welcome.back")
+                    ArenaGlassGroup {
+                        HStack(spacing: 12) {
+                            if page > 0 {
+                                Button("Back") { move(-1) }
+                                    .buttonStyle(ArenaActionStyle(prominent: false))
+                                    .frame(maxWidth: 90)
+                                    .accessibilityIdentifier("welcome.back")
+                            }
+                            Button(page == 2 ? "Let's get started" : "Continue") {
+                                if page == 2 { completion() } else { move(1) }
+                            }
+                            .buttonStyle(ArenaActionStyle())
+                            .accessibilityIdentifier("welcome.continue")
                         }
-                        Button(page == 2 ? "Let's get started" : "Continue") {
-                            if page == 2 { completion() } else { move(1) }
-                        }
-                        .buttonStyle(ArenaActionStyle())
-                        .accessibilityIdentifier("welcome.continue")
                     }
                 }
                 .padding(.horizontal, 24)
                 .padding(.vertical, 16)
                 .frame(maxWidth: 620)
                 .frame(maxWidth: .infinity)
-                .background(ArenaPalette.canvas)
+                .arenaControlDock()
             }
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
@@ -76,7 +78,7 @@ struct OnboardingView: View {
             .navigationTitle("Algorithm Arena")
             .navigationBarTitleDisplayMode(.inline)
         }
-        .tint(ArenaPalette.teal)
+        .tint(LearnStyle.teal)
     }
 
     private func move(_ delta: Int) {

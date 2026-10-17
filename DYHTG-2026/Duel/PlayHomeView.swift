@@ -52,9 +52,9 @@ struct PlayHomeView: View {
             .navigationTitle(store.snapshot == nil ? "Play" : "Plot Twist Duel")
             .navigationBarTitleDisplayMode(store.snapshot == nil ? .large : .inline)
             .toolbar {
-                ToolbarItem(placement: .topBarTrailing) { ProfileButton() }
-                if let snapshot = store.snapshot, snapshot.phase != .finished && snapshot.phase != .incomplete {
-                    ToolbarItem(placement: .topBarTrailing) {
+                ToolbarItemGroup(placement: .topBarTrailing) {
+                    ProfileButton()
+                    if let snapshot = store.snapshot, snapshot.phase != .finished && snapshot.phase != .incomplete {
                         Button("Leave", systemImage: "rectangle.portrait.and.arrow.right") { leaving = true }
                             .labelStyle(.iconOnly)
                             .disabled(!store.canAct)
@@ -117,24 +117,28 @@ struct PlayHomeView: View {
                 Text(algorithm == .dijkstra ? "Follow the cheapest known cost." : "Balance the cost so far with an estimate ahead.")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
-                Button {
-                    nicknameFocused = false
-                    Task { await store.create(nickname: cleanNickname, algorithm: algorithm) }
-                } label: {
-                    HStack {
-                        Text(store.isBusy ? "Creating room…" : "Create a Duel")
-                        if store.isBusy { ProgressView() }
-                        else { Image(systemName: "arrow.up.right") }
+                ArenaGlassGroup(spacing: 12) {
+                    VStack(spacing: 12) {
+                        Button {
+                            nicknameFocused = false
+                            Task { await store.create(nickname: cleanNickname, algorithm: algorithm) }
+                        } label: {
+                            HStack {
+                                Text(store.isBusy ? "Creating room…" : "Create a Duel")
+                                if store.isBusy { ProgressView() }
+                                else { Image(systemName: "arrow.up.right") }
+                            }
+                        }
+                        .buttonStyle(ArenaActionStyle())
+                        .disabled(!validNickname || !store.canAct)
+                        .accessibilityIdentifier("duel.create")
+
+                        Button("Join with a Code") { nicknameFocused = false; joining = true }
+                            .buttonStyle(ArenaActionStyle(prominent: false))
+                            .disabled(!validNickname || !store.canAct)
+                            .accessibilityIdentifier("duel.join")
                     }
                 }
-                .buttonStyle(ArenaActionStyle())
-                .disabled(!validNickname || !store.canAct)
-                .accessibilityIdentifier("duel.create")
-
-                Button("Join with a Code") { nicknameFocused = false; joining = true }
-                    .buttonStyle(ArenaActionStyle(prominent: false))
-                    .disabled(!validNickname || !store.canAct)
-                    .accessibilityIdentifier("duel.join")
                 if !validNickname {
                     Text("Choose a nickname with 2–20 characters.")
                         .font(.footnote)

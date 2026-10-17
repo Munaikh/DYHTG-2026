@@ -102,7 +102,7 @@ struct LobbyView: View {
                 Button("I'm Not Ready") {
                     Task { await store.perform(.setReady(ready: false)) }
                 }
-                .buttonStyle(.borderless)
+                .buttonStyle(ArenaCompactButtonStyle())
             }
         }
         .confirmationDialog("Leave this room?", isPresented: $isConfirmingLeave, titleVisibility: .visible) {
@@ -143,7 +143,7 @@ struct LobbyView: View {
         if !viewer.hasArrived(at: start) {
             PrimaryButton(title: "Check In at Start", busyTitle: "Checking In...", isBusy: isCheckingIn, action: checkIn)
             Button("Ask an Organiser to Check You In") { isAskingOrganiser = true }
-                .buttonStyle(.borderless)
+                .buttonStyle(ArenaCompactButtonStyle())
         } else if !viewer.ready {
             PrimaryButton(title: "Ready with \(room.algorithm.title)", busyTitle: "Getting Ready...", isBusy: isGettingReady) {
                 getReady(for: room.algorithm, viewer: viewer)

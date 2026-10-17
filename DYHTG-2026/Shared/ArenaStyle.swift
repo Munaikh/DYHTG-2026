@@ -9,7 +9,94 @@ enum ArenaPalette {
     static let surface = Color(.secondarySystemGroupedBackground)
 }
 
-struct ArenaActionStyle: ButtonStyle {
+/// Shared actions use system glass so focus, presses, disabled state and tint
+/// follow the platform. Learning cards and diagrams remain on solid surfaces.
+struct ArenaActionStyle: PrimitiveButtonStyle {
+    var prominent = true
+
+    @ViewBuilder func makeBody(configuration: Configuration) -> some View {
+        if #available(iOS 26, *) {
+            if prominent {
+                action(configuration)
+                    .buttonStyle(.glassProminent)
+                    .tint(ArenaPalette.teal)
+            } else {
+                action(configuration)
+                    .buttonStyle(.glass)
+            }
+        } else {
+            Button(role: configuration.role, action: configuration.trigger) {
+                configuration.label
+            }
+            .buttonStyle(ArenaLegacyActionStyle(prominent: prominent))
+        }
+    }
+
+    private func action(_ configuration: Configuration) -> some View {
+        Button(role: configuration.role, action: configuration.trigger) {
+            configuration.label
+                .font(.headline)
+                .frame(maxWidth: .infinity, minHeight: 28)
+                .foregroundStyle(prominent ? Color.white : Color.primary)
+        }
+        .controlSize(.large)
+        .buttonBorderShape(.capsule)
+    }
+}
+
+/// Utility actions retain their intrinsic width instead of filling a card.
+struct ArenaCompactButtonStyle: PrimitiveButtonStyle {
+    var prominent = false
+    var shape: ButtonBorderShape = .capsule
+
+    @ViewBuilder func makeBody(configuration: Configuration) -> some View {
+        if #available(iOS 26, *) {
+            if prominent {
+                action(configuration).buttonStyle(.glassProminent).tint(ArenaPalette.teal)
+            } else {
+                action(configuration).buttonStyle(.glass)
+            }
+        } else if prominent {
+            action(configuration).buttonStyle(.borderedProminent).tint(ArenaPalette.teal)
+        } else {
+            action(configuration).buttonStyle(.bordered)
+        }
+    }
+
+    private func action(_ configuration: Configuration) -> some View {
+        Button(role: configuration.role, action: configuration.trigger) {
+            configuration.label
+                .foregroundStyle(prominent ? Color.white : Color.primary)
+        }
+        .buttonBorderShape(shape)
+    }
+}
+
+/// Group neighboring controls for a single glass rendering context.
+struct ArenaGlassGroup<Content: View>: View {
+    var spacing: CGFloat = 12
+    @ViewBuilder var content: Content
+
+    var body: some View {
+        if #available(iOS 26, *) {
+            GlassEffectContainer(spacing: spacing) { content }
+        } else {
+            content
+        }
+    }
+}
+
+private struct ArenaControlDock: ViewModifier {
+    @ViewBuilder func body(content: Content) -> some View {
+        if #available(iOS 26, *) {
+            content
+        } else {
+            content.background(.regularMaterial)
+        }
+    }
+}
+
+private struct ArenaLegacyActionStyle: ButtonStyle {
     var prominent = true
     @Environment(\.isEnabled) private var enabled
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
@@ -27,6 +114,9 @@ struct ArenaActionStyle: ButtonStyle {
 }
 
 extension View {
+    /// Glass controls float above content; older systems retain a material dock.
+    func arenaControlDock() -> some View { modifier(ArenaControlDock()) }
+
     func arenaCard() -> some View {
         padding(20)
             .frame(maxWidth: .infinity, alignment: .leading)
