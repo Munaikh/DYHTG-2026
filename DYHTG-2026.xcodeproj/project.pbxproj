@@ -3,23 +3,23 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 46;
+	objectVersion = 70;
 	objects = {
 
 /* Begin PBXBuildFile section */
-		1DD87FF5ECA519E1335A9AA6 /* DYHTG2026App.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9761A5CB6C18FC4AEA556F2F /* DYHTG2026App.swift */; };
-		44803842F5C3F52676DA1D40 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 667E2F0D9C23B72997568220 /* Assets.xcassets */; };
 		473E31671392A80D708283FD /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1DB8CF0AD31C04948635F115 /* Foundation.framework */; };
-		87C98CB4B3E382C6E23481D4 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1F88D90177DED0DA94D106F /* ContentView.swift */; };
+		F2040AF83A51456F77327938 /* AlgorithmArenaCore in Frameworks */ = {isa = PBXBuildFile; productRef = CCB71D5D98E77B3AD5ECEFF4 /* AlgorithmArenaCore */; };
+		75E57638B2080B737A2637D7 /* AlgorithmArenaFixtures in Frameworks */ = {isa = PBXBuildFile; productRef = C61610FEDE2C01C9587217F7 /* AlgorithmArenaFixtures */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		1DB8CF0AD31C04948635F115 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS26.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
 		3F2F314006C04ECB8A009F8B /* DYHTG-2026.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "DYHTG-2026.app"; sourceTree = BUILT_PRODUCTS_DIR; };
-		667E2F0D9C23B72997568220 /* Assets.xcassets */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		9761A5CB6C18FC4AEA556F2F /* DYHTG2026App.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DYHTG2026App.swift; sourceTree = "<group>"; };
-		B1F88D90177DED0DA94D106F /* ContentView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		0A58AB065D9B3C2BA4C1C943 /* DYHTG-2026 */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = "DYHTG-2026"; sourceTree = "<group>"; };
+/* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		8969A92A0278E4ABE72B0EB0 /* Frameworks */ = {
@@ -27,22 +27,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				473E31671392A80D708283FD /* Foundation.framework in Frameworks */,
+				F2040AF83A51456F77327938 /* AlgorithmArenaCore in Frameworks */,
+				75E57638B2080B737A2637D7 /* AlgorithmArenaFixtures in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		0A58AB065D9B3C2BA4C1C943 /* DYHTG-2026 */ = {
-			isa = PBXGroup;
-			children = (
-				9761A5CB6C18FC4AEA556F2F /* DYHTG2026App.swift */,
-				B1F88D90177DED0DA94D106F /* ContentView.swift */,
-				667E2F0D9C23B72997568220 /* Assets.xcassets */,
-			);
-			path = "DYHTG-2026";
-			sourceTree = "<group>";
-		};
 		33DFA750739B445FDDD31942 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -91,7 +83,14 @@
 			);
 			dependencies = (
 			);
+			fileSystemSynchronizedGroups = (
+				0A58AB065D9B3C2BA4C1C943 /* DYHTG-2026 */,
+			);
 			name = "DYHTG-2026";
+			packageProductDependencies = (
+				CCB71D5D98E77B3AD5ECEFF4 /* AlgorithmArenaCore */,
+				C61610FEDE2C01C9587217F7 /* AlgorithmArenaFixtures */,
+			);
 			productName = "DYHTG-2026";
 			productReference = 3F2F314006C04ECB8A009F8B /* DYHTG-2026.app */;
 			productType = "com.apple.product-type.application";
@@ -119,6 +118,9 @@
 				Base,
 			);
 			mainGroup = 8FC690EBE74EEBFE230E52BA;
+			packageReferences = (
+				E67898DE245D6388FB20C073 /* XCLocalSwiftPackageReference "Packages/AlgorithmArenaCore" */,
+			);
 			productRefGroup = 6D8C799F77AB9FA41349ACB6 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -133,7 +135,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				44803842F5C3F52676DA1D40 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -144,8 +145,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				1DD87FF5ECA519E1335A9AA6 /* DYHTG2026App.swift in Sources */,
-				87C98CB4B3E382C6E23481D4 /* ContentView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -217,21 +216,26 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CLANG_ENABLE_OBJC_WEAK = NO;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = "DYHTG-2026";
+				INFOPLIST_KEY_CFBundleDisplayName = Arena;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.education";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Arena checks your location when you check in at the start, a checkpoint or the finish.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.example.DYHTG2026;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -249,21 +253,26 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CLANG_ENABLE_OBJC_WEAK = NO;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = "DYHTG-2026";
+				INFOPLIST_KEY_CFBundleDisplayName = Arena;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.education";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Arena checks your location when you check in at the start, a checkpoint or the finish.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.example.DYHTG2026;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -351,6 +360,24 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		E67898DE245D6388FB20C073 /* XCLocalSwiftPackageReference "Packages/AlgorithmArenaCore" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = Packages/AlgorithmArenaCore;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		CCB71D5D98E77B3AD5ECEFF4 /* AlgorithmArenaCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = AlgorithmArenaCore;
+		};
+		C61610FEDE2C01C9587217F7 /* AlgorithmArenaFixtures */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = AlgorithmArenaFixtures;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 6BC077C54D932D1DC59D9ADA /* Project object */;
 }
