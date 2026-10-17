@@ -37,7 +37,7 @@ struct FeedbackContent: View {
                     .foregroundStyle(.secondary)
             }
         } footer: {
-            Text("The result, points and replay unlock when both players have answered. You can keep walking; you'll find it under Feedback.")
+            Text("The result, points and replay unlock when both players have answered. You can keep walking; it will appear in Match Details.")
         }
     }
 
