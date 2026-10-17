@@ -116,29 +116,7 @@ struct LobbyView: View {
             retry: { Task { await store.retryPendingCommand() } },
             cancel: { store.discardPendingCommand() }
         )
-        .alert(
-            "Can't Check In",
-            isPresented: Binding(get: { checkInFailure != nil }, set: { if !$0 { checkInFailure = nil } }),
-            presenting: checkInFailure
-        ) { failure in
-            if failure == .denied {
-                Button("Open Settings") {
-                    if let url = URL(string: UIApplication.openSettingsURLString) {
-                        UIApplication.shared.open(url)
-                    }
-                }
-            } else {
-                Button("Try Again", action: checkIn)
-            }
-            Button("Cancel", role: .cancel) {}
-        } message: { failure in
-            switch failure {
-            case .denied:
-                Text("Location access is off for Arena. Allow it in Settings to check in at the start.")
-            case .unavailable:
-                Text("Your location isn't available yet. Move into the open and try again.")
-            }
-        }
+        .checkInFailureAlert($checkInFailure, retry: checkIn)
     }
 
     @ViewBuilder

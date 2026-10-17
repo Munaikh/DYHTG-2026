@@ -70,7 +70,7 @@ private struct ChoiceRow: View {
         Button(action: action) {
             HStack {
                 Text(title)
-                    .foregroundStyle(.primary)
+                    .foregroundStyle(Color.primary)
                 Spacer()
                 if isSelected {
                     Image(systemName: "checkmark")

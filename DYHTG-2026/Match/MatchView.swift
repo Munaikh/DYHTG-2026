@@ -1,203 +1,162 @@
 import AlgorithmArenaCore
+import MapKit
 import SwiftUI
 
 struct MatchView: View {
     @Bindable var store: MatchStore
 
-    @State private var openChallenge: ChallengeRoute?
-    @State private var isConfirmingLeave = false
+    @State private var location = LocationProvider()
+    @State private var camera: MapCameraPosition = .automatic
+    @State private var isPanelPresented = true
+    @State private var headerHeight: CGFloat = 180
+    @State private var detent = PresentationDetent.height(220)
+    @State private var modal: MatchModal?
+    @State private var reviewed: Set<ChallengeID> = []
+    @Environment(\.scenePhase) private var scenePhase
+
+    private var compactDetent: PresentationDetent {
+        .height(headerHeight)
+    }
+
+    private var readyFeedback: ChallengeDefinition? {
+        let released = store.snapshot?.viewer.feedback.compactMap { item -> ChallengeID? in
+            guard case .released(let feedback) = item, feedback.answers.count > 1 else { return nil }
+            return feedback.challengeID
+        }
+        return released?
+            .first { !reviewed.contains($0) }
+            .flatMap { store.challenges[$0] }
+    }
 
     var body: some View {
-        NavigationStack {
-            if let room = store.snapshot?.room, let viewer = store.viewer {
-                List {
+        if let viewer = store.viewer {
+            CourseMapView(
+                course: store.course,
+                viewer: viewer,
+                navigation: store.snapshot?.viewer.navigation,
+                position: $camera
+            )
+            .safeAreaPadding(.bottom, headerHeight + 24)
+            .overlay(alignment: .top) {
+                VStack(alignment: .leading, spacing: 8) {
+                    ScoreBadge(viewer: viewer, opponent: store.opponent)
                     if store.isReconnecting {
-                        ReconnectingRow()
-                    }
-
-                    Section("Now") {
-                        StageRow(stage: viewer.stage, course: store.course)
-                    }
-
-                    Section {
-                        Scoreboard(viewer: viewer, opponent: store.opponent)
-                    } header: {
-                        Text("Score")
-                    } footer: {
-                        Text(pointsSummary(viewer))
-                    }
-
-                    if let feedback = store.snapshot?.viewer.feedback, !feedback.isEmpty {
-                        Section("Feedback") {
-                            ForEach(feedback, id: \.challengeID) { item in
-                                if let challenge = store.challenges[item.challengeID] {
-                                    NavigationLink {
-                                        FeedbackContent(store: store, challenge: challenge)
-                                            .navigationTitle(challenge.slot.title)
-                                            .navigationBarTitleDisplayMode(.inline)
-                                    } label: {
-                                        LabeledContent(challenge.slot.title, value: status(of: item))
-                                    }
-                                }
-                            }
+                        HStack(spacing: 8) {
+                            ProgressView()
+                            Text("Reconnecting")
+                                .font(.subheadline.weight(.semibold))
                         }
+                        .padding(.horizontal, 14)
+                        .padding(.vertical, 10)
+                        .floatingBackground()
+                        .accessibilityElement(children: .combine)
                     }
-
-                    Section {
-                        LabeledContent("Algorithm", value: room.algorithm.title)
-                        Text(room.algorithm.rule)
-                            .font(.subheadline)
-                            .foregroundStyle(.secondary)
-                    }
-                }
-                .navigationTitle("Match")
-                .toolbar {
-                    ToolbarItem(placement: .topBarTrailing) {
-                        Menu {
-                            Button("Leave Match", systemImage: "rectangle.portrait.and.arrow.right", role: .destructive) {
-                                isConfirmingLeave = true
-                            }
-                        } label: {
-                            Label("More", systemImage: "ellipsis")
+                    if let challenge = readyFeedback {
+                        FeedbackBanner(title: "\(challenge.slot.title) feedback is ready") {
+                            reviewed.insert(challenge.id)
+                            modal = .challenge(challenge.id)
                         }
+                        .transition(.move(edge: .top).combined(with: .opacity))
                     }
                 }
-                .bottomActions {
-                    if let challenge = store.availableChallenge {
-                        PrimaryButton(title: actionTitle(for: challenge)) {
-                            openChallenge = ChallengeRoute(id: challenge.id)
-                        }
-                    }
-                }
-                .sheet(item: $openChallenge) { route in
-                    ChallengeView(store: store, challengeID: route.id)
-                }
-                .sensoryFeedback(.success, trigger: releasedCount)
-                .confirmationDialog("Leave the match?", isPresented: $isConfirmingLeave, titleVisibility: .visible) {
-                    Button("Leave Match", role: .destructive) {
-                        Task { await store.leave() }
-                    }
-                } message: {
-                    Text("The match ends as incomplete for both players. Losing signal doesn't count as leaving.")
-                }
-                .actionErrorAlert(
-                    $store.actionError,
-                    retry: { Task { await store.retryPendingCommand() } },
-                    cancel: { store.discardPendingCommand() }
-                )
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.horizontal, 16)
+                .padding(.trailing, 56)
+                .animation(.snappy, value: readyFeedback?.id)
             }
+            .sheet(isPresented: $isPanelPresented) {
+                MatchPanel(
+                    store: store,
+                    location: location,
+                    headerHeight: $headerHeight,
+                    modal: $modal,
+                    reviewed: $reviewed
+                )
+                .presentationDetents([compactDetent, .medium, .large], selection: $detent)
+                .presentationBackgroundInteraction(.enabled(upThrough: .medium))
+                .presentationDragIndicator(.visible)
+                .interactiveDismissDisabled()
+            }
+            .sensoryFeedback(.success, trigger: readyFeedback?.id)
+            .onChange(of: headerHeight) { oldValue, _ in
+                if detent == .height(oldValue) { detent = compactDetent }
+            }
+            .onAppear { followLeg(viewer) }
+            .onChange(of: store.snapshot?.viewer.navigation?.nextStop) {
+                withAnimation(.easeInOut(duration: 1.2)) { followLeg(viewer) }
+            }
+            .task { await location.startUpdating() }
+            .onChange(of: scenePhase) { _, phase in
+                if phase == .active {
+                    Task { await location.startUpdating() }
+                } else {
+                    location.stopUpdating()
+                }
+            }
+            .onDisappear { location.stopUpdating() }
         }
-    }
-
-    private var releasedCount: Int {
-        store.snapshot?.viewer.feedback.filter {
-            if case .released = $0 { return true }
-            return false
-        }.count ?? 0
-    }
-
-    private func actionTitle(for challenge: ChallengeDefinition) -> String {
-        switch challenge.slot {
-        case .practice: "Start Warm-up"
-        case .learningCheck: "Take Understanding Check"
-        default: "Answer \(challenge.slot.title)"
-        }
-    }
-
-    private func status(of item: FeedbackAvailability) -> String {
-        guard case .released(let feedback) = item else {
-            return "Waiting for \(store.opponent?.nickname ?? "the other player")"
-        }
-        let mine = feedback.answers.first { $0.playerID == store.snapshot?.viewer.playerID }
-        return mine?.isCorrect == true ? "Correct" : "Incorrect"
-    }
-
-    private func pointsSummary(_ viewer: PlayerProgress) -> String {
-        let available = "\(viewer.remainingAvailablePoints) points still available."
-        guard viewer.pendingRewardMaximum > 0 else { return available }
-        return available + " Up to \(viewer.pendingRewardMaximum) more unlock when both players have answered."
     }
 }
 
-private struct ChallengeRoute: Identifiable {
-    let id: ChallengeID
+extension MatchView {
+    private func followLeg(_ viewer: PlayerProgress) {
+        let origin = viewer.arrivals.last?.nodeID ?? store.course.stops.start
+        let target = store.snapshot?.viewer.navigation?.nextStop ?? store.course.stops.first
+        camera = .camera(store.course.camera(from: origin, to: target))
+    }
 }
 
-private struct Scoreboard: View {
+private struct ScoreBadge: View {
     let viewer: PlayerProgress
     let opponent: PlayerProgress?
 
     var body: some View {
-        HStack(spacing: 0) {
-            ScoreColumn(name: "You", score: viewer.releasedScore)
-            Divider()
-            ScoreColumn(name: opponent?.nickname ?? "Other player", score: opponent?.releasedScore ?? 0)
-        }
-        .padding(.vertical, 8)
-    }
-}
-
-private struct ScoreColumn: View {
-    let name: String
-    let score: Int
-
-    var body: some View {
-        VStack(spacing: 2) {
-            Text(score, format: .number)
-                .font(.largeTitle.bold())
-                .monospacedDigit()
-                .contentTransition(.numericText(value: Double(score)))
-            Text(name)
-                .font(.subheadline)
+        HStack(spacing: 6) {
+            Text("You \(viewer.releasedScore)")
+            Text("·")
                 .foregroundStyle(.secondary)
-                .lineLimit(1)
+            Text("\(opponent?.nickname ?? "Other player") \(opponent?.releasedScore ?? 0)")
         }
-        .frame(maxWidth: .infinity)
+        .font(.subheadline.weight(.semibold))
+        .monospacedDigit()
+        .padding(.horizontal, 14)
+        .padding(.vertical, 10)
+        .floatingBackground()
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel(name)
-        .accessibilityValue("\(score) points")
+        .accessibilityLabel("Score")
+        .accessibilityValue("You \(viewer.releasedScore), \(opponent?.nickname ?? "other player") \(opponent?.releasedScore ?? 0)")
     }
 }
 
-private struct StageRow: View {
-    let stage: PlayerStage
-    let course: CourseGraph
+private struct FeedbackBanner: View {
+    let title: String
+    let action: () -> Void
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 2) {
-            Text(title)
-            Text(detail)
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
+        Button(action: action) {
+            HStack(spacing: 8) {
+                Text(title)
+                    .font(.subheadline.weight(.semibold))
+                Image(systemName: "chevron.right")
+                    .font(.footnote.weight(.semibold))
+                    .foregroundStyle(.secondary)
+            }
+            .foregroundStyle(Color.primary)
+            .padding(.horizontal, 14)
+            .padding(.vertical, 10)
+            .floatingBackground()
         }
-        .accessibilityElement(children: .combine)
+        .buttonStyle(.plain)
     }
+}
 
-    private func name(_ node: NodeID) -> String {
-        course.nodes.first { $0.id == node }?.name ?? node.rawValue
-    }
-
-    private var title: String {
-        switch stage {
-        case .atStart: "At the start"
-        case .practice: "Opening prediction"
-        case .walking(let target): "Walk to \(name(target))"
-        case .challenge: "Checkpoint question"
-        case .choosingRoute: "Choose your route"
-        case .finished: "Finished"
-        case .departed: "You left the match"
-        }
-    }
-
-    private var detail: String {
-        switch stage {
-        case .atStart: "The match begins when the host starts it."
-        case .practice: "A warm-up question that doesn't count towards your score."
-        case .walking: "Check in when you get there."
-        case .challenge: "You get one answer. It locks when you submit."
-        case .choosingRoute: "Standard or bonus. You can't change it later."
-        case .finished: "Your score is final."
-        case .departed: "This match won't count."
+private extension View {
+    @ViewBuilder
+    func floatingBackground() -> some View {
+        if #available(iOS 26, *) {
+            glassEffect(.regular.interactive(), in: .capsule)
+        } else {
+            background(.regularMaterial, in: .capsule)
         }
     }
 }
