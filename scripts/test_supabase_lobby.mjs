@@ -218,7 +218,7 @@ async function run() {
     [{ ...scoped(s, { setReady: { ready: 'true' } }) }, 'invalidCommand'],
     [{ ...scoped(s, { setReady: { ready: null } }) }, 'invalidCommand'],
     [scoped(s, { setReady: { ready: true, userID: guest.user.id } }), 'invalidCommand'],
-    [scoped(s, { confirmArrival: { nodeID: '01-jms', evidence: { organiserApproval: { approvalID: 'fake' } } } }), 'invalidCommand'],
+    [scoped(s, { confirmArrival: { nodeID: '01-jms', evidence: { organiserApproval: { approvalID: 'fake' } } } }), 'invalidApproval'],
     [scoped(s, { submitAnswer: {} }), 'invalidCommand'],
     [scoped(s, { confirmAlgorithm: { algorithm: null } }), 'invalidCommand'],
   ];
