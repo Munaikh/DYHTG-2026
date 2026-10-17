@@ -119,7 +119,10 @@ struct LobbyView: View {
         )
         .checkInFailureAlert($checkInFailure, retry: checkIn)
         .sheet(isPresented: $isAskingOrganiser) {
-            OrganiserCheckInSheet(stopTitle: "the start") { code in
+            OrganiserCheckInSheet(
+                stopTitle: "the start",
+                request: store.arrivalRequest(for: store.course.stops.start)
+            ) { code in
                 await store.perform(.confirmArrival(
                     nodeID: store.course.stops.start,
                     evidence: .organiserApproval(approvalID: code)

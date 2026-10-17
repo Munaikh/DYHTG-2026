@@ -6,6 +6,7 @@ struct HomeView: View {
 
     @AppStorage("nickname") private var nickname = ""
     @State private var isJoining = false
+    @State private var isShowingOrganiserTools = false
     @State private var isCreating = false
     @State private var lastMode = MatchStore.Mode.live
     @State private var failure: ActionError?
@@ -43,6 +44,18 @@ struct HomeView: View {
             }
             .scrollDismissesKeyboard(.interactively)
             .navigationTitle("New Match")
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Menu {
+                        Button("Organiser Tools", systemImage: "person.badge.key") { isShowingOrganiserTools = true }
+                    } label: {
+                        Label("More", systemImage: "ellipsis")
+                    }
+                }
+            }
+            .sheet(isPresented: $isShowingOrganiserTools) {
+                OrganiserView()
+            }
             .bottomActions {
                 Group {
                     PrimaryButton(title: "Create Room", busyTitle: "Creating Room...", isBusy: isCreating) {
