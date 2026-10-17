@@ -9,8 +9,6 @@ actor DemoMatchService: MatchService {
         var opponent: Duration = .seconds(5)
     }
 
-    static let joinableCode = "ARENA1"
-
     private let course: CourseGraph
     private let timing: Timing
     private let viewerID = ArenaFixtures.playerID
@@ -93,19 +91,8 @@ actor DemoMatchService: MatchService {
                 algorithm: algorithm,
                 players: [DemoMatch.Player(id: viewerID, nickname: nickname)]
             )
-        case .joinRoom(let code, let nickname):
-            guard code.uppercased() == Self.joinableCode else {
-                throw MatchServiceError(code: .roomNotFound, message: "No room uses this code.")
-            }
-            var host = DemoMatch.Player(id: opponentID, nickname: "Sam", confirmed: true, ready: true)
-            host.arrivals = [ConfirmedArrival(nodeID: course.stops.start, method: .location)]
-            match = DemoMatch(
-                course: course,
-                code: Self.joinableCode,
-                creatorID: opponentID,
-                algorithm: .aStar,
-                players: [DemoMatch.Player(id: viewerID, nickname: nickname), host]
-            )
+        case .joinRoom:
+            throw MatchServiceError(code: .roomNotFound, message: "Practice rooms can't be joined.")
         default:
             try match?.apply(command.action, by: viewerID, commandID: command.id)
         }
@@ -132,7 +119,7 @@ actor DemoMatchService: MatchService {
     private func perform(_ move: DemoMatch.OpponentMove) {
         switch move {
         case .join:
-            match?.players.append(DemoMatch.Player(id: opponentID, nickname: "Sam"))
+            match?.players.append(DemoMatch.Player(id: opponentID, nickname: "Practice Partner"))
         case .act(let action):
             do {
                 try match?.apply(action, by: opponentID, commandID: UUID())

@@ -7,6 +7,7 @@ struct HomeView: View {
     @AppStorage("nickname") private var nickname = ""
     @State private var isJoining = false
     @State private var isCreating = false
+    @State private var lastMode = MatchStore.Mode.live
     @State private var failure: ActionError?
     @FocusState private var nicknameFocused: Bool
 
@@ -37,14 +38,16 @@ struct HomeView: View {
 
                 Section {
                 } footer: {
-                    Text("Pick Dijkstra or A*, then walk from the James McCune Smith Learning Hub to the Library. At each of three checkpoints, predict what the algorithm does next. Reasoning scores points; walking speed doesn't.")
+                    Text("Pick Dijkstra or A*, then walk from the James McCune Smith Learning Hub to the Library. At each of three checkpoints, predict what the algorithm does next. Reasoning scores points; walking speed doesn't. Practice Solo pairs you with a simulated player.")
                 }
             }
             .scrollDismissesKeyboard(.interactively)
             .navigationTitle("New Match")
             .bottomActions {
                 Group {
-                    PrimaryButton(title: "Create Room", busyTitle: "Creating Room...", isBusy: isCreating, action: createRoom)
+                    PrimaryButton(title: "Create Room", busyTitle: "Creating Room...", isBusy: isCreating) {
+                        createRoom(mode: .live)
+                    }
 
                     Button {
                         nicknameFocused = false
@@ -55,24 +58,29 @@ struct HomeView: View {
                     }
                     .buttonStyle(.bordered)
                     .disabled(isCreating)
+
+                    Button("Practice Solo") { createRoom(mode: .practice) }
+                        .buttonStyle(.borderless)
+                        .disabled(isCreating)
                 }
                 .disabled(!nicknameIsValid)
             }
             .sheet(isPresented: $isJoining) {
                 JoinRoomSheet(store: store, nickname: trimmedNickname)
             }
-            .actionErrorAlert($failure, retry: createRoom)
+            .actionErrorAlert($failure, retry: { createRoom(mode: lastMode) })
         }
     }
 
-    private func createRoom() {
+    private func createRoom(mode: MatchStore.Mode) {
         guard !isCreating else { return }
         nicknameFocused = false
         isCreating = true
+        lastMode = mode
         Task {
             defer { isCreating = false }
             do {
-                try await store.createRoom(nickname: trimmedNickname, algorithm: .dijkstra)
+                try await store.createRoom(nickname: trimmedNickname, algorithm: .dijkstra, mode: mode)
             } catch let error as MatchServiceError {
                 failure = ActionError(error, canRetry: true)
             } catch {
@@ -83,5 +91,5 @@ struct HomeView: View {
 }
 
 #Preview {
-    HomeView(store: .demo())
+    HomeView(store: .preview())
 }

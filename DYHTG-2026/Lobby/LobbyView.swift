@@ -9,6 +9,7 @@ struct LobbyView: View {
     @State private var isGettingReady = false
     @State private var checkInFailure: LocationProvider.Failure?
     @State private var isConfirmingLeave = false
+    @State private var isAskingOrganiser = false
 
     var body: some View {
         NavigationStack {
@@ -117,6 +118,14 @@ struct LobbyView: View {
             cancel: { store.discardPendingCommand() }
         )
         .checkInFailureAlert($checkInFailure, retry: checkIn)
+        .sheet(isPresented: $isAskingOrganiser) {
+            OrganiserCheckInSheet(stopTitle: "the start") { code in
+                await store.perform(.confirmArrival(
+                    nodeID: store.course.stops.start,
+                    evidence: .organiserApproval(approvalID: code)
+                ))
+            }
+        }
     }
 
     @ViewBuilder
@@ -130,6 +139,8 @@ struct LobbyView: View {
 
         if !viewer.hasArrived(at: start) {
             PrimaryButton(title: "Check In at Start", busyTitle: "Checking In...", isBusy: isCheckingIn, action: checkIn)
+            Button("Ask an Organiser to Check You In") { isAskingOrganiser = true }
+                .buttonStyle(.borderless)
         } else if !viewer.ready {
             PrimaryButton(title: "Ready with \(room.algorithm.title)", busyTitle: "Getting Ready...", isBusy: isGettingReady) {
                 getReady(for: room.algorithm, viewer: viewer)
@@ -211,7 +222,7 @@ extension PlayerProgress {
 }
 
 #Preview {
-    let store = MatchStore.demo(timing: .init(latency: .zero, lobby: .seconds(1)))
+    let store = MatchStore.preview(timing: .init(latency: .zero, lobby: .seconds(1)))
     LobbyView(store: store)
-        .task { try? await store.createRoom(nickname: "Alex", algorithm: .dijkstra) }
+        .task { try? await store.createRoom(nickname: "Alex", algorithm: .dijkstra, mode: .practice) }
 }
