@@ -6,6 +6,7 @@ struct HomeView: View {
 
     @AppStorage("nickname") private var nickname = ""
     @State private var isJoining = false
+    @State private var isShowingOrganiserTools = false
     @State private var isCreating = false
     @State private var lastMode = MatchStore.Mode.live
     @State private var failure: ActionError?
@@ -57,8 +58,18 @@ struct HomeView: View {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Close") { dismiss() }.disabled(isCreating)
                 }
+                ToolbarItem(placement: .topBarTrailing) {
+                    Menu {
+                        Button("Organiser Tools", systemImage: "person.badge.key") { isShowingOrganiserTools = true }
+                    } label: {
+                        Label("More", systemImage: "ellipsis")
+                    }
+                }
             }
             .interactiveDismissDisabled(isCreating)
+            .sheet(isPresented: $isShowingOrganiserTools) {
+                OrganiserView()
+            }
             .bottomActions {
                 if !nicknameIsValid {
                     Text("Enter a nickname to enable the match buttons.").font(.footnote).foregroundStyle(.secondary)

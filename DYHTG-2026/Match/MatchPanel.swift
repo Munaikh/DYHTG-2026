@@ -247,7 +247,10 @@ struct MatchPanel: View {
                 await store.perform(.chooseRoute(branch: branch))
             }
         case .organiser(let target):
-            OrganiserCheckInSheet(stopTitle: course.stopTitle(target)) { code in
+            OrganiserCheckInSheet(
+                stopTitle: course.stopTitle(target),
+                request: store.arrivalRequest(for: target)
+            ) { code in
                 await arrive(at: target, evidence: .organiserApproval(approvalID: code))
             }
         }

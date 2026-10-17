@@ -195,6 +195,15 @@ learning, 35 core/contract, with additional parameterized cases). The iPhone 18 
 Simulator build succeeded. One build-tool notice says App Intents metadata was
 skipped because the app has no AppIntents dependency; it is not a compilation error.
 
+## Integration with current main
+
+Before publishing the review branch, the newer organiser QR check-in commit
+`1834457` from main was integrated into this feature branch. The campus entry
+conflict was resolved by retaining both the clearer entry/Close action and the
+team's Organiser Tools menu and sheet. QR approval, organiser screens and the
+updated check-in plumbing remain intact. This integration changes only the
+feature branch, never main.
+
 ## Team review and remaining release work
 
 Ready for team review: native navigation, five indoor algorithms, trace-driven
@@ -209,4 +218,5 @@ before navigation release. Child-facing online multiplayer also needs the
 appropriate team privacy/safety review before release.
 
 The pre-existing local `Package.resolved` modification was preserved. Changes
-are on the feature branch and have not been pushed, merged or deployed.
+are isolated on the feature branch for team review. Main is unchanged; merging
+and deployment require separate approval.
