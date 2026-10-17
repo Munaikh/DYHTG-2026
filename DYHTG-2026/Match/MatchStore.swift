@@ -15,6 +15,8 @@ final class MatchStore {
     private(set) var pendingCommand: MatchCommand?
     private(set) var isSending = false
     private(set) var isReconnecting = false
+    private(set) var challenges: [ChallengeID: ChallengeDefinition] = [:]
+    var drafts: [ChallengeID: ChallengeDraft] = [:]
     var actionError: ActionError?
 
     let course: CourseGraph
@@ -40,6 +42,22 @@ final class MatchStore {
         snapshot.flatMap { snapshot in snapshot.room.players.first { $0.id != snapshot.viewer.playerID } }
     }
 
+    var availableChallenge: ChallengeDefinition? {
+        snapshot?.viewer.availableChallenges.first
+    }
+
+    func feedback(for id: ChallengeID) -> FeedbackAvailability? {
+        snapshot?.viewer.feedback.first { $0.challengeID == id }
+    }
+
+    func submission(for id: ChallengeID) -> PrivateSubmission? {
+        snapshot?.viewer.submissions.first { $0.challengeID == id }
+    }
+
+    func submit(_ answer: SubmittedAnswer, to challenge: ChallengeDefinition) async {
+        await perform(.submitAnswer(challengeID: challenge.id, answer: answer))
+    }
+
     var isCreator: Bool {
         guard let snapshot else { return false }
         return snapshot.room.creatorID == snapshot.viewer.playerID
@@ -54,6 +72,10 @@ final class MatchStore {
     }
 
     func perform(_ action: MatchAction) async {
+        await perform(action, reconciling: true)
+    }
+
+    private func perform(_ action: MatchAction, reconciling: Bool) async {
         guard let snapshot, pendingCommand == nil else { return }
         let command = MatchCommand(
             id: UUID(),
@@ -64,7 +86,13 @@ final class MatchStore {
             ),
             action: action
         )
-        await deliver(command)
+        let rejection = await deliver(command)
+        guard reconciling, rejection?.code == .staleRevision else { return }
+        await refresh()
+        actionError = nil
+        if isStillWanted(action) {
+            await perform(action, reconciling: false)
+        }
     }
 
     func retryPendingCommand() async {
@@ -103,12 +131,13 @@ final class MatchStore {
         defer { isSending = false }
         let receipt = try await service.send(command)
         self.service = service
-        snapshot = receipt.snapshot
+        apply(receipt.snapshot)
         observe(receipt.snapshot.room.matchID)
     }
 
-    private func deliver(_ command: MatchCommand) async {
-        guard let service else { return }
+    @discardableResult
+    private func deliver(_ command: MatchCommand) async -> MatchServiceError? {
+        guard let service else { return nil }
         pendingCommand = command
         isSending = true
         defer { isSending = false }
@@ -117,16 +146,42 @@ final class MatchStore {
             pendingCommand = nil
             actionError = nil
             apply(receipt.snapshot)
+            return nil
         } catch let error as MatchServiceError {
             pendingCommand = nil
             actionError = ActionError(error)
-            if error.code == .staleRevision {
-                await refresh()
-            }
+            return error
         } catch is CancellationError {
-            return
+            return nil
         } catch {
             actionError = .connectionLost
+            return nil
+        }
+    }
+
+    private func isStillWanted(_ action: MatchAction) -> Bool {
+        guard let snapshot, let viewer else { return false }
+        switch action {
+        case .selectAlgorithm(let algorithm):
+            return snapshot.room.phase == .lobby && snapshot.room.algorithm != algorithm
+        case .confirmAlgorithm(let algorithm):
+            return snapshot.room.algorithm == algorithm && !viewer.algorithmConfirmed
+        case .setReady(let ready):
+            return viewer.ready != ready
+        case .start:
+            return snapshot.room.phase == .lobby
+        case .confirmArrival(let node, _):
+            return !viewer.hasArrived(at: node)
+        case .chooseRoute:
+            return viewer.routeChoice == nil
+        case .submitAnswer(let challengeID, _):
+            return availableChallenge?.id == challengeID && submission(for: challengeID) == nil
+        case .finish:
+            return viewer.stage != .finished
+        case .leave:
+            return true
+        case .createRoom, .joinRoom:
+            return false
         }
     }
 
@@ -135,6 +190,9 @@ final class MatchStore {
             return
         }
         snapshot = latest
+        for challenge in latest.viewer.availableChallenges {
+            challenges[challenge.id] = challenge
+        }
     }
 
     private func observe(_ matchID: MatchID) {
@@ -159,6 +217,8 @@ final class MatchStore {
         observation = nil
         service = nil
         snapshot = nil
+        challenges = [:]
+        drafts = [:]
         pendingCommand = nil
         actionError = nil
         isReconnecting = false

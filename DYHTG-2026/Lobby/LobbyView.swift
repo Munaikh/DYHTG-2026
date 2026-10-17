@@ -233,7 +233,7 @@ extension PlayerProgress {
 }
 
 #Preview {
-    let store = MatchStore.demo(timing: .init(latency: .zero, opponent: .seconds(1)))
+    let store = MatchStore.demo(timing: .init(latency: .zero, lobby: .seconds(1)))
     LobbyView(store: store)
         .task { try? await store.createRoom(nickname: "Alex", algorithm: .dijkstra) }
 }

@@ -4,6 +4,7 @@ import SwiftUI
 struct MatchView: View {
     @Bindable var store: MatchStore
 
+    @State private var openChallenge: ChallengeRoute?
     @State private var isConfirmingLeave = false
 
     var body: some View {
@@ -26,6 +27,22 @@ struct MatchView: View {
                         Text(pointsSummary(viewer))
                     }
 
+                    if let feedback = store.snapshot?.viewer.feedback, !feedback.isEmpty {
+                        Section("Feedback") {
+                            ForEach(feedback, id: \.challengeID) { item in
+                                if let challenge = store.challenges[item.challengeID] {
+                                    NavigationLink {
+                                        FeedbackContent(store: store, challenge: challenge)
+                                            .navigationTitle(challenge.slot.title)
+                                            .navigationBarTitleDisplayMode(.inline)
+                                    } label: {
+                                        LabeledContent(challenge.slot.title, value: status(of: item))
+                                    }
+                                }
+                            }
+                        }
+                    }
+
                     Section {
                         LabeledContent("Algorithm", value: room.algorithm.title)
                         Text(room.algorithm.rule)
@@ -45,6 +62,17 @@ struct MatchView: View {
                         }
                     }
                 }
+                .bottomActions {
+                    if let challenge = store.availableChallenge {
+                        PrimaryButton(title: actionTitle(for: challenge)) {
+                            openChallenge = ChallengeRoute(id: challenge.id)
+                        }
+                    }
+                }
+                .sheet(item: $openChallenge) { route in
+                    ChallengeView(store: store, challengeID: route.id)
+                }
+                .sensoryFeedback(.success, trigger: releasedCount)
                 .confirmationDialog("Leave the match?", isPresented: $isConfirmingLeave, titleVisibility: .visible) {
                     Button("Leave Match", role: .destructive) {
                         Task { await store.leave() }
@@ -61,11 +89,38 @@ struct MatchView: View {
         }
     }
 
+    private var releasedCount: Int {
+        store.snapshot?.viewer.feedback.filter {
+            if case .released = $0 { return true }
+            return false
+        }.count ?? 0
+    }
+
+    private func actionTitle(for challenge: ChallengeDefinition) -> String {
+        switch challenge.slot {
+        case .practice: "Start Warm-up"
+        case .learningCheck: "Take Understanding Check"
+        default: "Answer \(challenge.slot.title)"
+        }
+    }
+
+    private func status(of item: FeedbackAvailability) -> String {
+        guard case .released(let feedback) = item else {
+            return "Waiting for \(store.opponent?.nickname ?? "the other player")"
+        }
+        let mine = feedback.answers.first { $0.playerID == store.snapshot?.viewer.playerID }
+        return mine?.isCorrect == true ? "Correct" : "Incorrect"
+    }
+
     private func pointsSummary(_ viewer: PlayerProgress) -> String {
         let available = "\(viewer.remainingAvailablePoints) points still available."
         guard viewer.pendingRewardMaximum > 0 else { return available }
         return available + " Up to \(viewer.pendingRewardMaximum) more unlock when both players have answered."
     }
+}
+
+private struct ChallengeRoute: Identifiable {
+    let id: ChallengeID
 }
 
 private struct Scoreboard: View {
