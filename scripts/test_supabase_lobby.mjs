@@ -171,7 +171,7 @@ async function run() {
   assert.equal(stale.currentRevision, s.revision);
   passed('ready/create/join retries survive stale revisions; changed payloads conflict; start requires verified arrival');
 
-  const memberChannel = await subscribe(host, matchID);
+  let memberChannel = await subscribe(host, matchID);
   const outsiderChannel = await subscribe(outsider, matchID);
   try {
     s = (await accept(host, scoped(s, { selectAlgorithm: { algorithm: 'aStar' } }))).snapshot;
@@ -187,8 +187,22 @@ async function run() {
       assert.deepEqual(Object.keys(e.record).sort(), ['matchID', 'revision']);
       assert.equal(e.record.matchID, matchID);
     }
+    // Miss two changes, then recover using the adapter's fetch/subscribe/fetch
+    // sequence. Connectivity loss sends neither leave nor a new anonymous login.
+    memberChannel.close();
+    const disconnectedRevision = s.revision;
+    s = (await accept(host, scoped(s, { selectAlgorithm: { algorithm: 'dijkstra' } }))).snapshot;
+    s = (await accept(host, scoped(s, { selectAlgorithm: { algorithm: 'aStar' } }))).snapshot;
+    const beforeSubscribe = await snapshot(host, matchID);
+    memberChannel = await subscribe(host, matchID);
+    const recovered = await snapshot(host, matchID);
+    assert.equal(recovered.revision, disconnectedRevision + 2);
+    assert.deepEqual(recovered.room, beforeSubscribe.room);
+    assert.equal(recovered.room.phase, 'lobby');
+    assert(recovered.room.players.every(p => !p.stage.departed));
+    s = recovered;
   } finally { memberChannel.close(); outsiderChannel.close(); }
-  passed('algorithm changes clear both players; real Realtime events contain only ID/revision and obey membership RLS');
+  passed('Realtime obeys membership RLS; disconnect/resubscribe recovers missed revisions without departure');
 
   const rows = await request('/rest/v1/arena_invalidations?select=*', host.access_token);
   assert(rows.ok); assert(rows.data.some(row => row.matchID === matchID));
