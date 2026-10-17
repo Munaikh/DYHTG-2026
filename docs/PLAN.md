@@ -153,7 +153,7 @@ Keep 2D replay available when camera permission is denied, hardware lacks suppor
 4. Add and validate outdoor navigation, route choice, and checkpoint AR.
 5. Run two-phone acceptance for both algorithms and evaluate learning.
 
-`Munaikh` owns the Swift core package, course/challenge data, shared contracts, and Supabase implementation. `owaini0` owns the editable design, SwiftUI views, platform adapters, assets, and Xcode project configuration. Shared-contract changes require fixture updates and review by both. See the work breakdown document for assigned issues and native GitHub dependencies.
+`Munaikh` owns the Swift core package, course/challenge data, shared contracts, and Supabase implementation. `owaini0` owns the editable design, SwiftUI views, platform adapters, assets, and Xcode project configuration. Shared-contract changes require fixture updates and review by both. See the [work breakdown](WORK_BREAKDOWN.md) for assigned issues and native GitHub dependencies.
 
 ## Acceptance criteria
 
