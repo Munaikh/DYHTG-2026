@@ -153,7 +153,7 @@ python3 scripts/verify_search_fixtures.py
 python3 scripts/verify_learning_content.py
 xcodebuild -project DYHTG-2026.xcodeproj -scheme DYHTG-2026 \
   -configuration Debug -destination 'platform=iOS Simulator,name=iPhone 18 Pro' \
-  CODE_SIGNING_ALLOWED=NO build
+  CODE_SIGN_IDENTITY=- build
 ```
 
 The pure package suites cover original contract/scoring/privacy behavior plus
@@ -179,7 +179,16 @@ at its standard text size and at accessibility extra-extra-large. XP/level label
 stack vertically at accessibility sizes. In practice, a hint was requested, an
 incorrect prediction received graph-specific feedback, and the corrected answer
 saved 20 XP. Closing the activity, returning to the library, and returning to Play
-worked. The original campus Create/Join/Solo controls remain reachable.
+worked. The original campus Create/Join/Solo controls remain reachable. A real room was
+also created through the native Simulator app, reaching the server-backed lobby
+with the correct nickname and algorithm selection. The temporary room was left
+after this check.
+
+Use normal local signing for Simulator integration tests (`CODE_SIGN_IDENTITY=-`).
+An earlier build with signing disabled compiled but could not persist the
+Supabase anonymous session in secure storage, producing a misleading Session
+Expired message. The normally signed build successfully created a live room.
+No authentication workaround or insecure token storage was added.
 
 Final automated results: 53 Swift test functions passed (10 progression, 8 authored
 learning, 35 core/contract, with additional parameterized cases). The iPhone 18 Pro

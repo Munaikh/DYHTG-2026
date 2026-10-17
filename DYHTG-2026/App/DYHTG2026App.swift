@@ -19,6 +19,8 @@ struct DYHTG2026App: App {
     var body: some Scene {
         WindowGroup {
             RootView(store: store, learning: learning)
+                .tint(.arenaAccent)
+                .accentColor(.arenaAccent)
                 .preferredColorScheme(learning.profile.preferences.appearance == "dark" ? .dark : learning.profile.preferences.appearance == "light" ? .light : nil)
         }
     }
