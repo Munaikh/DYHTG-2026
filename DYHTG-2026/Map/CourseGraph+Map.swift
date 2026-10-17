@@ -64,24 +64,20 @@ extension CourseGraph {
         return points.map(\.location)
     }
 
-    func coordinates(for branch: RouteBranch) -> [CLLocationCoordinate2D] {
-        coordinates(along: route(branch)?.edgeIDs ?? [], from: stops.start)
+    func stopSequence(for branch: RouteBranch) -> [NodeID] {
+        [stops.start, stops.first, middleStop(for: branch), stops.third, stops.finish]
     }
 
-    func divergingCoordinates(for branch: RouteBranch) -> [CLLocationCoordinate2D] {
-        let other = Set(route(branch == .bonus ? .standard : .bonus)?.edgeIDs ?? [])
+    func legCoordinates(from origin: NodeID, to target: NodeID, branch: RouteBranch) -> [CLLocationCoordinate2D] {
         var node = stops.start
-        var origin: NodeID?
-        var diverging: [EdgeID] = []
+        var leg: [EdgeID] = []
         for id in route(branch)?.edgeIDs ?? [] {
             guard let edge = edges.first(where: { $0.id == id }) else { continue }
-            if !other.contains(id) {
-                if origin == nil { origin = node }
-                diverging.append(id)
-            }
+            if node == origin || !leg.isEmpty { leg.append(id) }
             node = edge.from == node ? edge.to : edge.from
+            if !leg.isEmpty && node == target { break }
         }
-        return origin.map { coordinates(along: diverging, from: $0) } ?? []
+        return coordinates(along: leg, from: origin)
     }
 }
 

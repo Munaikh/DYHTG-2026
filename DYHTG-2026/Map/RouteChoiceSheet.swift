@@ -4,6 +4,7 @@ import SwiftUI
 
 struct RouteChoiceSheet: View {
     let course: CourseGraph
+    let paths: WalkingPaths
     let choose: (RouteBranch) async -> Void
 
     @Environment(\.dismiss) private var dismiss
@@ -17,9 +18,9 @@ struct RouteChoiceSheet: View {
                 Section {
                     Map(initialPosition: .automatic, interactionModes: []) {
                         ForEach(RouteBranch.allCases, id: \.self) { branch in
-                            MapPolyline(coordinates: course.coordinates(for: branch))
+                            MapPolyline(coordinates: paths.path(for: branch, in: course))
                                 .stroke(
-                                    branch == selection ? Color.accent : Color(.systemGray2),
+                                    branch == selection ? Color.accent : .white.opacity(0.8),
                                     style: StrokeStyle(lineWidth: branch == selection ? 6 : 4, lineCap: .round, lineJoin: .round)
                                 )
                             if let node = course.node(course.middleStop(for: branch)) {
@@ -33,7 +34,7 @@ struct RouteChoiceSheet: View {
                             }
                         }
                     }
-                    .mapStyle(.standard(pointsOfInterest: .excludingAll))
+                    .mapStyle(.hybrid(pointsOfInterest: .excludingAll))
                     .frame(height: 200)
                     .listRowInsets(EdgeInsets())
                     .accessibilityHidden(true)

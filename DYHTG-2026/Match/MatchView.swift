@@ -6,6 +6,7 @@ struct MatchView: View {
     @Bindable var store: MatchStore
 
     @State private var location = LocationProvider()
+    @State private var paths = WalkingPaths()
     @State private var camera: MapCameraPosition = .automatic
     @State private var isPanelPresented = true
     @State private var headerHeight: CGFloat = 180
@@ -34,6 +35,7 @@ struct MatchView: View {
                 course: store.course,
                 viewer: viewer,
                 navigation: store.snapshot?.viewer.navigation,
+                paths: paths,
                 position: $camera
             )
             .safeAreaPadding(.bottom, headerHeight + 24)
@@ -68,6 +70,8 @@ struct MatchView: View {
                 MatchPanel(
                     store: store,
                     location: location,
+                    paths: paths,
+                    showsDetails: detent != compactDetent,
                     headerHeight: $headerHeight,
                     modal: $modal,
                     reviewed: $reviewed
@@ -78,14 +82,18 @@ struct MatchView: View {
                 .interactiveDismissDisabled()
             }
             .sensoryFeedback(.success, trigger: readyFeedback?.id)
-            .onChange(of: headerHeight) { oldValue, _ in
-                if detent == .height(oldValue) { detent = compactDetent }
+            .onChange(of: headerHeight) {
+                if detent != .medium && detent != .large { detent = compactDetent }
             }
-            .onAppear { followLeg(viewer) }
+            .onAppear {
+                detent = compactDetent
+                followLeg(viewer)
+            }
             .onChange(of: store.snapshot?.viewer.navigation?.nextStop) {
                 withAnimation(.easeInOut(duration: 1.2)) { followLeg(viewer) }
             }
             .task { await location.startUpdating() }
+            .task(id: store.course.reference.version) { await paths.load(store.course) }
             .onChange(of: scenePhase) { _, phase in
                 if phase == .active {
                     Task { await location.startUpdating() }
