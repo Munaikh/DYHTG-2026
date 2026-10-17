@@ -5,6 +5,8 @@ struct FeedbackContent: View {
     let store: MatchStore
     let challenge: ChallengeDefinition
 
+    @State private var arReplay: ARReplayRequest?
+
     private var opponentName: String {
         store.opponent?.nickname ?? "the other player"
     }
@@ -17,6 +19,9 @@ struct FeedbackContent: View {
             default:
                 pending
             }
+        }
+        .fullScreenCover(item: $arReplay) { request in
+            ARReplayView(trace: request.trace, scenario: challenge.scenario)
         }
     }
 
@@ -87,6 +92,9 @@ struct FeedbackContent: View {
             NavigationLink("Replay the Search") {
                 ReplayView(trace: feedback.trace, scenario: challenge.scenario)
             }
+            if ARReplayView.isSupported {
+                Button("View Replay in AR") { arReplay = ARReplayRequest(trace: feedback.trace) }
+            }
         } footer: {
             Text("Step through every node the search looked at, including the ones that don't end up on the route.")
         }
@@ -110,4 +118,9 @@ private struct ResultRow: View {
         }
         .accessibilityElement(children: .combine)
     }
+}
+
+private struct ARReplayRequest: Identifiable {
+    let id = UUID()
+    let trace: SearchTrace
 }

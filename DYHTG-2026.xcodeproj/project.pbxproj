@@ -224,6 +224,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = Arena;
+				INFOPLIST_KEY_NSCameraUsageDescription = "Arena uses the camera only while you view a search replay in AR.";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.education";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Arena checks your location when you check in at the start, a checkpoint or the finish.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -261,6 +262,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = Arena;
+				INFOPLIST_KEY_NSCameraUsageDescription = "Arena uses the camera only while you view a search replay in AR.";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.education";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Arena checks your location when you check in at the start, a checkpoint or the finish.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
