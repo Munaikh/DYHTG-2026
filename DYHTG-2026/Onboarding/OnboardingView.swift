@@ -7,7 +7,7 @@ struct OnboardingView: View {
     private let tabs = ["01 / Learn", "02 / Play", "03 / Visualize"]
     private let titles = ["Think like\nan algorithm.", "Then change\nthe game.", "See the search\nunfold."]
     private let subtitles = [
-        "Predict the next move. Explore each step. Make Dijkstra and A* click.",
+        "Explore five algorithms through short lessons and puzzles. Earn XP, complete quests, and make each step click.",
         "Challenge a friend in Plot Twist Duel. Three rounds. One bridge closure. Can you adapt?",
         "Watch algorithms explore a campus. Close a path, try a detour, and compare the results."
     ]

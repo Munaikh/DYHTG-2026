@@ -10,6 +10,8 @@ struct PlayHomeView: View {
     @State private var leaving = false
     @FocusState private var nicknameFocused: Bool
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(LearningStore.self) private var learning
+    @State private var showingPractice = false
 
     private var cleanNickname: String { nickname.trimmingCharacters(in: .whitespacesAndNewlines) }
     private var validNickname: Bool { (2...20).contains(cleanNickname.count) }
@@ -65,6 +67,9 @@ struct PlayHomeView: View {
                 Text("The match will end as incomplete for both players.")
             }
             .sheet(isPresented: $joining) { joinSheet }
+            .sheet(isPresented: $showingPractice) {
+                LearnLibrary(learning: learning, mode: .practice, dismissable: true)
+            }
             .alert(item: $store.error) { error in
                 if error.canRetry {
                     Alert(title: Text(error.title), message: Text(error.message),
@@ -140,6 +145,20 @@ struct PlayHomeView: View {
             Label("Reasoning wins. There’s no speed bonus.", systemImage: "brain")
                 .font(.footnote)
                 .foregroundStyle(.secondary)
+            Button { showingPractice = true } label: {
+                HStack(spacing: 14) {
+                    Image(systemName: "puzzlepiece.extension.fill").font(.title2)
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Warm up with a puzzle").font(.headline)
+                        Text("15 solo challenges · all 5 algorithms")
+                            .font(.subheadline).foregroundStyle(.secondary)
+                    }
+                    Spacer(minLength: 0)
+                    Image(systemName: "arrow.up.right")
+                }.arenaCard()
+            }
+            .buttonStyle(.plain)
+            .accessibilityIdentifier("duel.practice")
         }
     }
 

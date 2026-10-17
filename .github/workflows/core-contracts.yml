@@ -8,6 +8,8 @@ on:
       - 'content/learning/**'
       - 'scripts/verify_search_fixtures.py'
       - 'scripts/verify_learning_content.py'
+      - 'scripts/test_learning_store.*'
+      - 'DYHTG-2026/Adventure/Services/LearningStore.swift'
       - '.github/workflows/core-contracts.yml'
   push:
     branches: [main]
@@ -17,6 +19,8 @@ on:
       - 'content/learning/**'
       - 'scripts/verify_search_fixtures.py'
       - 'scripts/verify_learning_content.py'
+      - 'scripts/test_learning_store.*'
+      - 'DYHTG-2026/Adventure/Services/LearningStore.swift'
       - '.github/workflows/core-contracts.yml'
 
 permissions:
@@ -31,6 +35,8 @@ jobs:
         run: swift --version
       - name: Test core, mock service, and checked-in JSON fixtures
         run: swift test --package-path Packages/AlgorithmArenaCore
+      - name: Test learning persistence, reward retries and nickname ownership
+        run: bash scripts/test_learning_store.sh
       - name: Verify cross-language search and course fixtures
         run: python3 scripts/verify_search_fixtures.py
       - name: Verify authored learning content independently
