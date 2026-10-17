@@ -189,9 +189,6 @@ def main():
                     version = json.loads(json.dumps(scenario))
                     components = [course["reference"]["id"], course["reference"]["version"], version["source"], version["goal"]]
                     version["id"] = ":".join(f"{len(part.encode('utf-8'))}:{part}" for part in components)
-                    if algorithm == "dijkstra":
-                        for node in version["nodes"]:
-                            node["heuristic"] = 0
                     check_trace(version, algorithm, course_path.with_name(f"{algorithm}-trace.json"))
                     count += 1
         for graph_path in sorted(course_path.parent.glob("requests/*/graph.json")):

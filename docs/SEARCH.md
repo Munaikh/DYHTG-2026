@@ -88,7 +88,9 @@ nodes stay visible and explored branches remain separate from the final route.
 A* rejects negative values, a nonzero goal heuristic, overestimation, or an
 edge-wise inconsistency (including reverse traversal of bidirectional edges).
 Validation independently computes exact goal distances on reversed edges.
-Dijkstra ignores h for selection. Integer values and arithmetic are restricted
+Dijkstra ignores h for selection. Both algorithms retain the same published h
+values under the shared scenario ID, so either replay can be reconstructed from
+the scenario. Integer values and arithmetic are restricted
 to JavaScript's exact nonnegative integer range; overflow throws instead of trapping
 or silently rounding. Disconnected goals return `unreachable`; source = goal
 returns one node, no edges and zero cost.

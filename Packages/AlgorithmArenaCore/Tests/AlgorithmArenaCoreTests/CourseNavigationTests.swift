@@ -58,6 +58,30 @@ import Testing
       == Array(first.polyline.reversed()))
 }
 
+@Test func courseScenarioHeuristicsAreIndependentOfAlgorithm() throws {
+  let course = try GilmorehillCourse.candidate()
+  let navigator = try CourseNavigator(course: course, expected: course.reference)
+  let table = try navigator.heuristics(to: course.stops.finish)
+  let dijkstra = try navigator.search(
+    from: course.stops.start, to: course.stops.finish, algorithm: .dijkstra)
+  let aStar = try navigator.search(
+    from: course.stops.start, to: course.stops.finish, algorithm: .aStar)
+  #expect(dijkstra.trace.scenarioID == aStar.trace.scenarioID)
+  #expect(dijkstra.trace.steps.first?.state == aStar.trace.steps.first?.state)
+  let h = Dictionary(uniqueKeysWithValues: table.values.map { ($0.nodeID, $0.h) })
+  #expect(table.values.contains { $0.h > 0 })
+  let scenario = GraphScenario(
+    id: dijkstra.trace.scenarioID,
+    nodes: course.nodes.map { .init(id: $0.id, label: $0.name, heuristic: h[$0.id]!) },
+    edges: course.edges.map {
+      .init(from: $0.from, to: $0.to, cost: $0.costMetres, bidirectional: $0.bidirectional)
+    },
+    source: course.stops.start, goal: course.stops.finish)
+  // A scenario reconstructed from its published h must reproduce either adapter trace.
+  #expect(try SearchEngine.search(scenario, algorithm: .dijkstra) == dijkstra.trace)
+  #expect(try SearchEngine.search(scenario, algorithm: .aStar) == aStar.trace)
+}
+
 private func editingCourse(_ edit: (inout [String: Any]) -> Void) throws -> CourseGraph {
   var json = try #require(
     JSONSerialization.jsonObject(with: ContractJSON.encoder().encode(GilmorehillCourse.candidate()))

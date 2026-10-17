@@ -190,14 +190,8 @@ public struct CourseNavigator: Sendable {
   public func search(from source: NodeID, to goal: NodeID, algorithm: AlgorithmKind) throws
     -> CourseSearchResult
   {
-    let table: CourseHeuristics
-    if algorithm == .aStar {
-      table = try heuristics(to: goal)
-    } else {
-      table = .init(
-        course: course.reference, goal: goal,
-        values: nodes.keys.sorted().map { .init(nodeID: $0, h: 0) })
-    }
+    // The scenario's h values are immutable; Dijkstra ignores h only for priority.
+    let table = try heuristics(to: goal)
     let trace = try SearchEngine.search(
       scenario(from: source, to: goal, table: table), algorithm: algorithm)
     guard case .route(let nodeIDs, _) = trace.outcome else {
