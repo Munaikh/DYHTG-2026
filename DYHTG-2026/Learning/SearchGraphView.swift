@@ -7,44 +7,43 @@ struct SearchGraphView: View {
     var selection: NodeID?
     var highlightedEdge: (from: NodeID, to: NodeID)?
     var onSelect: (NodeID) -> Void = { _ in }
-
-    private let nodeSize: CGFloat = 44
-    private let inset = CGSize(width: 44, height: 40)
+    private let nodeSize: CGFloat = 46
 
     var body: some View {
         let layout = GraphLayout(scenario: presentation.scenario)
-        let height = CGFloat(layout.rows) * 96 + 24
-
+        let height: CGFloat = layout.rows > 2 ? 370 : 300
         GeometryReader { proxy in
-            let frame = proxy.size
+            let drawing = GraphDrawing(layout: layout, scenario: presentation.scenario,
+                                       size: proxy.size, isAStar: presentation.algorithm == .aStar)
             ZStack {
-                ForEach(Array(presentation.scenario.edges.enumerated()), id: \.offset) { _, edge in
-                    if let from = layout.positions[edge.from], let to = layout.positions[edge.to] {
-                        EdgeView(
-                            from: point(from, in: frame),
-                            to: point(to, in: frame),
-                            cost: edge.cost,
-                            directed: !edge.bidirectional,
-                            emphasis: emphasis(for: edge),
-                            nodeRadius: nodeSize / 2
-                        )
+                ForEach(Array(presentation.scenario.edges.enumerated()), id: \.offset) { index, edge in
+                    if let path = drawing.edges[index] {
+                        EdgeView(path: path,
+                                 directed: !edge.bidirectional, emphasis: emphasis(for: edge),
+                                 nodeRadius: nodeSize / 2)
+                    }
+                }
+                ForEach(Array(presentation.scenario.edges.enumerated()), id: \.offset) { index, edge in
+                    if let point = drawing.edgeLabels[index] {
+                        EdgeCostLabel(cost: edge.cost, highlighted: emphasis(for: edge) != .normal)
+                            .position(point)
                     }
                 }
                 ForEach(presentation.nodes) { node in
-                    if let position = layout.positions[node.id] {
-                        NodeView(
-                            node: node,
-                            caption: presentation.costText(node),
-                            isSource: node.id == presentation.scenario.source,
-                            isGoal: node.id == presentation.scenario.goal,
-                            isSelected: node.id == selection,
-                            size: nodeSize
-                        )
-                        .position(point(position, in: frame))
-                        .onTapGesture {
-                            if selectable.contains(node.id) { onSelect(node.id) }
-                        }
-                        .accessibilityAddTraits(selectable.contains(node.id) ? .isButton : [])
+                    if let point = drawing.points[node.id] {
+                        NodeView(node: node, caption: presentation.costText(node),
+                                 isSource: node.id == presentation.scenario.source,
+                                 isGoal: node.id == presentation.scenario.goal,
+                                 isSelected: node.id == selection, size: nodeSize)
+                            .position(point)
+                            .onTapGesture {
+                                if selectable.contains(node.id) { onSelect(node.id) }
+                            }
+                            .accessibilityAddTraits(selectable.contains(node.id) ? .isButton : [])
+                        NodeCostLabel(node: node, isAStar: presentation.algorithm == .aStar)
+                            .position(drawing.captions[node.id] ?? point)
+                            .allowsHitTesting(false)
+                            .accessibilityHidden(true)
                     }
                 }
             }
@@ -52,13 +51,6 @@ struct SearchGraphView: View {
         .frame(height: height)
         .accessibilityElement(children: .contain)
         .accessibilityLabel("Search graph")
-    }
-
-    private func point(_ unit: CGPoint, in size: CGSize) -> CGPoint {
-        CGPoint(
-            x: inset.width + unit.x * (size.width - inset.width * 2),
-            y: inset.height + unit.y * (size.height - inset.height * 2)
-        )
     }
 
     private func emphasis(for edge: ScenarioEdge) -> EdgeView.Emphasis {
@@ -76,65 +68,220 @@ struct SearchGraphView: View {
     }
 }
 
-private struct EdgeView: View {
-    enum Emphasis {
-        case normal
-        case active
-        case route
-    }
+/// Circle centers anchor the edges; captions never shift their endpoints.
+/// Normalizing authored positions uses the full available card width.
+private struct GraphDrawing {
+    let points: [NodeID: CGPoint]
+    let captions: [NodeID: CGPoint]
+    let edgeLabels: [Int: CGPoint]
+    let edges: [Int: GraphEdgePath]
 
+    init(layout: GraphLayout, scenario: GraphScenario, size: CGSize, isAStar: Bool) {
+        let xs = layout.positions.values.map(\.x), ys = layout.positions.values.map(\.y)
+        let minX = xs.min() ?? 0, maxX = xs.max() ?? 1
+        let minY = ys.min() ?? 0, maxY = ys.max() ?? 1
+        let insetX: CGFloat = 28
+        let insetY: CGFloat = isAStar ? 68 : 54
+        let points = layout.positions.mapValues { unit in
+            CGPoint(x: insetX + (unit.x - minX) / max(maxX - minX, 0.01) * max(size.width - 2 * insetX, 1),
+                    y: minY == maxY ? size.height / 2 : insetY + (unit.y - minY) / (maxY - minY) * (size.height - 2 * insetY))
+        }
+        let captionSize = CGSize(width: isAStar ? 96 : 48, height: isAStar ? 38 : 24)
+        let captions = points.mapValues { point in
+            CGPoint(x: min(max(point.x, captionSize.width / 2), size.width - captionSize.width / 2),
+                    y: point.y + (point.y < size.height * 0.4 ? -1 : 1) * (28 + captionSize.height / 2))
+        }
+        var occupied = points.values.map { CGRect(x: $0.x - 29, y: $0.y - 29, width: 58, height: 58) }
+        occupied += captions.values.map { CGRect(x: $0.x - captionSize.width / 2 - 3, y: $0.y - captionSize.height / 2 - 3,
+                                                 width: captionSize.width + 6, height: captionSize.height + 6) }
+        var labels: [Int: CGPoint] = [:]
+        let bounds = CGRect(origin: .zero, size: size)
+        var edges: [Int: GraphEdgePath] = [:]
+        for (index, edge) in scenario.edges.enumerated() {
+            guard let from = points[edge.from], let to = points[edge.to] else { continue }
+            let others = points.filter { $0.key != edge.from && $0.key != edge.to }.map(\.value)
+            let direct = GraphEdgePath(from: from, to: to)
+            let blocked = others.contains { center in
+                (1..<24).contains { step in direct.point(CGFloat(step) / 24).distance(to: center) < 38 }
+            }
+            if blocked {
+                let middle = direct.point(0.5), normal = direct.normal(0.5)
+                let offsets: [CGFloat] = [-100, 100, -150, 150]
+                let candidates = offsets.map { offset in
+                    GraphEdgePath(from: from, to: to,
+                                  control: CGPoint(x: middle.x + normal.x * offset, y: middle.y + normal.y * offset))
+                }
+                func score(_ path: GraphEdgePath) -> Int {
+                    (1..<24).reduce(0) { result, step in
+                        let point = path.point(CGFloat(step) / 24)
+                        return result + others.filter { point.distance(to: $0) < 38 }.count * 100
+                            + (bounds.insetBy(dx: 8, dy: 8).contains(point) ? 0 : 1000)
+                            + captions.values.filter { point.distance(to: $0) < 24 }.count
+                    }
+                }
+                edges[index] = candidates.enumerated().min {
+                    score($0.element) * 10 + $0.offset < score($1.element) * 10 + $1.offset
+                }?.element ?? direct
+            } else {
+                edges[index] = direct
+            }
+        }
+        for (index, edge) in scenario.edges.enumerated() {
+            guard let path = edges[index] else { continue }
+            let width = CGFloat(String(edge.cost).count) * 9 + 14
+            var candidates: [CGPoint] = []
+            let fractions: [CGFloat] = [0.5, 0.4, 0.6]
+            let offsets: [CGFloat] = [-16, 16, -28, 28]
+            for fraction in fractions {
+                for offset in offsets {
+                    let point = path.point(fraction), normal = path.normal(fraction)
+                    let x = point.x + normal.x * offset
+                    let y = point.y + normal.y * offset
+                    candidates.append(CGPoint(x: x, y: y))
+                }
+            }
+            func box(_ point: CGPoint) -> CGRect {
+                CGRect(x: point.x - width / 2, y: point.y - 12, width: width, height: 24)
+            }
+            let best = candidates.enumerated().min { lhs, rhs in
+                func score(_ item: (offset: Int, element: CGPoint)) -> Int {
+                    let rect = box(item.element)
+                    let crossedEdges = edges.filter { otherIndex, otherPath in
+                        guard otherIndex != index else { return false }
+                        return (0...24).contains { step in
+                            rect.insetBy(dx: -2, dy: -2).contains(otherPath.point(CGFloat(step) / 24))
+                        }
+                    }.count
+                    return (bounds.contains(rect) ? 0 : 10_000)
+                        + occupied.filter { $0.intersects(rect) }.count * 1_000
+                        + crossedEdges * 100 + item.offset
+                }
+                return score(lhs) < score(rhs)
+            }?.element ?? path.point(0.5)
+            labels[index] = best
+            occupied.append(box(best).insetBy(dx: -3, dy: -3))
+        }
+        self.points = points
+        self.captions = captions
+        self.edgeLabels = labels
+        self.edges = edges
+    }
+}
+
+private struct GraphEdgePath {
     let from: CGPoint
     let to: CGPoint
-    let cost: Int
+    var control: CGPoint?
+
+    func point(_ t: CGFloat) -> CGPoint {
+        guard let control else {
+            return CGPoint(x: from.x + (to.x - from.x) * t, y: from.y + (to.y - from.y) * t)
+        }
+        let u = 1 - t
+        return CGPoint(x: u * u * from.x + 2 * u * t * control.x + t * t * to.x,
+                       y: u * u * from.y + 2 * u * t * control.y + t * t * to.y)
+    }
+
+    func direction(_ t: CGFloat) -> CGPoint {
+        let dx: CGFloat, dy: CGFloat
+        if let control {
+            dx = (1 - t) * (control.x - from.x) + t * (to.x - control.x)
+            dy = (1 - t) * (control.y - from.y) + t * (to.y - control.y)
+        } else {
+            dx = to.x - from.x
+            dy = to.y - from.y
+        }
+        let length = max(hypot(dx, dy), 1)
+        return CGPoint(x: dx / length, y: dy / length)
+    }
+
+    func normal(_ t: CGFloat) -> CGPoint {
+        let direction = direction(t)
+        return CGPoint(x: -direction.y, y: direction.x)
+    }
+}
+
+private extension CGPoint {
+    func distance(to other: CGPoint) -> CGFloat { hypot(x - other.x, y - other.y) }
+}
+
+private struct EdgeView: View {
+    enum Emphasis { case normal, active, route }
+    let path: GraphEdgePath
     let directed: Bool
     let emphasis: Emphasis
     let nodeRadius: CGFloat
 
     private var color: Color {
-        switch emphasis {
-        case .normal: Color(.secondaryLabel).opacity(0.7)
-        case .active, .route: .accentColor
-        }
+        emphasis == .normal ? Color(.secondaryLabel) : Color.accentColor
     }
 
     var body: some View {
-        let length = max(hypot(to.x - from.x, to.y - from.y), 1)
-        let unit = CGPoint(x: (to.x - from.x) / length, y: (to.y - from.y) / length)
-        let start = CGPoint(x: from.x + unit.x * nodeRadius, y: from.y + unit.y * nodeRadius)
-        let end = CGPoint(x: to.x - unit.x * (nodeRadius + 2), y: to.y - unit.y * (nodeRadius + 2))
-
+        let first = path.direction(0), unit = path.direction(1)
+        let start = CGPoint(x: path.from.x + first.x * (nodeRadius + 3), y: path.from.y + first.y * (nodeRadius + 3))
+        let end = CGPoint(x: path.to.x - unit.x * (nodeRadius + 5), y: path.to.y - unit.y * (nodeRadius + 5))
+        let base = CGPoint(x: end.x - unit.x * 10, y: end.y - unit.y * 10)
         ZStack {
-            Path { path in
-                path.move(to: start)
-                path.addLine(to: end)
-                if directed {
-                    let wing: CGFloat = 8
-                    let angle = atan2(unit.y, unit.x)
-                    for offset in [CGFloat.pi * 0.84, -CGFloat.pi * 0.84] {
-                        path.move(to: end)
-                        path.addLine(to: CGPoint(x: end.x + cos(angle + offset) * wing, y: end.y + sin(angle + offset) * wing))
-                    }
+            Path { stroke in
+                stroke.move(to: start)
+                if let control = path.control {
+                    stroke.addQuadCurve(to: directed ? base : end, control: control)
+                } else {
+                    stroke.addLine(to: directed ? base : end)
                 }
             }
-            .stroke(
-                color,
-                style: StrokeStyle(
-                    lineWidth: emphasis == .route ? 3 : 1.5,
-                    lineCap: .round,
-                    dash: emphasis == .active ? [5, 4] : []
-                )
-            )
-
-            Text(cost, format: .number)
-                .font(.caption.weight(.bold))
-                .monospacedDigit()
-                .foregroundStyle(emphasis == .normal ? Color.primary : Color.accentColor)
-                .padding(.horizontal, 5)
-                .padding(.vertical, 1)
-                .background(Color(.secondarySystemGroupedBackground), in: .rect(cornerRadius: 4))
-                .position(x: (from.x + to.x) / 2, y: (from.y + to.y) / 2)
+            .stroke(color, style: StrokeStyle(lineWidth: emphasis == .normal ? 2.2 : 3.2, lineCap: .round))
+            if directed {
+                Path { path in
+                    path.move(to: end)
+                    path.addLine(to: CGPoint(x: base.x - unit.y * 5, y: base.y + unit.x * 5))
+                    path.addLine(to: CGPoint(x: base.x + unit.y * 5, y: base.y - unit.x * 5))
+                    path.closeSubpath()
+                }
+                .fill(color)
+            }
         }
         .accessibilityHidden(true)
+    }
+}
+
+private struct EdgeCostLabel: View {
+    let cost: Int
+    let highlighted: Bool
+
+    var body: some View {
+        Text(cost, format: .number)
+            .font(.system(size: 14, weight: .bold, design: .rounded))
+            .monospacedDigit()
+            .foregroundStyle(highlighted ? Color.accentColor : Color.primary)
+            .padding(.horizontal, 6).padding(.vertical, 3)
+            .background(Color(.secondarySystemGroupedBackground), in: .rect(cornerRadius: 7))
+            .overlay { RoundedRectangle(cornerRadius: 7).strokeBorder(Color.primary.opacity(0.12), lineWidth: 1) }
+            .accessibilityHidden(true)
+    }
+}
+
+private struct NodeCostLabel: View {
+    let node: NodeSummary
+    let isAStar: Bool
+
+    var body: some View {
+        VStack(spacing: 2) {
+            if isAStar {
+                Text("g \(node.g.map(String.init) ?? "∞") · h \(node.h)")
+                    .font(.system(size: 12, weight: .medium, design: .rounded))
+                Text("f \(node.f.map(String.init) ?? "∞")")
+                    .font(.system(size: 14, weight: .bold, design: .rounded))
+            } else {
+                Text("g \(node.g.map(String.init) ?? "∞")")
+                    .font(.system(size: 14, weight: .semibold, design: .rounded))
+            }
+        }
+        .monospacedDigit()
+        .foregroundStyle(.primary)
+        .fixedSize()
+        .padding(.horizontal, 3).padding(.vertical, 2)
+        .background(Color(.secondarySystemGroupedBackground), in: .rect(cornerRadius: 5))
     }
 }
 
@@ -147,64 +294,39 @@ private struct NodeView: View {
     let size: CGFloat
 
     var body: some View {
-        VStack(spacing: 4) {
-            ZStack {
-                shape
-                Text(node.label)
-                    .font(.headline)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.65)
-                    .padding(.horizontal, 3)
-                    .foregroundStyle(node.state == .current ? Color.white : node.state == .undiscovered ? Color.secondary : Color.primary)
-            }
-            .frame(width: size, height: size)
-            .overlay {
-                if isSelected {
-                    Circle()
-                        .stroke(Color.accentColor, lineWidth: 2)
-                        .padding(-5)
-                }
-            }
-
-            Text(caption)
-                .font(.caption.weight(.medium))
-                .monospacedDigit()
-                .foregroundStyle(.primary)
-                .fixedSize()
+        ZStack {
+            shape
+            Text(node.label)
+                .font(.system(size: 20, weight: .bold, design: .rounded))
+                .lineLimit(1).minimumScaleFactor(0.65).padding(.horizontal, 3)
+                .foregroundStyle(node.state == .current ? Color.white : Color.primary)
         }
+        .frame(width: size, height: size)
+        .overlay {
+            if isSelected { Circle().stroke(Color.accentColor, lineWidth: 2).padding(-5) }
+        }
+        .contentShape(Circle())
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel(accessibilityTitle)
+        .accessibilityLabel(isSource ? "Node \(node.label), start" : isGoal ? "Node \(node.label), goal" : "Node \(node.label)")
         .accessibilityValue("\(node.state.title), \(caption)")
         .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
 
-    private var accessibilityTitle: String {
-        if isSource { return "Node \(node.label), start" }
-        if isGoal { return "Node \(node.label), goal" }
-        return "Node \(node.label)"
-    }
-
-    @ViewBuilder
-    private var shape: some View {
+    @ViewBuilder private var shape: some View {
         switch node.state {
         case .undiscovered:
-            Circle()
-                .fill(Color(.secondarySystemGroupedBackground))
-                .overlay(Circle().strokeBorder(Color(.secondaryLabel), lineWidth: 1.5))
+            Circle().fill(Color(.secondarySystemGroupedBackground))
+                .overlay(Circle().strokeBorder(Color(.secondaryLabel), lineWidth: 2))
         case .frontier:
-            Circle()
-                .fill(Color(.secondarySystemGroupedBackground))
-                .overlay(Circle().strokeBorder(Color.accentColor, style: StrokeStyle(lineWidth: 2, dash: [4, 3])))
+            Circle().fill(Color(.secondarySystemGroupedBackground))
+                .overlay(Circle().strokeBorder(Color.accentColor, style: StrokeStyle(lineWidth: 2.5, dash: [5, 3])))
         case .current:
-            Circle()
-                .fill(Color.accentColor)
+            Circle().fill(Color.accentColor)
         case .settled:
-            Circle()
-                .fill(Color(.systemGray5))
-                .overlay(Circle().strokeBorder(Color(.systemGray3), lineWidth: 1))
+            Circle().fill(Color(.systemGray5))
+                .overlay(Circle().strokeBorder(Color(.secondaryLabel), lineWidth: 1.5))
         case .route:
-            Circle()
-                .fill(Color(.secondarySystemGroupedBackground))
+            Circle().fill(Color(.secondarySystemGroupedBackground))
                 .overlay(Circle().strokeBorder(Color.accentColor, lineWidth: 3))
         }
     }
