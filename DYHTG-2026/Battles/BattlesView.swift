@@ -67,7 +67,7 @@ struct BattlesView: View {
                         if let start = state.startedAt, let finish = state.finishedAt, let seconds = duration(start, finish) { LabeledContent("Match Duration", value: "\(seconds/60)m \(seconds%60)s") }
                         PrimaryButton(title: "Play Again", isBusy: store.busy) { Task { await store.act("rematch") } }
                         Button("Return Home") { Task { await store.close(); if store.state == nil { dismiss() } } }
-                        NavigationLink("View Profile") { ProfileView(store: store) }
+                        NavigationLink("View Profile") { ProfileView() }
                     }
                 }
                 Section {
@@ -78,9 +78,9 @@ struct BattlesView: View {
                 Section {
                     Label("Challenge a Friend", systemImage: "person.2.fill").font(.title2.bold())
                     Text("Solve paths, explore graphs, sort values and search efficiently. The first to 100 wins.").foregroundStyle(.secondary)
-                    if !store.signedIn { NavigationLink("Connect Your Player Account") { ProfileView(store: store) } }
+                    if !store.signedIn { NavigationLink("Customize Your Profile") { ProfileView() } }
                     else {
-                        NavigationLink("Player Profile") { ProfileView(store: store) }
+                        NavigationLink("Player Profile") { ProfileView() }
                         Button("Resume My Room") { Task { await store.recover() } }
                         PrimaryButton(title: "Create Private Room", isBusy: store.busy) { enter("create") }
                         TextField("Room code", text: $roomCode).textInputAutocapitalization(.characters).autocorrectionDisabled()

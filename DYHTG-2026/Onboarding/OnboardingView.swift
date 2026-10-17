@@ -4,41 +4,79 @@ struct OnboardingView: View {
     let completion: () -> Void
     @State private var page = 0
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
-    private let titles = ["Algorithms Come Alive.", "Think Faster. Win Smarter.", "Find Your Best Path."]
+    private let tabs = ["01 / Learn", "02 / Play", "03 / Visualize"]
+    private let titles = ["Think like\nan algorithm.", "Then change\nthe game.", "See the search\nunfold."]
     private let subtitles = [
-        "Discover how algorithms think, explore and solve problems through beautiful interactive experiences.",
-        "Connect with friends, compete in algorithmic challenges, and climb your way to victory.",
-        "Discover how algorithms navigate the real world and find the smartest routes between places and people."
+        "Predict the next move. Explore each step. Make Dijkstra and A* click.",
+        "Challenge a friend in Plot Twist Duel. Three rounds. One bridge closure. Can you adapt?",
+        "Watch algorithms explore a campus. Close a path, try a detour, and compare the results."
     ]
 
     var body: some View {
         NavigationStack {
             ScrollView {
-                VStack(spacing: 28) {
+                VStack(alignment: .leading, spacing: 24) {
+                    ArenaEyebrow(text: tabs[page], color: ArenaPalette.teal)
                     OnboardingDemo(page: page)
-                        .frame(height: 270)
-                        .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 24))
-                    VStack(spacing: 16) {
-                        Text(titles[page]).font(.largeTitle.bold()).multilineTextAlignment(.center)
-                        Text(subtitles[page]).font(.title3).foregroundStyle(.secondary).multilineTextAlignment(.center)
+                        .frame(height: 250)
+                        .foregroundStyle(.white)
+                        .tint(ArenaPalette.mint)
+                        .background(ArenaPalette.ink, in: .rect(cornerRadius: 28))
+                    VStack(alignment: .leading, spacing: 14) {
+                        Text(titles[page])
+                            .font(.system(.largeTitle, design: .rounded, weight: .bold))
+                            .fixedSize(horizontal: false, vertical: true)
+                        Text(subtitles[page])
+                            .font(.title3)
+                            .foregroundStyle(.secondary)
+                            .fixedSize(horizontal: false, vertical: true)
                     }
+                    .id(page)
+                    .transition(.opacity)
+                }
+                .padding(24)
+                .frame(maxWidth: 620)
+                .frame(maxWidth: .infinity)
+            }
+            .background(ArenaPalette.canvas)
+            .safeAreaInset(edge: .bottom) {
+                VStack(spacing: 16) {
                     HStack(spacing: 10) {
                         ForEach(0..<3) { index in
-                            Capsule().fill(index == page ? Color.accentColor : Color.secondary.opacity(0.25))
+                            Capsule().fill(index == page ? ArenaPalette.teal : Color.secondary.opacity(0.25))
                                 .frame(width: index == page ? 28 : 8, height: 8)
                         }
                     }
                     .accessibilityLabel("Welcome screen \(page + 1) of 3")
-                    PrimaryButton(title: page == 2 ? "Let's Get Started" : "Continue") {
-                        if page == 2 { completion() } else { move(1) }
+                    HStack(spacing: 12) {
+                        if page > 0 {
+                            Button("Back") { move(-1) }
+                                .buttonStyle(ArenaActionStyle(prominent: false))
+                                .frame(maxWidth: 90)
+                                .accessibilityIdentifier("welcome.back")
+                        }
+                        Button(page == 2 ? "Let's get started" : "Continue") {
+                            if page == 2 { completion() } else { move(1) }
+                        }
+                        .buttonStyle(ArenaActionStyle())
+                        .accessibilityIdentifier("welcome.continue")
                     }
-                    if page > 0 { Button("Back") { move(-1) } }
                 }
-                .padding(24).frame(maxWidth: 620).frame(maxWidth: .infinity)
+                .padding(.horizontal, 24)
+                .padding(.vertical, 16)
+                .frame(maxWidth: 620)
+                .frame(maxWidth: .infinity)
+                .background(ArenaPalette.canvas)
             }
-            .background(Color(.systemGroupedBackground))
-            .toolbar { ToolbarItem(placement: .topBarTrailing) { Button("Skip", action: completion) } }
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Skip", action: completion).accessibilityIdentifier("welcome.skip")
+                }
+            }
+            .navigationTitle("Algorithm Arena")
+            .navigationBarTitleDisplayMode(.inline)
         }
+        .tint(ArenaPalette.teal)
     }
 
     private func move(_ delta: Int) {
@@ -54,25 +92,32 @@ private struct OnboardingDemo: View {
             let cycle = reduceMotion ? 0.8 : context.date.timeIntervalSinceReferenceDate.truncatingRemainder(dividingBy: 8) / 8
             VStack(spacing: 16) {
                 if page == 1 {
-                    Text(cycle > 0.85 ? "Alex wins!" : "Round \(Int(cycle * 3) + 1) · \(cycle < 0.5 ? "Easy" : "Hard")")
-                        .font(.headline).foregroundStyle(.tint)
+                    let round = min(3, Int(cycle * 3) + 1)
+                    Label(round == 2 ? "PLOT TWIST · BRIDGE CLOSED" : "ROUND \(round) OF 3", systemImage: round == 2 ? "bolt.fill" : "bolt.shield.fill")
+                        .font(.caption.weight(.heavy))
+                        .foregroundStyle(round == 2 ? ArenaPalette.amber : ArenaPalette.mint)
                     ForEach(0..<2) { i in
-                        HStack {
-                            Image(systemName: i == 0 ? "person.crop.circle.fill" : "person.crop.circle").font(.largeTitle)
-                            VStack(alignment: .leading) {
-                                HStack { Text(i == 0 ? "Alex" : "Sam"); Spacer(); Text("\(Int(min(1,cycle/0.85) * (i == 0 ? 100 : 76)))") }
-                                ProgressView(value: min(1,cycle/0.85) * (i == 0 ? 1 : 0.76))
+                        let score = i == 0 ? round * 100 : (round == 1 ? 100 : (round - 1) * 100)
+                        HStack(spacing: 14) {
+                            Image(systemName: i == 0 ? "hare.fill" : "tortoise.fill")
+                                .font(.title2)
+                                .foregroundStyle(ArenaPalette.mint)
+                                .frame(width: 44, height: 44)
+                                .background(.white.opacity(0.1), in: Circle())
+                            VStack(alignment: .leading, spacing: 8) {
+                                HStack {
+                                    Text(i == 0 ? "Alex" : "Sam").font(.headline)
+                                    Spacer()
+                                    Text("\(score)").font(.headline.monospacedDigit())
+                                        .contentTransition(.numericText())
+                                }
+                                ProgressView(value: Double(score), total: 300)
+                                    .tint(ArenaPalette.mint)
                             }
                         }
                     }
-                    HStack(spacing: 12) {
-                        ForEach(0..<4) { i in
-                            Text("\((cycle > 0.5 ? [1,2,3,4] : [3,1,4,2])[i])")
-                                .font(.caption.bold().monospacedDigit()).frame(width: 28, height: 28)
-                                .background(Color.accentColor.opacity(0.12), in: Circle())
-                        }
-                    }
-                    Text("Tap nodes. Solve paths. Race to 100.").font(.caption).foregroundStyle(.secondary)
+                    Text("Predict privately. Reveal together.")
+                        .font(.footnote).foregroundStyle(.white.opacity(0.8))
                 } else {
                     Canvas { ctx, size in
                         let points = [CGPoint(x: 0.12, y: 0.55), CGPoint(x: 0.32, y: 0.2), CGPoint(x: 0.36, y: 0.8), CGPoint(x: 0.6, y: 0.35), CGPoint(x: 0.7, y: 0.8), CGPoint(x: 0.9, y: 0.45)].map { CGPoint(x: $0.x * size.width, y: $0.y * size.height) }
@@ -80,7 +125,7 @@ private struct OnboardingDemo: View {
                         if page == 2 {
                             for i in 0..<7 {
                                 var road = Path(); road.move(to: CGPoint(x: 0, y: CGFloat(i)*32)); road.addLine(to: CGPoint(x: size.width, y: CGFloat(i)*32+18))
-                                ctx.stroke(road, with: .color(.secondary.opacity(0.12)), lineWidth: 8)
+                                ctx.stroke(road, with: .color(.white.opacity(0.08)), lineWidth: 8)
                             }
                         }
                         for (index, edge) in edges.enumerated() {
@@ -90,35 +135,35 @@ private struct OnboardingDemo: View {
                             let phase = page == 2 ? cycle.truncatingRemainder(dividingBy: 0.5)*2 : cycle
                             let rank = guided ? [0,4,1,5,6,2,3][index] : index
                             let lit = Double(rank) / 8 < phase
-                            ctx.stroke(line, with: .color(lit ? .accentColor : .secondary.opacity(0.2)), style: StrokeStyle(lineWidth: lit ? 4 : 2, lineCap: .round))
+                            ctx.stroke(line, with: .color(lit ? ArenaPalette.mint : .white.opacity(0.25)), style: StrokeStyle(lineWidth: lit ? 4 : 2, lineCap: .round))
                             if lit {
                                 let t = (cycle * 3).truncatingRemainder(dividingBy: 1)
                                 let p = CGPoint(x: a.x + (b.x-a.x)*t, y: a.y + (b.y-a.y)*t)
-                                ctx.fill(Path(ellipseIn: CGRect(x: p.x-3, y: p.y-3, width: 6, height: 6)), with: .color(.primary))
+                                ctx.fill(Path(ellipseIn: CGRect(x: p.x-3, y: p.y-3, width: 6, height: 6)), with: .color(.white))
                                 if page == 2 {
                                     let reverse=CGPoint(x:b.x+(a.x-b.x)*t,y:b.y+(a.y-b.y)*t)
-                                    ctx.fill(Path(ellipseIn:CGRect(x:reverse.x-3,y:reverse.y-3,width:6,height:6)),with:.color(.green))
+                                    ctx.fill(Path(ellipseIn:CGRect(x:reverse.x-3,y:reverse.y-3,width:6,height:6)),with:.color(ArenaPalette.amber))
                                 }
                             }
                         }
                         if page == 2 {
                             if cycle.truncatingRemainder(dividingBy: 0.5)*2 > 0.65 {
                                 var chosen=Path();chosen.move(to:points[0]);chosen.addLines([points[1],points[3],points[5]])
-                                ctx.stroke(chosen,with:.color(.accentColor),style:StrokeStyle(lineWidth:6,lineCap:.round,lineJoin:.round))
+                                ctx.stroke(chosen,with:.color(ArenaPalette.mint),style:StrokeStyle(lineWidth:6,lineCap:.round,lineJoin:.round))
                             }
-                            ctx.draw(Text("Alex").font(.caption.bold()),at:CGPoint(x:points[0].x,y:points[0].y+24))
-                            ctx.draw(Text("Sam").font(.caption.bold()),at:CGPoint(x:points[5].x,y:points[5].y+24))
+                            ctx.draw(Text("Start").font(.caption.bold()),at:CGPoint(x:points[0].x,y:points[0].y+24))
+                            ctx.draw(Text("Goal").font(.caption.bold()),at:CGPoint(x:points[5].x,y:points[5].y+24))
                         }
                         for (index, point) in points.enumerated() {
-                            ctx.fill(Path(ellipseIn: CGRect(x: point.x-10,y: point.y-10,width: 20,height: 20)), with: .color(Double(index)/7 < cycle ? .accentColor : .secondary.opacity(0.4)))
+                            ctx.fill(Path(ellipseIn: CGRect(x: point.x-10,y: point.y-10,width: 20,height: 20)), with: .color(Double(index)/7 < cycle ? ArenaPalette.mint : .white.opacity(0.4)))
                         }
                     }.frame(height: 180)
-                    Text(page == 0 ? "Explore  ·  Discover  ·  Solve" : (cycle < 0.5 ? "BFS · Fictional sample locations" : "A* · Fictional sample locations"))
-                        .font(.caption).foregroundStyle(.secondary)
+                    Text(page == 0 ? "Predict  ·  Reveal  ·  Understand" : (cycle < 0.5 ? "Explore the network" : "Discover a route"))
+                        .font(.caption).foregroundStyle(.white.opacity(0.8))
                 }
             }.padding(24)
         }
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel(page == 0 ? "An algorithm discovers a path through connected nodes" : page == 1 ? "Two sample players solve progressively harder challenges" : "Two fictional friends explore routes towards each other")
+        .accessibilityLabel(page == 0 ? "An algorithm discovers a path through connected nodes" : page == 1 ? "A sample Plot Twist Duel: three rounds, a bridge closure, and shared scores" : "An illustrated search discovers a route from start to goal")
     }
 }

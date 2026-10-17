@@ -24,6 +24,14 @@ uses anonymous Supabase sessions. Map tiles come from MapKit. The campus paths
 are an educational model awaiting an outdoor survey; Visualize does not request
 location permission or provide walking directions.
 
+## Welcome and profile
+
+The animated welcome tour introduces these same three tabs. Open your avatar in
+any tab to edit your nickname, choose one of eight avatars, pick a profile color,
+or replay the welcome tour. Edits are drafts until **Save profile**; **Cancel**
+discards them. Profiles save locally, and a nickname change applies to the next
+duel you create or join. Existing room identities and anonymous sessions stay intact.
+
 ## Run the app
 
 Use Xcode with a Swift 6 toolchain and an installed iOS Simulator runtime.
@@ -140,3 +148,7 @@ The [original MVP plan](docs/PLAN.md), [two-person work breakdown](docs/WORK_BRE
 Their checkpoint requirements and implementation-status notes should not be used
 as the current product specification. The legacy backend suites remain available
 as `scripts/test_supabase_lobby.mjs` and `scripts/test_supabase_match.mjs`.
+
+The rebased Pathfinder branch also retains experimental friend-battle and road-search
+source. Those routes are not exposed by the active three-tab shell; its older
+[expansion notes](docs/EXPANSION.md) are historical, not current setup requirements.

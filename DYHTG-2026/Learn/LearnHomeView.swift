@@ -36,6 +36,7 @@ struct LearnHomeView: View {
             }
             .background(Color(.systemGroupedBackground))
             .navigationTitle("Learn")
+            .toolbar { ToolbarItem(placement: .topBarTrailing) { ProfileButton() } }
             .navigationDestination(for: AlgorithmKind.self) { algorithm in
                 LessonSessionView(algorithm: algorithm, progress: progress) { next in
                     path = [next]

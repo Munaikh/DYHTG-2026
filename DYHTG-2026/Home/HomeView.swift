@@ -45,7 +45,7 @@ struct HomeView: View {
                     NavigationLink { PathfinderView(battles: battles) } label: {
                         Label("Explore Pathfinder", systemImage: "map")
                     }
-                    NavigationLink { ProfileView(store: battles) } label: {
+                    NavigationLink { ProfileView() } label: {
                         Label("Profile", systemImage: "person.crop.circle")
                     }
                 }

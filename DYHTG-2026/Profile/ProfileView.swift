@@ -1,86 +1,248 @@
 import SwiftUI
 
-struct ProfileView: View {
-    @Bindable var store: BattleStore
-    @AppStorage("nickname") private var nickname = ""
-    @AppStorage("battleAvatar") private var avatar = "person.crop.circle.fill"
-    @State private var email = ""
-    @State private var code = ""
-    @State private var codeSent = false
-    let avatars = ["person.crop.circle.fill", "hare.fill", "tortoise.fill", "bird.fill"]
+private enum ProfileTint: String, CaseIterable, Identifiable {
+    case mint, amber, sky
+    var id: String { rawValue }
+    var title: String { rawValue.capitalized }
+    var color: Color {
+        switch self {
+        case .mint: ArenaPalette.mint
+        case .amber: ArenaPalette.amber
+        case .sky: Color(red: 0.57, green: 0.79, blue: 1)
+        }
+    }
+}
+
+private struct PlayerAvatar: View {
+    let symbol: String
+    let color: Color
+    var size: CGFloat = 40
 
     var body: some View {
-        Form {
-            Section("Player Profile") {
-                Image(systemName: avatar).font(.system(size: 52)).foregroundStyle(.tint).frame(maxWidth: .infinity).padding()
-                TextField("Nickname", text: $nickname).textContentType(.nickname)
-                    .onChange(of: nickname) { nickname = String(nickname.prefix(20)) }
-                Picker("Avatar", selection: $avatar) {
-                    ForEach(avatars, id: \.self) { icon in Image(systemName: icon).tag(icon) }
-                }
-                if store.signedIn {
-                    Button("Save Profile") { Task { await store.saveProfile(nickname: nickname, avatar: avatar) } }
-                        .disabled(store.busy || nickname.trimmingCharacters(in: .whitespacesAndNewlines).count < 2)
-                    Label("Account connected · available on your other devices", systemImage: "checkmark.shield")
-                        .font(.caption).foregroundStyle(.secondary)
-                }
-            }
-            if !store.signedIn {
-                Section {
-                    TextField("Email", text: $email).textContentType(.emailAddress).keyboardType(.emailAddress).textInputAutocapitalization(.never).autocorrectionDisabled()
-                    Button(codeSent ? "Send Another Code" : "Email a Sign-in Code") {
-                        Task { await store.sendCode(email: email); codeSent = store.error == nil }
-                    }.disabled(store.busy || !email.contains("@"))
-                    if codeSent {
-                        TextField("Email code", text: $code).textContentType(.oneTimeCode).keyboardType(.numberPad)
-                        Button("Verify & Connect Account") {
-                            Task {
-                                await store.verify(email: email, code: code)
-                                if store.signedIn {
-                                    await store.stats()
-                                    if store.statistics?.profile == nil && nickname.count >= 2 {
-                                        await store.saveProfile(nickname: nickname, avatar: avatar)
-                                    }
-                                }
-                            }
-                        }.disabled(store.busy || code.count < 6)
-                    }
-                } header: { Text("Play Across Devices") } footer: {
-                    Text("Use the same email on each device to restore your battle statistics. Email sign-in requires the Supabase email provider and code template described in the setup guide.")
-                }
-            }
-            if let stats = store.statistics {
-                Section("Battle Statistics") {
-                    HStack {
-                        metric("Wins", stats.wins); metric("Losses", stats.matches-stats.wins); metric("Matches", stats.matches)
-                    }
-                    LabeledContent("Win Rate", value: stats.matches == 0 ? "No matches yet" : "\(Int(Double(stats.wins)/Double(stats.matches)*100))%")
-                    ProgressView(value: Double(stats.wins), total: Double(max(1,stats.matches))).accessibilityLabel("Wins out of all completed matches")
-                    LabeledContent("Current Win Streak", value: "\(stats.currentStreak)")
-                    LabeledContent("Best Win Streak", value: "\(stats.bestStreak)")
-                }
-                Section("Recent Matches") {
-                    if stats.history.isEmpty { ContentUnavailableView("Your first battle awaits", systemImage: "flag.checkered", description: Text("Completed friend battles will appear here.")) }
-                    ForEach(stats.history) { match in
-                        HStack {
-                            Image(systemName: match.won ? "trophy.fill" : "flag.checkered").foregroundStyle(.tint)
-                            VStack(alignment: .leading, spacing: 4) {
-                                Text(match.opponent).font(.headline)
-                                Text("\(match.won ? "Win" : "Loss") · \(match.score) points · \(match.difficulty)").font(.caption)
-                                Text(BattleTime.date(match.completedAt)?.formatted(date: .abbreviated, time: .shortened) ?? String(match.completedAt.prefix(10))).font(.caption).foregroundStyle(.secondary)
-                            }
-                        }
-                    }
-                }
-            }
-            if store.busy { ProgressView() }
-            if let error = store.error { Text(error).foregroundStyle(.red) }
-        }
-        .navigationTitle("Profile")
-        .task { await store.stats() }
-        .refreshable { await store.stats() }
+        Image(systemName: symbol)
+            .font(.system(size: size * 0.44, weight: .semibold))
+            .foregroundStyle(ArenaPalette.ink)
+            .frame(width: size, height: size)
+            .background(color, in: Circle())
     }
-    private func metric(_ title: String, _ value: Int) -> some View {
-        VStack { Text("\(value)").font(.title.bold().monospacedDigit()); Text(title).font(.caption).foregroundStyle(.secondary) }.frame(maxWidth: .infinity)
+}
+
+/// A single profile entry point reused by all three tabs.
+struct ProfileButton: View {
+    @AppStorage("battleAvatar") private var avatar = "person.crop.circle.fill"
+    @AppStorage("profileTint") private var tint = ProfileTint.mint.rawValue
+    @State private var showingProfile = false
+
+    var body: some View {
+        Button { showingProfile = true } label: {
+            PlayerAvatar(symbol: avatar, color: (ProfileTint(rawValue: tint) ?? .mint).color, size: 32)
+        }
+        .accessibilityLabel("Edit profile")
+        .accessibilityIdentifier("profile.open")
+        .sheet(isPresented: $showingProfile) {
+            NavigationStack { ProfileView() }
+                .tint(ArenaPalette.teal)
+        }
+    }
+}
+
+struct ProfileView: View {
+    @AppStorage("nickname") private var nickname = ""
+    @AppStorage("battleAvatar") private var avatar = "person.crop.circle.fill"
+    @AppStorage("profileTint") private var tint = ProfileTint.mint.rawValue
+    @State private var draftNickname = ""
+    @State private var draftAvatar = "person.crop.circle.fill"
+    @State private var draftTint = ProfileTint.mint
+    @State private var loaded = false
+    @State private var showingWelcome = false
+    @FocusState private var nameFocused: Bool
+    @Environment(\.dismiss) private var dismiss
+
+    private let avatars: [(symbol: String, name: String)] = [
+        ("person.crop.circle.fill", "Player"), ("bolt.fill", "Bolt"),
+        ("hare.fill", "Hare"), ("tortoise.fill", "Tortoise"),
+        ("bird.fill", "Bird"), ("leaf.fill", "Leaf"),
+        ("paperplane.fill", "Explorer"), ("star.fill", "Star")
+    ]
+    private var cleanNickname: String { draftNickname.trimmingCharacters(in: .whitespacesAndNewlines) }
+    private var validNickname: Bool { (2...20).contains(cleanNickname.count) }
+
+    var body: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 20) {
+                preview
+                nameEditor
+                avatarPicker
+                colorPicker
+                Button {
+                    nameFocused = false
+                    showingWelcome = true
+                } label: {
+                    Label("Watch the welcome tour", systemImage: "play.circle")
+                        .font(.subheadline.weight(.semibold))
+                        .frame(maxWidth: .infinity, minHeight: 44)
+                }
+                .accessibilityIdentifier("profile.welcome")
+                Text("Your profile saves on this device.")
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+                    .frame(maxWidth: .infinity)
+            }
+            .padding(20)
+            .frame(maxWidth: 620)
+            .frame(maxWidth: .infinity)
+        }
+        .background(ArenaPalette.canvas)
+        .scrollDismissesKeyboard(.interactively)
+        .navigationTitle("Your profile")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .cancellationAction) {
+                Button("Cancel") { dismiss() }
+                    .accessibilityIdentifier("profile.cancel")
+            }
+            ToolbarItemGroup(placement: .keyboard) {
+                Spacer()
+                Button("Done") { nameFocused = false }
+            }
+        }
+        .safeAreaInset(edge: .bottom) {
+            Button("Save profile", systemImage: "checkmark") { save() }
+                .buttonStyle(ArenaActionStyle())
+                .disabled(!validNickname)
+                .accessibilityIdentifier("profile.save")
+                .padding(.horizontal, 20)
+                .padding(.vertical, 12)
+                .background(.bar)
+        }
+        .onAppear {
+            guard !loaded else { return }
+            draftNickname = nickname
+            draftAvatar = avatar
+            draftTint = ProfileTint(rawValue: tint) ?? .mint
+            loaded = true
+        }
+        .fullScreenCover(isPresented: $showingWelcome) {
+            OnboardingView { showingWelcome = false }
+        }
+    }
+
+    private var preview: some View {
+        HStack(spacing: 18) {
+            PlayerAvatar(symbol: draftAvatar, color: draftTint.color, size: 76)
+                .contentTransition(.symbolEffect(.replace))
+            VStack(alignment: .leading, spacing: 8) {
+                ArenaEyebrow(text: "Your arena ID", color: draftTint.color)
+                Text(cleanNickname.isEmpty ? "Your nickname" : cleanNickname)
+                    .font(.system(.title2, design: .rounded, weight: .bold))
+                    .foregroundStyle(.white)
+                    .lineLimit(2)
+                Text("Ready for your next move.")
+                    .font(.subheadline)
+                    .foregroundStyle(.white.opacity(0.8))
+            }
+            Spacer(minLength: 0)
+        }
+        .padding(24)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(ArenaPalette.ink, in: .rect(cornerRadius: 24))
+    }
+
+    private var nameEditor: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                ArenaEyebrow(text: "Duel name")
+                Spacer()
+                Text("\(cleanNickname.count)/20")
+                    .font(.caption.monospacedDigit())
+                    .foregroundStyle(validNickname ? Color.secondary : ArenaPalette.teal)
+            }
+            HStack {
+                TextField("Your nickname", text: $draftNickname)
+                    .font(.title3.weight(.semibold))
+                    .textContentType(.nickname)
+                    .autocorrectionDisabled()
+                    .submitLabel(.done)
+                    .focused($nameFocused)
+                    .onSubmit { nameFocused = false }
+                    .accessibilityIdentifier("profile.nickname")
+                    .onChange(of: draftNickname) { _, value in
+                        if value.count > 20 { draftNickname = String(value.prefix(20)) }
+                    }
+                if !draftNickname.isEmpty {
+                    Button("Clear nickname", systemImage: "xmark.circle.fill") { draftNickname = "" }
+                        .labelStyle(.iconOnly)
+                        .foregroundStyle(.secondary)
+                        .accessibilityIdentifier("profile.clearName")
+                }
+            }
+            .padding(14)
+            .background(ArenaPalette.canvas, in: .rect(cornerRadius: 14))
+            Text(validNickname ? "Used when you create or join your next duel." : "Choose a nickname with 2–20 characters.")
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+        }
+        .arenaCard()
+    }
+
+    private var avatarPicker: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            ArenaEyebrow(text: "Pick your player")
+            LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 4), spacing: 14) {
+                ForEach(avatars, id: \.symbol) { item in
+                    Button {
+                        nameFocused = false
+                        draftAvatar = item.symbol
+                    } label: {
+                        PlayerAvatar(symbol: item.symbol, color: draftAvatar == item.symbol ? draftTint.color : ArenaPalette.canvas, size: 52)
+                            .padding(4)
+                            .overlay(Circle().strokeBorder(draftAvatar == item.symbol ? ArenaPalette.teal : .clear, lineWidth: 2))
+                            .frame(maxWidth: .infinity)
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel(item.name)
+                    .accessibilityAddTraits(draftAvatar == item.symbol ? .isSelected : [])
+                    .accessibilityIdentifier("profile.avatar.\(item.name.lowercased())")
+                }
+            }
+        }
+        .arenaCard()
+    }
+
+    private var colorPicker: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            ArenaEyebrow(text: "Make it yours")
+            HStack(spacing: 12) {
+                ForEach(ProfileTint.allCases) { choice in
+                    Button {
+                        nameFocused = false
+                        draftTint = choice
+                    } label: {
+                        VStack(spacing: 8) {
+                            Image(systemName: "checkmark")
+                                .font(.headline)
+                                .opacity(draftTint == choice ? 1 : 0)
+                                .frame(width: 40, height: 40)
+                                .background(choice.color, in: Circle())
+                                .foregroundStyle(ArenaPalette.ink)
+                            Text(choice.title).font(.caption.weight(.semibold))
+                        }
+                        .frame(maxWidth: .infinity)
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityAddTraits(draftTint == choice ? .isSelected : [])
+                    .accessibilityIdentifier("profile.tint.\(choice.rawValue)")
+                }
+            }
+        }
+        .arenaCard()
+    }
+
+    private func save() {
+        guard validNickname else { return }
+        nickname = cleanNickname
+        avatar = draftAvatar
+        tint = draftTint.rawValue
+        dismiss()
     }
 }

@@ -1,3 +1,9 @@
+> Historical experiment: the active app uses Learn, Plot Twist Duel, and the
+> educational campus Visualize tab described in [README](../README.md).
+> The welcome tour and local profile editor have been integrated into that shell.
+> The friend-battle, email-account, and real-road features below remain dormant;
+> their migration and deployment steps are not required for the active app.
+
 # Friend battles and Pathfinder
 
 The original campus game, its contracts, QR/organiser arrivals, solo practice,
