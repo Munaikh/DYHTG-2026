@@ -60,3 +60,12 @@ tools and isolated previews/tests; keep it out of the production app.
 ```sh
 python3 -B scripts/verify_learning_content.py
 ```
+
+## Supabase rooms and sessions
+
+The [Supabase lobby backend](docs/SUPABASE.md) implements contract-v1 room
+creation/join, anonymous player identity, algorithm agreement and readiness,
+member-only snapshots, idempotent commands and safe Realtime invalidations.
+Reproducible configuration, migrations, security tests and integration tests live
+under `supabase/` and `scripts/test_supabase_lobby.mjs`. The iOS adapter and full
+match/scoring rules remain separate work.
