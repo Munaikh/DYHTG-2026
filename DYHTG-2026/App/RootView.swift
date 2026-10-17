@@ -34,7 +34,7 @@ struct RootView: View {
             if route == .home { learning.syncCampusNickname() }
         }
         .onChange(of: scenePhase) { _, phase in
-            guard phase == .active else { return }
+            guard phase == .active else { ArenaSoundPlayer.shared.stop(); return }
             Task { await store.refresh() }
         }
     }

@@ -11,6 +11,7 @@ struct PrimaryButton: View {
     var body: some View {
         Button {
             guard !isBusy else { return }
+            ArenaSoundPlayer.shared.play(.tap)
             action()
         } label: {
             HStack(spacing: 8) {

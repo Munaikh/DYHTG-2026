@@ -101,7 +101,11 @@ struct StudySessionView: View {
                   RoundedRectangle(cornerRadius: 13).stroke(
                     selected == node ? Color.arenaForest : Color.secondary.opacity(0.25),
                     lineWidth: selected == node ? 2 : 1))
-              }.buttonStyle(.plain).disabled(correct == true)
+              }.buttonStyle(ArenaFeedbackButtonStyle()).disabled(correct == true)
+                .animation(
+                  systemReduceMotion || learning.profile.preferences.reduceMotion
+                    ? nil : .spring(duration: 0.22), value: selected
+                )
                 .accessibilityAddTraits(selected == node ? .isSelected : [])
             }
           }
@@ -142,7 +146,7 @@ struct StudySessionView: View {
               systemImage: "lightbulb"
             ) {
               learning.hint(for: activity)
-            }.frame(maxWidth: .infinity, minHeight: 44)
+            }.frame(maxWidth: .infinity, minHeight: 44).buttonStyle(ArenaFeedbackButtonStyle())
             if hintCount > 0 {
               Text(activity.hints[min(hintCount - 1, 2)]).padding(16).frame(
                 maxWidth: .infinity, alignment: .leading
@@ -177,6 +181,9 @@ struct StudySessionView: View {
             Button("Retry loading saved progress") { learning.reload() }
           }
         }.padding(20).frame(maxWidth: 650).frame(maxWidth: .infinity)
+          .animation(
+            systemReduceMotion || learning.profile.preferences.reduceMotion
+              ? nil : .easeOut(duration: 0.22), value: correct)
       }.background(Color.arenaCanvas)
         .navigationTitle(activity.algorithm.shortName).navigationBarTitleDisplayMode(.inline)
         .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Close") { dismiss() } } }

@@ -77,6 +77,26 @@ only publishes earned progress after a successful save. Existing graph rendering
 is reused with an optional indoor cost display. Existing competitive challenge
 logic and answer derivation remain separate.
 
+## Interaction sounds and motion
+
+Main learning buttons, algorithm cards and answer choices have a short press
+animation; selection and answer feedback transition gently. System Reduce Motion
+and the saved app preference remove these added motion effects.
+
+Optional soft tap, success, level-up and gentle retry cues are generated locally
+as short mono PCM sounds and played with AVAudioPlayer. The audio session uses
+`ambient`, respects Silent Mode/device volume, and mixes with music and VoiceOver.
+No microphone, network request or external sound asset is needed. Disabled
+buttons do not play. Rewards chime only after progress saves successfully.
+Sounds stop when the app becomes inactive or the setting is turned off.
+
+Profile → Sound includes Button sounds and a sample button. This preference is
+saved under `arena.soundEffectsEnabled` in the existing app's UserDefaults,
+without changing or invalidating the existing learning-save schema. Sounds are
+on initially and are never required to understand feedback. The native build
+with these interaction changes passes. Physical speaker output and the hardware
+Ring/Silent switch should also be checked on an iPhone before release.
+
 ## XP, quests and cosmetic rewards
 
 Learning XP is **not competitive match points**.

@@ -76,6 +76,7 @@ final class LearningStore {
             ? "Your progress is saved." : "New achievement earned. See Profile.")
           : "Title unlocked: \(names.joined(separator: ", "))."
         notice = RewardNotice(title: title, detail: detail)
+        ArenaSoundPlayer.shared.play(profile.level > oldLevel ? .levelUp : .success)
       }
       storageError = nil
       return true
@@ -88,7 +89,9 @@ final class LearningStore {
   func answer(_ node: NodeID, in activity: StudyActivity) -> Bool? {
     do {
       let update = try LearningJourney.answer(profile, activityID: activity.id, node: node)
-      return commit(update) ? update.correct : nil
+      guard commit(update) else { return nil }
+      if update.correct == false { ArenaSoundPlayer.shared.play(.tryAgain) }
+      return update.correct
     } catch {
       storageError = "That answer isn’t available. Choose one of the labelled points."
       return nil
@@ -105,7 +108,12 @@ final class LearningStore {
     }
   }
   func equip(_ title: LearningTitle) {
-    do { _ = commit(try LearningJourney.equip(profile, titleID: title.id)) } catch {
+    do {
+      let changed = profile.equippedTitle != title.id
+      if commit(try LearningJourney.equip(profile, titleID: title.id)), changed {
+        ArenaSoundPlayer.shared.play(.success)
+      }
+    } catch {
       storageError = "This title is locked. Its card explains how to earn it."
     }
   }

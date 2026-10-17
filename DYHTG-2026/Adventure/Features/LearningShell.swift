@@ -57,8 +57,10 @@ struct AdventureHome: View {
                 Text(learning.equippedTitle).font(.subheadline).foregroundStyle(.secondary)
               }
             }
-          }.buttonStyle(.plain).accessibilityLabel("Open profile for \(learning.profile.nickname)")
-            .accessibilityValue(learning.equippedTitle)
+          }.buttonStyle(ArenaFeedbackButtonStyle()).accessibilityLabel(
+            "Open profile for \(learning.profile.nickname)"
+          )
+          .accessibilityValue(learning.equippedTitle)
           AdventureCard { LearningXPBar(profile: learning.profile) }
           AdventureCard {
             VStack(alignment: .leading, spacing: 16) {
@@ -99,7 +101,7 @@ struct AdventureHome: View {
                   ).font(.caption).foregroundStyle(.secondary)
                 }
               }
-            }.buttonStyle(.plain).accessibilityHint("Open Quests")
+            }.buttonStyle(ArenaFeedbackButtonStyle()).accessibilityHint("Open Quests")
           }
           VStack(alignment: .leading, spacing: 6) {
             Label("Learning tip", systemImage: "lightbulb").font(.headline)
@@ -147,7 +149,7 @@ struct LearnLibrary: View {
                     .secondary)
                 }
               }
-            }.buttonStyle(.plain)
+            }.buttonStyle(ArenaFeedbackButtonStyle())
           }
         }.padding(20).frame(maxWidth: 650).frame(maxWidth: .infinity)
       }.background(Color.arenaCanvas)
@@ -194,7 +196,7 @@ struct AlgorithmModuleView: View {
                 Spacer(minLength: 0)
               }
             }
-          }.buttonStyle(.plain)
+          }.buttonStyle(ArenaFeedbackButtonStyle())
         }
         if mode == .lesson {
           Text("Finish all 3 lessons for a one-time 100 XP module reward.").font(.subheadline)
@@ -235,7 +237,7 @@ struct AdventurePlay: View {
                 Label("Choose a puzzle", systemImage: "arrow.right").font(.headline)
               }
             }
-          }.buttonStyle(.plain)
+          }.buttonStyle(ArenaFeedbackButtonStyle())
           AdventureCard {
             VStack(alignment: .leading, spacing: 14) {
               Label("Campus match", systemImage: "map.fill").font(.title2.bold())

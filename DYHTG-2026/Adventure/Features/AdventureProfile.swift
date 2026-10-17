@@ -5,6 +5,8 @@ struct AdventureProfile: View {
   @Bindable var learning: LearningStore
   @State private var nickname = ""
   @State private var savedName = false
+  @AppStorage(ArenaSoundPlayer.preferenceKey) private var soundsEnabled = true
+  @State private var samplePlayed: Bool?
   var body: some View {
     NavigationStack {
       List {
@@ -61,6 +63,27 @@ struct AdventureProfile: View {
           Text(
             "Text follows your iPhone’s text-size setting. Every graph also has a text description."
           ).font(.footnote).foregroundStyle(.secondary)
+        }
+        Section {
+          Toggle("Button sounds", isOn: $soundsEnabled)
+            .onChange(of: soundsEnabled) { _, enabled in
+              samplePlayed = nil
+              if !enabled { ArenaSoundPlayer.shared.stop() }
+            }
+          Button("Play sample sound", systemImage: "speaker.wave.2.fill") {
+            samplePlayed = ArenaSoundPlayer.shared.play(.success)
+          }.disabled(!soundsEnabled)
+          if let samplePlayed {
+            Label(
+              samplePlayed ? "Sample played" : "Sound unavailable. Try again.",
+              systemImage: samplePlayed ? "checkmark.circle" : "speaker.slash"
+            )
+            .font(.footnote).foregroundStyle(.secondary)
+          }
+        } header: {
+          Text("Sound")
+        } footer: {
+          Text("Soft tap and reward sounds follow Silent Mode and your device volume.")
         }
         Section("Your privacy") {
           Text(
