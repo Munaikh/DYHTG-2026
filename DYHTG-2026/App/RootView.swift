@@ -17,6 +17,9 @@ struct RootView: View {
             case .match:
                 MatchView(store: store)
                     .transition(.opacity)
+            case .results:
+                ResultsView(store: store)
+                    .transition(.opacity)
             }
         }
         .animation(.easeInOut(duration: 0.25), value: store.route)

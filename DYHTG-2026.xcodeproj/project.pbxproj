@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		473E31671392A80D708283FD /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1DB8CF0AD31C04948635F115 /* Foundation.framework */; };
 		75E57638B2080B737A2637D7 /* AlgorithmArenaFixtures in Frameworks */ = {isa = PBXBuildFile; productRef = C61610FEDE2C01C9587217F7 /* AlgorithmArenaFixtures */; };
+		E5ACE898B0F4F40E577EA406 /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = 2183D1707FC6F37D2ED31F1E /* Supabase */; };
 		F2040AF83A51456F77327938 /* AlgorithmArenaCore in Frameworks */ = {isa = PBXBuildFile; productRef = CCB71D5D98E77B3AD5ECEFF4 /* AlgorithmArenaCore */; };
 /* End PBXBuildFile section */
 
@@ -26,6 +27,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E5ACE898B0F4F40E577EA406 /* Supabase in Frameworks */,
 				473E31671392A80D708283FD /* Foundation.framework in Frameworks */,
 				F2040AF83A51456F77327938 /* AlgorithmArenaCore in Frameworks */,
 				75E57638B2080B737A2637D7 /* AlgorithmArenaFixtures in Frameworks */,
@@ -88,6 +90,7 @@
 			);
 			name = "DYHTG-2026";
 			packageProductDependencies = (
+				2183D1707FC6F37D2ED31F1E /* Supabase */,
 				CCB71D5D98E77B3AD5ECEFF4 /* AlgorithmArenaCore */,
 				C61610FEDE2C01C9587217F7 /* AlgorithmArenaFixtures */,
 			);
@@ -119,6 +122,7 @@
 			);
 			mainGroup = 8FC690EBE74EEBFE230E52BA;
 			packageReferences = (
+				9426E681A4A2B745FA847BE5 /* XCRemoteSwiftPackageReference "supabase-swift" */,
 				E67898DE245D6388FB20C073 /* XCLocalSwiftPackageReference "Packages/AlgorithmArenaCore" */,
 			);
 			productRefGroup = 6D8C799F77AB9FA41349ACB6 /* Products */;
@@ -370,7 +374,23 @@
 		};
 /* End XCLocalSwiftPackageReference section */
 
+/* Begin XCRemoteSwiftPackageReference section */
+		9426E681A4A2B745FA847BE5 /* XCRemoteSwiftPackageReference "supabase-swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/supabase/supabase-swift";
+			requirement = {
+				kind = exactVersion;
+				version = 2.55.3;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
 /* Begin XCSwiftPackageProductDependency section */
+		2183D1707FC6F37D2ED31F1E /* Supabase */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9426E681A4A2B745FA847BE5 /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = Supabase;
+		};
 		C61610FEDE2C01C9587217F7 /* AlgorithmArenaFixtures */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = AlgorithmArenaFixtures;

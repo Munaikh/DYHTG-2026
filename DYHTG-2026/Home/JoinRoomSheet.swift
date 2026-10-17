@@ -12,18 +12,18 @@ struct JoinRoomSheet: View {
     @FocusState private var codeFocused: Bool
 
     private var normalizedCode: String {
-        String(code.uppercased().filter { $0.isLetter || $0.isNumber })
+        String(code.uppercased().filter(\.isHexDigit))
     }
 
     private var canJoin: Bool {
-        normalizedCode.count == 6 && !isJoining
+        normalizedCode.count == 10 && !isJoining
     }
 
     var body: some View {
         NavigationStack {
             Form {
                 Section {
-                    TextField("ABC123", text: $code)
+                    TextField("Room code", text: $code)
                         .font(.title2.weight(.semibold))
                         .kerning(3)
                         .textInputAutocapitalization(.characters)
@@ -33,7 +33,7 @@ struct JoinRoomSheet: View {
                         .focused($codeFocused)
                         .onChange(of: code) {
                             failure = nil
-                            if code.count > 6 { code = String(code.prefix(6)) }
+                            if code.count > 10 { code = String(code.prefix(10)) }
                         }
                         .onSubmit(join)
                         .accessibilityLabel("Room code")
@@ -42,7 +42,7 @@ struct JoinRoomSheet: View {
                         Text(failure)
                             .foregroundStyle(.red)
                     } else {
-                        Text("Enter the six-character code from the host's lobby.")
+                        Text("Enter the 10-character code shown in the host's lobby.")
                     }
                 }
             }
