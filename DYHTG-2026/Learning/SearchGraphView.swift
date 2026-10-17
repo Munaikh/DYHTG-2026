@@ -14,7 +14,9 @@ struct SearchGraphView: View {
         let height: CGFloat = layout.rows > 2 ? 370 : 300
         GeometryReader { proxy in
             let drawing = GraphDrawing(layout: layout, scenario: presentation.scenario,
-                                       size: proxy.size, isAStar: presentation.algorithm == .aStar)
+                                       size: proxy.size, isAStar: presentation.algorithm == .aStar,
+                                       isIndoorTraversal: presentation.indoorCostDisplay == .breadthFirst
+                                           || presentation.indoorCostDisplay == .depthFirst)
             ZStack {
                 ForEach(Array(presentation.scenario.edges.enumerated()), id: \.offset) { index, edge in
                     if let path = drawing.edges[index] {
@@ -40,7 +42,8 @@ struct SearchGraphView: View {
                                 if selectable.contains(node.id) { onSelect(node.id) }
                             }
                             .accessibilityAddTraits(selectable.contains(node.id) ? .isButton : [])
-                        NodeCostLabel(node: node, isAStar: presentation.algorithm == .aStar)
+                        NodeCostLabel(node: node, caption: presentation.costText(node),
+                                      isAStar: presentation.algorithm == .aStar)
                             .position(drawing.captions[node.id] ?? point)
                             .allowsHitTesting(false)
                             .accessibilityHidden(true)
@@ -76,7 +79,7 @@ private struct GraphDrawing {
     let edgeLabels: [Int: CGPoint]
     let edges: [Int: GraphEdgePath]
 
-    init(layout: GraphLayout, scenario: GraphScenario, size: CGSize, isAStar: Bool) {
+    init(layout: GraphLayout, scenario: GraphScenario, size: CGSize, isAStar: Bool, isIndoorTraversal: Bool) {
         let xs = layout.positions.values.map(\.x), ys = layout.positions.values.map(\.y)
         let minX = xs.min() ?? 0, maxX = xs.max() ?? 1
         let minY = ys.min() ?? 0, maxY = ys.max() ?? 1
@@ -86,12 +89,49 @@ private struct GraphDrawing {
             CGPoint(x: insetX + (unit.x - minX) / max(maxX - minX, 0.01) * max(size.width - 2 * insetX, 1),
                     y: minY == maxY ? size.height / 2 : insetY + (unit.y - minY) / (maxY - minY) * (size.height - 2 * insetY))
         }
-        let captionSize = CGSize(width: isAStar ? 96 : 48, height: isAStar ? 38 : 24)
-        let captions = points.mapValues { point in
+        let captionSize = CGSize(width: isAStar ? 96 : isIndoorTraversal ? 64 : 48, height: isAStar ? 38 : 24)
+        var captions = points.mapValues { point in
             CGPoint(x: min(max(point.x, captionSize.width / 2), size.width - captionSize.width / 2),
                     y: point.y + (point.y < size.height * 0.4 ? -1 : 1) * (28 + captionSize.height / 2))
         }
-        var occupied = points.values.map { CGRect(x: $0.x - 29, y: $0.y - 29, width: 58, height: 58) }
+        let nodeBoxes = points.values.map { CGRect(x: $0.x - 29, y: $0.y - 29, width: 58, height: 58) }
+        func captionBox(_ center: CGPoint) -> CGRect {
+            CGRect(x: center.x - captionSize.width / 2 - 3, y: center.y - captionSize.height / 2 - 3,
+                   width: captionSize.width + 6, height: captionSize.height + 6)
+        }
+        let ids = points.keys.sorted()
+        let captionBoxes = ids.compactMap { captions[$0].map(captionBox) }
+        let hasCaptionCollision = captionBoxes.indices.contains { index in
+            captionBoxes.indices.contains { $0 > index && captionBoxes[index].intersects(captionBoxes[$0]) }
+        }
+        // At narrow widths, adjacent A* captions can meet. For small diagrams,
+        // choose above/below placements together so fixing one label cannot
+        // push the next into a dead end. Uncrowded layouts stay exactly as authored.
+        if hasCaptionCollision && ids.count <= 10 {
+            let preferred = captions
+            var best = captions
+            var bestScore = Int.max
+            let labelBounds = CGRect(origin: .zero, size: size).insetBy(dx: -3, dy: -3)
+            func arrange(_ index: Int, _ chosen: [NodeID: CGPoint], _ boxes: [CGRect], _ score: Int) {
+                guard score < bestScore else { return }
+                guard index < ids.count else { best = chosen; bestScore = score; return }
+                let id = ids[index]
+                guard let point = points[id], let first = preferred[id] else { return }
+                let opposite = CGPoint(x: first.x, y: 2 * point.y - first.y)
+                for (offset, center) in [first, opposite].enumerated() {
+                    let box = captionBox(center)
+                    let penalty = (labelBounds.contains(box) ? 0 : 10_000)
+                        + nodeBoxes.filter { $0.intersects(box) }.count * 10_000
+                        + boxes.filter { $0.intersects(box) }.count * 1_000 + offset
+                    var next = chosen
+                    next[id] = center
+                    arrange(index + 1, next, boxes + [box], score + penalty)
+                }
+            }
+            arrange(0, [:], [], 0)
+            captions = best
+        }
+        var occupied = nodeBoxes
         occupied += captions.values.map { CGRect(x: $0.x - captionSize.width / 2 - 3, y: $0.y - captionSize.height / 2 - 3,
                                                  width: captionSize.width + 6, height: captionSize.height + 6) }
         var labels: [Int: CGPoint] = [:]
@@ -263,6 +303,7 @@ private struct EdgeCostLabel: View {
 
 private struct NodeCostLabel: View {
     let node: NodeSummary
+    let caption: String
     let isAStar: Bool
 
     var body: some View {
@@ -273,7 +314,7 @@ private struct NodeCostLabel: View {
                 Text("f \(node.f.map(String.init) ?? "∞")")
                     .font(.system(size: 14, weight: .bold, design: .rounded))
             } else {
-                Text("g \(node.g.map(String.init) ?? "∞")")
+                Text(caption)
                     .font(.system(size: 14, weight: .semibold, design: .rounded))
             }
         }
@@ -321,7 +362,9 @@ private struct NodeView: View {
             Circle().fill(Color(.secondarySystemGroupedBackground))
                 .overlay(Circle().strokeBorder(Color.accentColor, style: StrokeStyle(lineWidth: 2.5, dash: [5, 3])))
         case .current:
-            Circle().fill(Color.accentColor)
+            // The app tint becomes mint in dark mode. A fixed teal fill keeps
+            // the white node label readable in every learning/duel/map context.
+            Circle().fill(ArenaPalette.teal)
         case .settled:
             Circle().fill(Color(.systemGray5))
                 .overlay(Circle().strokeBorder(Color(.secondaryLabel), lineWidth: 1.5))

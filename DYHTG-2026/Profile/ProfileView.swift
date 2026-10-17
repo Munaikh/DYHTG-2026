@@ -48,6 +48,7 @@ struct ProfileButton: View {
 }
 
 struct ProfileView: View {
+    @Environment(LearningStore.self) private var learning
     @AppStorage("nickname") private var nickname = ""
     @AppStorage("battleAvatar") private var avatar = "person.crop.circle.fill"
     @AppStorage("profileTint") private var tint = ProfileTint.mint.rawValue
@@ -73,6 +74,7 @@ struct ProfileView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
                 preview
+                AdventureProfile(learning: learning)
                 nameEditor
                 avatarPicker
                 colorPicker
@@ -127,6 +129,7 @@ struct ProfileView: View {
         .fullScreenCover(isPresented: $showingWelcome) {
             OnboardingView { showingWelcome = false }
         }
+        .modifier(LearningNoticeModifier(learning: learning))
     }
 
     private var preview: some View {
@@ -139,7 +142,7 @@ struct ProfileView: View {
                     .font(.system(.title2, design: .rounded, weight: .bold))
                     .foregroundStyle(.white)
                     .lineLimit(2)
-                Text("Ready for your next move.")
+                Text(learning.equippedTitle)
                     .font(.subheadline)
                     .foregroundStyle(.white.opacity(0.8))
             }
@@ -251,6 +254,7 @@ struct ProfileView: View {
         nickname = cleanNickname
         avatar = draftAvatar
         tint = draftTint.rawValue
+        learning.syncNickname()
         dismiss()
     }
 }

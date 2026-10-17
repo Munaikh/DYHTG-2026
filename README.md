@@ -2,7 +2,7 @@
 
 [Hackathon demo guide and validation](docs/HACKATHON_DEMO.md) · [Plot Twist Duel backend](docs/DUEL.md)
 
-A native SwiftUI app for learning Dijkstra and A* by making predictions, competing
+A native SwiftUI app for learning BFS, DFS, Dijkstra, A*, and Greedy by making predictions, competing
 with a friend, and watching searches unfold. Targets **iOS 17+** on iPhone and
 iPad, using **Swift 6** and the Supabase Swift SDK.
 
@@ -10,7 +10,7 @@ iPad, using **Swift 6** and the Supabase Swift SDK.
 
 | Tab | Experience |
 | --- | --- |
-| **Learn** | Interactive lessons for both algorithms: predict the next node, update a cost, inspect the replay, and try a new graph. Progress saves on the device; no room or nickname is required. |
+| **Learn** | A Home dashboard with 15 lessons and 15 practice puzzles across five algorithms, trace replays, hints, XP, and quests. Original Dijkstra/A* guided lessons remain as Duel warm-ups. Progress saves on the device; no room or nickname is required. |
 | **Play** | **Plot Twist Duel**: two players, three prediction rounds, private answers, shared animated reveals, and server-authoritative scores. A bridge closes in round two; a different network tests understanding in round three. |
 | **Visualize** | A campus search laboratory with map/graph views, two prepared journeys, Dijkstra/A* selection, play/pause/step/scrub controls, adjustable playback speed, and a node-cost table. Close a path to trigger a detour or disconnect the destination, then compare route costs and expanded-node counts. |
 
@@ -28,9 +28,17 @@ location permission or provide walking directions.
 
 The animated welcome tour introduces these same three tabs. Open your avatar in
 any tab to edit your nickname, choose one of eight avatars, pick a profile color,
-or replay the welcome tour. Edits are drafts until **Save profile**; **Cancel**
+or replay the welcome tour. Name, avatar and color edits are drafts until **Save profile**; **Cancel**
 discards them. Profiles save locally, and a nickname change applies to the next
 duel you create or join. Existing room identities and anonymous sessions stay intact.
+
+Your profile also holds learning XP, levels, eleven cosmetic titles and six
+achievements. Six quests reward learning and completed Plot Twist duels;
+repeating a completed activity or claiming a reward again never duplicates XP.
+Equipped titles and beginner-tip preferences save immediately.
+Titles and learning XP do not affect competitive scores. See the
+[gamified learning integration notes](GAME_EXPERIENCE_IMPLEMENTATION.md) for
+scope, persistence, and the features selected from PR #31.
 
 ## Run the app
 
@@ -72,6 +80,7 @@ content verifiers:
 ```sh
 swift test --package-path Packages/AlgorithmArenaCore
 bash scripts/test_duel_store.sh
+bash scripts/test_learning_store.sh
 python3 -B scripts/verify_search_fixtures.py
 python3 -B scripts/verify_learning_content.py
 ```
@@ -122,6 +131,7 @@ closures, no-route recovery, larger text, and Reduce Motion on the target device
 ## Code and content
 
 - [`DYHTG-2026/Learn`](DYHTG-2026/Learn): lessons and local progress.
+- [`DYHTG-2026/Adventure`](DYHTG-2026/Adventure): five-algorithm libraries, practice, quests, collections, and the shared learning store.
 - [`DYHTG-2026/Duel`](DYHTG-2026/Duel): multiplayer UI, transport, and persistent command recovery.
 - [`DYHTG-2026/Visualization`](DYHTG-2026/Visualization): campus experiments and search presentation.
 - [`Packages/AlgorithmArenaCore`](Packages/AlgorithmArenaCore): Foundation-only search engine, traces, routing, public lesson catalog, and wire models.

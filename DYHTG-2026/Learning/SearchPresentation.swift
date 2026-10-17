@@ -30,12 +30,20 @@ struct NodeSummary: Identifiable {
     var f: Int? { g.map { $0 + h } }
 }
 
+/// Indoor lesson labels are independent of the two-algorithm multiplayer contract.
+enum IndoorCostDisplay: Equatable {
+    case breadthFirst
+    case depthFirst
+    case greedy
+}
+
 struct SearchPresentation {
     let scenario: GraphScenario
     let algorithm: AlgorithmKind
     let state: SearchState
     var current: NodeID?
     var routeNodes: [NodeID] = []
+    var indoorCostDisplay: IndoorCostDisplay?
 
     var routeEdges: Set<String> {
         Set(zip(routeNodes, routeNodes.dropFirst()).map { "\($0.0.rawValue)>\($0.1.rawValue)" })
@@ -72,6 +80,29 @@ struct SearchPresentation {
     }
 
     func costText(_ node: NodeSummary) -> String {
+        switch indoorCostDisplay {
+        case .breadthFirst:
+            // Count parent links rather than presenting weighted g as BFS depth.
+            guard node.g != nil else { return "depth –" }
+            var current = node.id
+            var seen: Set<NodeID> = []
+            var depth = 0
+            while current != scenario.source {
+                guard seen.insert(current).inserted,
+                      let parent = state.costs.first(where: { $0.nodeID == current })?.predecessor
+                else { return "depth –" }
+                depth += 1
+                current = parent
+            }
+            return "depth \(depth)"
+        case .depthFirst:
+            if let order = state.settled.firstIndex(of: node.id) { return "visit \(order + 1)" }
+            return state.frontier.contains(node.id) ? "waiting" : "–"
+        case .greedy:
+            return "h \(node.h)"
+        case nil:
+            break
+        }
         let g = node.g.map(String.init) ?? "∞"
         switch algorithm {
         case .dijkstra:
