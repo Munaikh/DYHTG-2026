@@ -97,11 +97,20 @@ Engine cost arrays are node-ID ordered; settled arrays retain expansion order.
 `relax` includes rejected equal-cost and already-settled neighbour attempts.
 Costs, heuristics and computed priorities must fit `0...9007199254740991` for exact
 server integers; invalid graphs, invalid A* heuristics and arithmetic overflow throw.
-Practice and transfer questions are synthetic
-content; the production learning bank and explanations are delivered in #5.
+The original practice and transfer questions remain synthetic development
+content. The [authored #5 learning bank](../docs/LEARNING.md) now provides all
+question slots, answer fixtures, worked explanations and full engine replays in
+the separate server-only `AlgorithmArenaLearning` product.
 Each question slot has a distinct graph so an earlier released replay cannot
 disclose a later scored question. Both players still get the same shared-checkpoint
 scenario, irrespective of branch.
+
+The learning bank adds optional `ScenarioNode.position` (normalised illustrative
+diagram x/y, never GPS or edge costs) and `ReleasedFeedback.workedStepTraceIndices`
+(one replay-index array per worked step). Existing documents omit both fields;
+old decoders may ignore them. New decoders accept their absence. See the learning
+handoff for layout and replay fallbacks. Answer banks remain outside core and the
+production app, with no change to the pending-feedback wire shape.
 
 `CampusPathNetwork` contains paths and explicit junction connectivity, independent
 of game stops. Each selection generates an immutable `CampusRoutingGraph` with

@@ -1,0 +1,174 @@
+{
+  "action" : {
+    "transfer" : {
+      "nodeOptions" : [
+        "Y",
+        "Z",
+        "W"
+      ],
+      "reasons" : [
+        {
+          "id" : "goal-distance",
+          "text" : "It is closest to the goal."
+        },
+        {
+          "id" : "frontier-priority",
+          "text" : "It has the lowest tentative g in the frontier."
+        },
+        {
+          "id" : "already-settled",
+          "text" : "It was already expanded."
+        },
+        {
+          "id" : "fewest-edges",
+          "text" : "It uses the fewest edges from the start."
+        }
+      ]
+    }
+  },
+  "algorithm" : "dijkstra",
+  "contentVersion" : "2026-10-17.1",
+  "feedbackGate" : "immediate",
+  "id" : "learning-dijkstra-learningCheck-v1",
+  "maximumPoints" : 0,
+  "presentedState" : {
+    "costs" : [
+      {
+        "g" : 1,
+        "h" : 3,
+        "nodeID" : "V",
+        "predecessor" : "X"
+      },
+      {
+        "g" : 4,
+        "h" : 2,
+        "nodeID" : "W",
+        "predecessor" : "V"
+      },
+      {
+        "g" : 0,
+        "h" : 3,
+        "nodeID" : "X"
+      },
+      {
+        "g" : 6,
+        "h" : 1,
+        "nodeID" : "Y",
+        "predecessor" : "X"
+      },
+      {
+        "g" : 9,
+        "h" : 0,
+        "nodeID" : "Z",
+        "predecessor" : "V"
+      }
+    ],
+    "frontier" : [
+      "W",
+      "Y",
+      "Z"
+    ],
+    "settled" : [
+      "X",
+      "V"
+    ]
+  },
+  "prompt" : "This unfamiliar graph is partway through a search. Which frontier node expands next, and why? Your first attempt is recorded separately and earns no match points.",
+  "scenario" : {
+    "edges" : [
+      {
+        "bidirectional" : false,
+        "cost" : 1,
+        "from" : "X",
+        "to" : "V"
+      },
+      {
+        "bidirectional" : false,
+        "cost" : 6,
+        "from" : "X",
+        "to" : "Y"
+      },
+      {
+        "bidirectional" : false,
+        "cost" : 3,
+        "from" : "V",
+        "to" : "W"
+      },
+      {
+        "bidirectional" : false,
+        "cost" : 8,
+        "from" : "V",
+        "to" : "Z"
+      },
+      {
+        "bidirectional" : false,
+        "cost" : 1,
+        "from" : "W",
+        "to" : "Y"
+      },
+      {
+        "bidirectional" : false,
+        "cost" : 2,
+        "from" : "W",
+        "to" : "Z"
+      },
+      {
+        "bidirectional" : false,
+        "cost" : 1,
+        "from" : "Y",
+        "to" : "Z"
+      }
+    ],
+    "goal" : "Z",
+    "id" : "learning-dijkstra-learningCheck-graph-v1",
+    "nodes" : [
+      {
+        "heuristic" : 3,
+        "id" : "X",
+        "label" : "X",
+        "position" : {
+          "x" : 0.05,
+          "y" : 0.5
+        }
+      },
+      {
+        "heuristic" : 3,
+        "id" : "V",
+        "label" : "V",
+        "position" : {
+          "x" : 0.3,
+          "y" : 0.15
+        }
+      },
+      {
+        "heuristic" : 2,
+        "id" : "W",
+        "label" : "W",
+        "position" : {
+          "x" : 0.4,
+          "y" : 0.8
+        }
+      },
+      {
+        "heuristic" : 1,
+        "id" : "Y",
+        "label" : "Y",
+        "position" : {
+          "x" : 0.7,
+          "y" : 0.2
+        }
+      },
+      {
+        "heuristic" : 0,
+        "id" : "Z",
+        "label" : "Z",
+        "position" : {
+          "x" : 0.95,
+          "y" : 0.5
+        }
+      }
+    ],
+    "source" : "X"
+  },
+  "slot" : "learningCheck"
+}

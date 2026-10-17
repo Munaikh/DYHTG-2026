@@ -5,14 +5,18 @@ on:
     paths:
       - 'Packages/AlgorithmArenaCore/**'
       - 'contracts/**'
+      - 'content/learning/**'
       - 'scripts/verify_search_fixtures.py'
+      - 'scripts/verify_learning_content.py'
       - '.github/workflows/core-contracts.yml'
   push:
     branches: [main]
     paths:
       - 'Packages/AlgorithmArenaCore/**'
       - 'contracts/**'
+      - 'content/learning/**'
       - 'scripts/verify_search_fixtures.py'
+      - 'scripts/verify_learning_content.py'
       - '.github/workflows/core-contracts.yml'
 
 permissions:
@@ -29,3 +33,5 @@ jobs:
         run: swift test --package-path Packages/AlgorithmArenaCore
       - name: Verify cross-language search and course fixtures
         run: python3 scripts/verify_search_fixtures.py
+      - name: Verify authored learning content independently
+        run: python3 -B scripts/verify_learning_content.py

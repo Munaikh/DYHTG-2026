@@ -1,0 +1,155 @@
+{
+  "action" : {
+    "enterCost" : {
+      "nodeID" : "F"
+    }
+  },
+  "algorithm" : "aStar",
+  "contentVersion" : "2026-10-17.1",
+  "feedbackGate" : "immediate",
+  "id" : "learning-aStar-bonusMiddle-v1",
+  "maximumPoints" : 40,
+  "presentedState" : {
+    "costs" : [
+      {
+        "g" : 0,
+        "h" : 7,
+        "nodeID" : "C"
+      },
+      {
+        "g" : 3,
+        "h" : 6,
+        "nodeID" : "D",
+        "predecessor" : "C"
+      },
+      {
+        "g" : 8,
+        "h" : 4,
+        "nodeID" : "E",
+        "predecessor" : "C"
+      },
+      {
+        "g" : 12,
+        "h" : 2,
+        "nodeID" : "F",
+        "predecessor" : "C"
+      },
+      {
+        "h" : 0,
+        "nodeID" : "H"
+      }
+    ],
+    "frontier" : [
+      "E",
+      "F"
+    ],
+    "settled" : [
+      "C",
+      "D"
+    ]
+  },
+  "prompt" : "Starting at D, relax D → E, then use that updated g to relax E → F. After both updates, what g(F) should be kept?",
+  "scenario" : {
+    "edges" : [
+      {
+        "bidirectional" : false,
+        "cost" : 3,
+        "from" : "C",
+        "to" : "D"
+      },
+      {
+        "bidirectional" : false,
+        "cost" : 8,
+        "from" : "C",
+        "to" : "E"
+      },
+      {
+        "bidirectional" : false,
+        "cost" : 12,
+        "from" : "C",
+        "to" : "F"
+      },
+      {
+        "bidirectional" : false,
+        "cost" : 2,
+        "from" : "D",
+        "to" : "E"
+      },
+      {
+        "bidirectional" : false,
+        "cost" : 10,
+        "from" : "D",
+        "to" : "F"
+      },
+      {
+        "bidirectional" : false,
+        "cost" : 3,
+        "from" : "E",
+        "to" : "F"
+      },
+      {
+        "bidirectional" : false,
+        "cost" : 2,
+        "from" : "F",
+        "to" : "H"
+      },
+      {
+        "bidirectional" : false,
+        "cost" : 11,
+        "from" : "E",
+        "to" : "H"
+      }
+    ],
+    "goal" : "H",
+    "id" : "learning-aStar-bonusMiddle-graph-v1",
+    "nodes" : [
+      {
+        "heuristic" : 7,
+        "id" : "C",
+        "label" : "C",
+        "position" : {
+          "x" : 0.05,
+          "y" : 0.5
+        }
+      },
+      {
+        "heuristic" : 6,
+        "id" : "D",
+        "label" : "D",
+        "position" : {
+          "x" : 0.3,
+          "y" : 0.15
+        }
+      },
+      {
+        "heuristic" : 4,
+        "id" : "E",
+        "label" : "E",
+        "position" : {
+          "x" : 0.4,
+          "y" : 0.8
+        }
+      },
+      {
+        "heuristic" : 2,
+        "id" : "F",
+        "label" : "F",
+        "position" : {
+          "x" : 0.7,
+          "y" : 0.2
+        }
+      },
+      {
+        "heuristic" : 0,
+        "id" : "H",
+        "label" : "H",
+        "position" : {
+          "x" : 0.95,
+          "y" : 0.5
+        }
+      }
+    ],
+    "source" : "C"
+  },
+  "slot" : "bonusMiddle"
+}

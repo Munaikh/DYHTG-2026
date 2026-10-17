@@ -1,0 +1,144 @@
+{
+  "action" : {
+    "selectRoute" : {
+      "options" : [
+        {
+          "id" : "via-side",
+          "text" : "J → L → Z"
+        },
+        {
+          "id" : "via-middle",
+          "text" : "J → K → M → Z"
+        }
+      ]
+    }
+  },
+  "algorithm" : "aStar",
+  "contentVersion" : "2026-10-17.1",
+  "feedbackGate" : "afterBothSubmissions",
+  "id" : "learning-aStar-third-v1",
+  "maximumPoints" : 20,
+  "presentedState" : {
+    "costs" : [
+      {
+        "g" : 0,
+        "h" : 3,
+        "nodeID" : "J"
+      },
+      {
+        "h" : 4,
+        "nodeID" : "K"
+      },
+      {
+        "h" : 1,
+        "nodeID" : "L"
+      },
+      {
+        "h" : 2,
+        "nodeID" : "M"
+      },
+      {
+        "h" : 0,
+        "nodeID" : "Z"
+      }
+    ],
+    "frontier" : [
+      "J"
+    ],
+    "settled" : [
+
+    ]
+  },
+  "prompt" : "Which of these routes has the lower total edge cost? The search may expand nodes that are absent from the final route.",
+  "scenario" : {
+    "edges" : [
+      {
+        "bidirectional" : false,
+        "cost" : 3,
+        "from" : "J",
+        "to" : "K"
+      },
+      {
+        "bidirectional" : false,
+        "cost" : 2,
+        "from" : "J",
+        "to" : "L"
+      },
+      {
+        "bidirectional" : false,
+        "cost" : 2,
+        "from" : "K",
+        "to" : "M"
+      },
+      {
+        "bidirectional" : false,
+        "cost" : 11,
+        "from" : "L",
+        "to" : "Z"
+      },
+      {
+        "bidirectional" : false,
+        "cost" : 3,
+        "from" : "M",
+        "to" : "Z"
+      },
+      {
+        "bidirectional" : false,
+        "cost" : 9,
+        "from" : "K",
+        "to" : "Z"
+      }
+    ],
+    "goal" : "Z",
+    "id" : "learning-aStar-third-graph-v1",
+    "nodes" : [
+      {
+        "heuristic" : 3,
+        "id" : "J",
+        "label" : "J",
+        "position" : {
+          "x" : 0.05,
+          "y" : 0.5
+        }
+      },
+      {
+        "heuristic" : 4,
+        "id" : "K",
+        "label" : "K",
+        "position" : {
+          "x" : 0.3,
+          "y" : 0.15
+        }
+      },
+      {
+        "heuristic" : 1,
+        "id" : "L",
+        "label" : "L",
+        "position" : {
+          "x" : 0.4,
+          "y" : 0.8
+        }
+      },
+      {
+        "heuristic" : 2,
+        "id" : "M",
+        "label" : "M",
+        "position" : {
+          "x" : 0.7,
+          "y" : 0.2
+        }
+      },
+      {
+        "heuristic" : 0,
+        "id" : "Z",
+        "label" : "Z",
+        "position" : {
+          "x" : 0.95,
+          "y" : 0.5
+        }
+      }
+    ],
+    "source" : "J"
+  },
+  "slot" : "third"
+}

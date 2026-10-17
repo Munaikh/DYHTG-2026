@@ -1,0 +1,118 @@
+{
+  "action" : {
+    "selectNode" : {
+      "options" : [
+        "Q",
+        "R"
+      ]
+    }
+  },
+  "algorithm" : "dijkstra",
+  "contentVersion" : "2026-10-17.1",
+  "feedbackGate" : "immediate",
+  "id" : "learning-dijkstra-practice-v1",
+  "maximumPoints" : 0,
+  "presentedState" : {
+    "costs" : [
+      {
+        "g" : 0,
+        "h" : 6,
+        "nodeID" : "P"
+      },
+      {
+        "g" : 4,
+        "h" : 5,
+        "nodeID" : "Q",
+        "predecessor" : "P"
+      },
+      {
+        "g" : 7,
+        "h" : 1,
+        "nodeID" : "R",
+        "predecessor" : "P"
+      },
+      {
+        "h" : 0,
+        "nodeID" : "T"
+      }
+    ],
+    "frontier" : [
+      "Q",
+      "R"
+    ],
+    "settled" : [
+      "P"
+    ]
+  },
+  "prompt" : "g is the tentative distance from the start. Expand the unsettled frontier node with the lowest g, regardless of closeness to the goal. R is drawn closer to the goal. Which frontier node expands next? This prediction is unscored.",
+  "scenario" : {
+    "edges" : [
+      {
+        "bidirectional" : false,
+        "cost" : 4,
+        "from" : "P",
+        "to" : "Q"
+      },
+      {
+        "bidirectional" : false,
+        "cost" : 7,
+        "from" : "P",
+        "to" : "R"
+      },
+      {
+        "bidirectional" : false,
+        "cost" : 6,
+        "from" : "Q",
+        "to" : "T"
+      },
+      {
+        "bidirectional" : false,
+        "cost" : 1,
+        "from" : "R",
+        "to" : "T"
+      }
+    ],
+    "goal" : "T",
+    "id" : "learning-dijkstra-practice-graph-v1",
+    "nodes" : [
+      {
+        "heuristic" : 6,
+        "id" : "P",
+        "label" : "P",
+        "position" : {
+          "x" : 0.05,
+          "y" : 0.5
+        }
+      },
+      {
+        "heuristic" : 5,
+        "id" : "Q",
+        "label" : "Q",
+        "position" : {
+          "x" : 0.35,
+          "y" : 0.15
+        }
+      },
+      {
+        "heuristic" : 1,
+        "id" : "R",
+        "label" : "R",
+        "position" : {
+          "x" : 0.8,
+          "y" : 0.7
+        }
+      },
+      {
+        "heuristic" : 0,
+        "id" : "T",
+        "label" : "T",
+        "position" : {
+          "x" : 0.95,
+          "y" : 0.5
+        }
+      }
+    ],
+    "source" : "P"
+  },
+  "slot" : "practice"
+}
