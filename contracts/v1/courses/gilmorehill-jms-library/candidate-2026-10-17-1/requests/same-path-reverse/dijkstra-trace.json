@@ -1,0 +1,368 @@
+{
+  "algorithm" : "dijkstra",
+  "outcome" : {
+    "route" : {
+      "cost" : 58,
+      "nodeIDs" : [
+        "selection:source",
+        "selection:goal"
+      ]
+    }
+  },
+  "scenarioID" : "23:gilmorehill-jms-library:22:candidate-2026-10-17-1:11:jms-gardens:16:404befd8adab9f56:16:c0112c7b890d5a5a:11:jms-gardens:16:404befc84c731992:16:c0112cb889cd54b9",
+  "steps" : [
+    {
+      "event" : {
+        "initial" : {
+
+        }
+      },
+      "index" : 0,
+      "state" : {
+        "costs" : [
+          {
+            "h" : 20,
+            "nodeID" : "junction:01-jms"
+          },
+          {
+            "h" : 120,
+            "nodeID" : "junction:02-lilybank-gardens"
+          },
+          {
+            "h" : 206,
+            "nodeID" : "junction:03-lilybank-house"
+          },
+          {
+            "h" : 222,
+            "nodeID" : "junction:04-hetherington"
+          },
+          {
+            "h" : 222,
+            "nodeID" : "junction:05-rejoin"
+          },
+          {
+            "h" : 257,
+            "nodeID" : "junction:06-fraser"
+          },
+          {
+            "h" : 308,
+            "nodeID" : "junction:07-library"
+          },
+          {
+            "h" : 0,
+            "nodeID" : "selection:goal"
+          },
+          {
+            "g" : 0,
+            "h" : 57,
+            "nodeID" : "selection:source"
+          }
+        ],
+        "frontier" : [
+          "selection:source"
+        ],
+        "settled" : [
+
+        ]
+      }
+    },
+    {
+      "event" : {
+        "expand" : {
+          "nodeID" : "selection:source"
+        }
+      },
+      "index" : 1,
+      "state" : {
+        "costs" : [
+          {
+            "h" : 20,
+            "nodeID" : "junction:01-jms"
+          },
+          {
+            "h" : 120,
+            "nodeID" : "junction:02-lilybank-gardens"
+          },
+          {
+            "h" : 206,
+            "nodeID" : "junction:03-lilybank-house"
+          },
+          {
+            "h" : 222,
+            "nodeID" : "junction:04-hetherington"
+          },
+          {
+            "h" : 222,
+            "nodeID" : "junction:05-rejoin"
+          },
+          {
+            "h" : 257,
+            "nodeID" : "junction:06-fraser"
+          },
+          {
+            "h" : 308,
+            "nodeID" : "junction:07-library"
+          },
+          {
+            "h" : 0,
+            "nodeID" : "selection:goal"
+          },
+          {
+            "g" : 0,
+            "h" : 57,
+            "nodeID" : "selection:source"
+          }
+        ],
+        "frontier" : [
+
+        ],
+        "settled" : [
+          "selection:source"
+        ]
+      }
+    },
+    {
+      "event" : {
+        "relax" : {
+          "accepted" : true,
+          "candidateCost" : 68,
+          "from" : "selection:source",
+          "to" : "junction:02-lilybank-gardens"
+        }
+      },
+      "index" : 2,
+      "state" : {
+        "costs" : [
+          {
+            "h" : 20,
+            "nodeID" : "junction:01-jms"
+          },
+          {
+            "g" : 68,
+            "h" : 120,
+            "nodeID" : "junction:02-lilybank-gardens",
+            "predecessor" : "selection:source"
+          },
+          {
+            "h" : 206,
+            "nodeID" : "junction:03-lilybank-house"
+          },
+          {
+            "h" : 222,
+            "nodeID" : "junction:04-hetherington"
+          },
+          {
+            "h" : 222,
+            "nodeID" : "junction:05-rejoin"
+          },
+          {
+            "h" : 257,
+            "nodeID" : "junction:06-fraser"
+          },
+          {
+            "h" : 308,
+            "nodeID" : "junction:07-library"
+          },
+          {
+            "h" : 0,
+            "nodeID" : "selection:goal"
+          },
+          {
+            "g" : 0,
+            "h" : 57,
+            "nodeID" : "selection:source"
+          }
+        ],
+        "frontier" : [
+          "junction:02-lilybank-gardens"
+        ],
+        "settled" : [
+          "selection:source"
+        ]
+      }
+    },
+    {
+      "event" : {
+        "relax" : {
+          "accepted" : true,
+          "candidateCost" : 58,
+          "from" : "selection:source",
+          "to" : "selection:goal"
+        }
+      },
+      "index" : 3,
+      "state" : {
+        "costs" : [
+          {
+            "h" : 20,
+            "nodeID" : "junction:01-jms"
+          },
+          {
+            "g" : 68,
+            "h" : 120,
+            "nodeID" : "junction:02-lilybank-gardens",
+            "predecessor" : "selection:source"
+          },
+          {
+            "h" : 206,
+            "nodeID" : "junction:03-lilybank-house"
+          },
+          {
+            "h" : 222,
+            "nodeID" : "junction:04-hetherington"
+          },
+          {
+            "h" : 222,
+            "nodeID" : "junction:05-rejoin"
+          },
+          {
+            "h" : 257,
+            "nodeID" : "junction:06-fraser"
+          },
+          {
+            "h" : 308,
+            "nodeID" : "junction:07-library"
+          },
+          {
+            "g" : 58,
+            "h" : 0,
+            "nodeID" : "selection:goal",
+            "predecessor" : "selection:source"
+          },
+          {
+            "g" : 0,
+            "h" : 57,
+            "nodeID" : "selection:source"
+          }
+        ],
+        "frontier" : [
+          "selection:goal",
+          "junction:02-lilybank-gardens"
+        ],
+        "settled" : [
+          "selection:source"
+        ]
+      }
+    },
+    {
+      "event" : {
+        "expand" : {
+          "nodeID" : "selection:goal"
+        }
+      },
+      "index" : 4,
+      "state" : {
+        "costs" : [
+          {
+            "h" : 20,
+            "nodeID" : "junction:01-jms"
+          },
+          {
+            "g" : 68,
+            "h" : 120,
+            "nodeID" : "junction:02-lilybank-gardens",
+            "predecessor" : "selection:source"
+          },
+          {
+            "h" : 206,
+            "nodeID" : "junction:03-lilybank-house"
+          },
+          {
+            "h" : 222,
+            "nodeID" : "junction:04-hetherington"
+          },
+          {
+            "h" : 222,
+            "nodeID" : "junction:05-rejoin"
+          },
+          {
+            "h" : 257,
+            "nodeID" : "junction:06-fraser"
+          },
+          {
+            "h" : 308,
+            "nodeID" : "junction:07-library"
+          },
+          {
+            "g" : 58,
+            "h" : 0,
+            "nodeID" : "selection:goal",
+            "predecessor" : "selection:source"
+          },
+          {
+            "g" : 0,
+            "h" : 57,
+            "nodeID" : "selection:source"
+          }
+        ],
+        "frontier" : [
+          "junction:02-lilybank-gardens"
+        ],
+        "settled" : [
+          "selection:source",
+          "selection:goal"
+        ]
+      }
+    },
+    {
+      "event" : {
+        "reachedGoal" : {
+          "nodeID" : "selection:goal"
+        }
+      },
+      "index" : 5,
+      "state" : {
+        "costs" : [
+          {
+            "h" : 20,
+            "nodeID" : "junction:01-jms"
+          },
+          {
+            "g" : 68,
+            "h" : 120,
+            "nodeID" : "junction:02-lilybank-gardens",
+            "predecessor" : "selection:source"
+          },
+          {
+            "h" : 206,
+            "nodeID" : "junction:03-lilybank-house"
+          },
+          {
+            "h" : 222,
+            "nodeID" : "junction:04-hetherington"
+          },
+          {
+            "h" : 222,
+            "nodeID" : "junction:05-rejoin"
+          },
+          {
+            "h" : 257,
+            "nodeID" : "junction:06-fraser"
+          },
+          {
+            "h" : 308,
+            "nodeID" : "junction:07-library"
+          },
+          {
+            "g" : 58,
+            "h" : 0,
+            "nodeID" : "selection:goal",
+            "predecessor" : "selection:source"
+          },
+          {
+            "g" : 0,
+            "h" : 57,
+            "nodeID" : "selection:source"
+          }
+        ],
+        "frontier" : [
+          "junction:02-lilybank-gardens"
+        ],
+        "settled" : [
+          "selection:source",
+          "selection:goal"
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,65 @@
+{
+  "edges" : [
+    {
+      "bidirectional" : false,
+      "cost" : 0,
+      "from" : "S",
+      "to" : "B"
+    },
+    {
+      "bidirectional" : false,
+      "cost" : 0,
+      "from" : "S",
+      "to" : "A"
+    },
+    {
+      "bidirectional" : true,
+      "cost" : 0,
+      "from" : "A",
+      "to" : "B"
+    },
+    {
+      "bidirectional" : false,
+      "cost" : 1,
+      "from" : "A",
+      "to" : "G"
+    },
+    {
+      "bidirectional" : false,
+      "cost" : 1,
+      "from" : "B",
+      "to" : "G"
+    },
+    {
+      "bidirectional" : false,
+      "cost" : 0,
+      "from" : "A",
+      "to" : "A"
+    }
+  ],
+  "goal" : "G",
+  "id" : "fixture-search-zero-cycle-v1",
+  "nodes" : [
+    {
+      "heuristic" : 0,
+      "id" : "S",
+      "label" : "S"
+    },
+    {
+      "heuristic" : 0,
+      "id" : "A",
+      "label" : "A"
+    },
+    {
+      "heuristic" : 0,
+      "id" : "B",
+      "label" : "B"
+    },
+    {
+      "heuristic" : 0,
+      "id" : "G",
+      "label" : "G"
+    }
+  ],
+  "source" : "S"
+}

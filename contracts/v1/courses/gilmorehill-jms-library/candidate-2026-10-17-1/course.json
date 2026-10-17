@@ -1,0 +1,272 @@
+{
+  "arrivalPolicy" : {
+    "maximumFixAgeSeconds" : 10,
+    "maximumHorizontalAccuracyMetres" : 20,
+    "radiusMetres" : 25
+  },
+  "contractVersion" : 1,
+  "edges" : [
+    {
+      "bidirectional" : true,
+      "costMetres" : 146,
+      "from" : "01-jms",
+      "id" : "jms-gardens",
+      "polyline" : [
+        {
+          "latitude" : 55.87312,
+          "longitude" : -4.2937
+        },
+        {
+          "latitude" : 55.87345,
+          "longitude" : -4.29365
+        },
+        {
+          "latitude" : 55.87395,
+          "longitude" : -4.29335
+        },
+        {
+          "latitude" : 55.87425,
+          "longitude" : -4.29275
+        }
+      ],
+      "to" : "02-lilybank-gardens"
+    },
+    {
+      "bidirectional" : true,
+      "costMetres" : 118,
+      "from" : "02-lilybank-gardens",
+      "id" : "gardens-house",
+      "polyline" : [
+        {
+          "latitude" : 55.87425,
+          "longitude" : -4.29275
+        },
+        {
+          "latitude" : 55.87465,
+          "longitude" : -4.2926
+        },
+        {
+          "latitude" : 55.87468,
+          "longitude" : -4.29145
+        }
+      ],
+      "to" : "03-lilybank-house"
+    },
+    {
+      "bidirectional" : true,
+      "costMetres" : 151,
+      "from" : "03-lilybank-house",
+      "id" : "house-rejoin",
+      "polyline" : [
+        {
+          "latitude" : 55.87468,
+          "longitude" : -4.29145
+        },
+        {
+          "latitude" : 55.8747,
+          "longitude" : -4.2909
+        },
+        {
+          "latitude" : 55.87415,
+          "longitude" : -4.29065
+        },
+        {
+          "latitude" : 55.87375,
+          "longitude" : -4.2902
+        }
+      ],
+      "to" : "05-rejoin"
+    },
+    {
+      "bidirectional" : true,
+      "costMetres" : 313,
+      "from" : "02-lilybank-gardens",
+      "id" : "gardens-hetherington",
+      "polyline" : [
+        {
+          "latitude" : 55.87425,
+          "longitude" : -4.29275
+        },
+        {
+          "latitude" : 55.875,
+          "longitude" : -4.2926
+        },
+        {
+          "latitude" : 55.875,
+          "longitude" : -4.29045
+        },
+        {
+          "latitude" : 55.87415,
+          "longitude" : -4.29045
+        }
+      ],
+      "to" : "04-hetherington"
+    },
+    {
+      "bidirectional" : true,
+      "costMetres" : 48,
+      "from" : "04-hetherington",
+      "id" : "hetherington-rejoin",
+      "polyline" : [
+        {
+          "latitude" : 55.87415,
+          "longitude" : -4.29045
+        },
+        {
+          "latitude" : 55.87375,
+          "longitude" : -4.2902
+        }
+      ],
+      "to" : "05-rejoin"
+    },
+    {
+      "bidirectional" : true,
+      "costMetres" : 88,
+      "from" : "05-rejoin",
+      "id" : "rejoin-fraser",
+      "polyline" : [
+        {
+          "latitude" : 55.87375,
+          "longitude" : -4.2902
+        },
+        {
+          "latitude" : 55.87335,
+          "longitude" : -4.2901
+        },
+        {
+          "latitude" : 55.87312,
+          "longitude" : -4.28955
+        }
+      ],
+      "to" : "06-fraser"
+    },
+    {
+      "bidirectional" : true,
+      "costMetres" : 104,
+      "from" : "06-fraser",
+      "id" : "fraser-library",
+      "polyline" : [
+        {
+          "latitude" : 55.87312,
+          "longitude" : -4.28955
+        },
+        {
+          "latitude" : 55.87312,
+          "longitude" : -4.28875
+        },
+        {
+          "latitude" : 55.8736,
+          "longitude" : -4.28875
+        }
+      ],
+      "to" : "07-library"
+    }
+  ],
+  "name" : "Gilmorehill JMS → Library — awaiting outdoor survey",
+  "nodes" : [
+    {
+      "coordinate" : {
+        "latitude" : 55.87312,
+        "longitude" : -4.2937
+      },
+      "id" : "01-jms",
+      "name" : "Outside James McCune Smith Learning Hub",
+      "stoppingNote" : "Estimated survey candidate. Confirm pedestrian access, step-free route and safe stopping space outdoors; not approved for navigation."
+    },
+    {
+      "coordinate" : {
+        "latitude" : 55.87425,
+        "longitude" : -4.29275
+      },
+      "id" : "02-lilybank-gardens",
+      "name" : "Lilybank Gardens — checkpoint one",
+      "stoppingNote" : "Estimated survey candidate. Confirm pedestrian access, step-free route and safe stopping space outdoors; not approved for navigation."
+    },
+    {
+      "coordinate" : {
+        "latitude" : 55.87468,
+        "longitude" : -4.29145
+      },
+      "id" : "03-lilybank-house",
+      "name" : "Lilybank House — standard middle",
+      "stoppingNote" : "Estimated survey candidate. Confirm pedestrian access, step-free route and safe stopping space outdoors; not approved for navigation."
+    },
+    {
+      "coordinate" : {
+        "latitude" : 55.87415,
+        "longitude" : -4.29045
+      },
+      "id" : "04-hetherington",
+      "name" : "Hetherington — bonus middle",
+      "stoppingNote" : "Estimated survey candidate. Confirm pedestrian access, step-free route and safe stopping space outdoors; not approved for navigation."
+    },
+    {
+      "coordinate" : {
+        "latitude" : 55.87375,
+        "longitude" : -4.2902
+      },
+      "id" : "05-rejoin",
+      "name" : "Bute Gardens branch rejoin",
+      "stoppingNote" : "Estimated survey candidate. Confirm pedestrian access, step-free route and safe stopping space outdoors; not approved for navigation."
+    },
+    {
+      "coordinate" : {
+        "latitude" : 55.87312,
+        "longitude" : -4.28955
+      },
+      "id" : "06-fraser",
+      "name" : "Outside Fraser Building — checkpoint three",
+      "stoppingNote" : "Estimated survey candidate. Confirm pedestrian access, step-free route and safe stopping space outdoors; not approved for navigation."
+    },
+    {
+      "coordinate" : {
+        "latitude" : 55.8736,
+        "longitude" : -4.28875
+      },
+      "id" : "07-library",
+      "name" : "Outside University Library — finish",
+      "stoppingNote" : "Estimated survey candidate. Confirm pedestrian access, step-free route and safe stopping space outdoors; not approved for navigation."
+    }
+  ],
+  "readiness" : "awaitingSurvey",
+  "reference" : {
+    "id" : "gilmorehill-jms-library",
+    "version" : "candidate-2026-10-17-1"
+  },
+  "routes" : [
+    {
+      "branch" : "standard",
+      "difficulty" : "One cost update",
+      "distanceMetres" : 607,
+      "edgeIDs" : [
+        "jms-gardens",
+        "gardens-house",
+        "house-rejoin",
+        "rejoin-fraser",
+        "fraser-library"
+      ],
+      "middleRewardPoints" : 20
+    },
+    {
+      "branch" : "bonus",
+      "difficulty" : "Compare and replace a tentative cost",
+      "distanceMetres" : 699,
+      "edgeIDs" : [
+        "jms-gardens",
+        "gardens-hetherington",
+        "hetherington-rejoin",
+        "rejoin-fraser",
+        "fraser-library"
+      ],
+      "middleRewardPoints" : 40
+    }
+  ],
+  "stops" : {
+    "bonusMiddle" : "04-hetherington",
+    "finish" : "07-library",
+    "first" : "02-lilybank-gardens",
+    "standardMiddle" : "03-lilybank-house",
+    "start" : "01-jms",
+    "third" : "06-fraser"
+  }
+}

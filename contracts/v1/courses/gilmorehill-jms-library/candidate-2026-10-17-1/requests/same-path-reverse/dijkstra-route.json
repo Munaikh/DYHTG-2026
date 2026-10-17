@@ -1,0 +1,28 @@
+{
+  "course" : {
+    "id" : "gilmorehill-jms-library",
+    "version" : "candidate-2026-10-17-1"
+  },
+  "distanceMetres" : 58,
+  "edgeIDs" : [
+    "path:jms-gardens:1"
+  ],
+  "nodeIDs" : [
+    "selection:source",
+    "selection:goal"
+  ],
+  "polyline" : [
+    {
+      "latitude" : 55.8738,
+      "longitude" : -4.293439999999999
+    },
+    {
+      "latitude" : 55.87345,
+      "longitude" : -4.29365
+    },
+    {
+      "latitude" : 55.873300129128566,
+      "longitude" : -4.293672707707793
+    }
+  ]
+}

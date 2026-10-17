@@ -1,0 +1,261 @@
+[
+  {
+    "course" : {
+      "id" : "gilmorehill-jms-library",
+      "version" : "candidate-2026-10-17-1"
+    },
+    "goal" : "01-jms",
+    "values" : [
+      {
+        "h" : 0,
+        "nodeID" : "01-jms"
+      },
+      {
+        "h" : 138,
+        "nodeID" : "02-lilybank-gardens"
+      },
+      {
+        "h" : 223,
+        "nodeID" : "03-lilybank-house"
+      },
+      {
+        "h" : 232,
+        "nodeID" : "04-hetherington"
+      },
+      {
+        "h" : 229,
+        "nodeID" : "05-rejoin"
+      },
+      {
+        "h" : 258,
+        "nodeID" : "06-fraser"
+      },
+      {
+        "h" : 313,
+        "nodeID" : "07-library"
+      }
+    ]
+  },
+  {
+    "course" : {
+      "id" : "gilmorehill-jms-library",
+      "version" : "candidate-2026-10-17-1"
+    },
+    "goal" : "02-lilybank-gardens",
+    "values" : [
+      {
+        "h" : 138,
+        "nodeID" : "01-jms"
+      },
+      {
+        "h" : 0,
+        "nodeID" : "02-lilybank-gardens"
+      },
+      {
+        "h" : 94,
+        "nodeID" : "03-lilybank-house"
+      },
+      {
+        "h" : 143,
+        "nodeID" : "04-hetherington"
+      },
+      {
+        "h" : 168,
+        "nodeID" : "05-rejoin"
+      },
+      {
+        "h" : 235,
+        "nodeID" : "06-fraser"
+      },
+      {
+        "h" : 259,
+        "nodeID" : "07-library"
+      }
+    ]
+  },
+  {
+    "course" : {
+      "id" : "gilmorehill-jms-library",
+      "version" : "candidate-2026-10-17-1"
+    },
+    "goal" : "03-lilybank-house",
+    "values" : [
+      {
+        "h" : 223,
+        "nodeID" : "01-jms"
+      },
+      {
+        "h" : 94,
+        "nodeID" : "02-lilybank-gardens"
+      },
+      {
+        "h" : 0,
+        "nodeID" : "03-lilybank-house"
+      },
+      {
+        "h" : 85,
+        "nodeID" : "04-hetherington"
+      },
+      {
+        "h" : 129,
+        "nodeID" : "05-rejoin"
+      },
+      {
+        "h" : 210,
+        "nodeID" : "06-fraser"
+      },
+      {
+        "h" : 206,
+        "nodeID" : "07-library"
+      }
+    ]
+  },
+  {
+    "course" : {
+      "id" : "gilmorehill-jms-library",
+      "version" : "candidate-2026-10-17-1"
+    },
+    "goal" : "04-hetherington",
+    "values" : [
+      {
+        "h" : 232,
+        "nodeID" : "01-jms"
+      },
+      {
+        "h" : 143,
+        "nodeID" : "02-lilybank-gardens"
+      },
+      {
+        "h" : 85,
+        "nodeID" : "03-lilybank-house"
+      },
+      {
+        "h" : 0,
+        "nodeID" : "04-hetherington"
+      },
+      {
+        "h" : 47,
+        "nodeID" : "05-rejoin"
+      },
+      {
+        "h" : 127,
+        "nodeID" : "06-fraser"
+      },
+      {
+        "h" : 122,
+        "nodeID" : "07-library"
+      }
+    ]
+  },
+  {
+    "course" : {
+      "id" : "gilmorehill-jms-library",
+      "version" : "candidate-2026-10-17-1"
+    },
+    "goal" : "05-rejoin",
+    "values" : [
+      {
+        "h" : 229,
+        "nodeID" : "01-jms"
+      },
+      {
+        "h" : 168,
+        "nodeID" : "02-lilybank-gardens"
+      },
+      {
+        "h" : 129,
+        "nodeID" : "03-lilybank-house"
+      },
+      {
+        "h" : 47,
+        "nodeID" : "04-hetherington"
+      },
+      {
+        "h" : 0,
+        "nodeID" : "05-rejoin"
+      },
+      {
+        "h" : 80,
+        "nodeID" : "06-fraser"
+      },
+      {
+        "h" : 91,
+        "nodeID" : "07-library"
+      }
+    ]
+  },
+  {
+    "course" : {
+      "id" : "gilmorehill-jms-library",
+      "version" : "candidate-2026-10-17-1"
+    },
+    "goal" : "06-fraser",
+    "values" : [
+      {
+        "h" : 258,
+        "nodeID" : "01-jms"
+      },
+      {
+        "h" : 235,
+        "nodeID" : "02-lilybank-gardens"
+      },
+      {
+        "h" : 210,
+        "nodeID" : "03-lilybank-house"
+      },
+      {
+        "h" : 127,
+        "nodeID" : "04-hetherington"
+      },
+      {
+        "h" : 80,
+        "nodeID" : "05-rejoin"
+      },
+      {
+        "h" : 0,
+        "nodeID" : "06-fraser"
+      },
+      {
+        "h" : 73,
+        "nodeID" : "07-library"
+      }
+    ]
+  },
+  {
+    "course" : {
+      "id" : "gilmorehill-jms-library",
+      "version" : "candidate-2026-10-17-1"
+    },
+    "goal" : "07-library",
+    "values" : [
+      {
+        "h" : 313,
+        "nodeID" : "01-jms"
+      },
+      {
+        "h" : 259,
+        "nodeID" : "02-lilybank-gardens"
+      },
+      {
+        "h" : 206,
+        "nodeID" : "03-lilybank-house"
+      },
+      {
+        "h" : 122,
+        "nodeID" : "04-hetherington"
+      },
+      {
+        "h" : 91,
+        "nodeID" : "05-rejoin"
+      },
+      {
+        "h" : 73,
+        "nodeID" : "06-fraser"
+      },
+      {
+        "h" : 0,
+        "nodeID" : "07-library"
+      }
+    ]
+  }
+]

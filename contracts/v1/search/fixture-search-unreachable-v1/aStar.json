@@ -1,0 +1,239 @@
+{
+  "algorithm" : "aStar",
+  "outcome" : {
+    "unreachable" : {
+
+    }
+  },
+  "scenarioID" : "fixture-search-unreachable-v1",
+  "steps" : [
+    {
+      "event" : {
+        "initial" : {
+
+        }
+      },
+      "index" : 0,
+      "state" : {
+        "costs" : [
+          {
+            "h" : 0,
+            "nodeID" : "A"
+          },
+          {
+            "h" : 0,
+            "nodeID" : "B"
+          },
+          {
+            "h" : 0,
+            "nodeID" : "G"
+          },
+          {
+            "g" : 0,
+            "h" : 0,
+            "nodeID" : "S"
+          }
+        ],
+        "frontier" : [
+          "S"
+        ],
+        "settled" : [
+
+        ]
+      }
+    },
+    {
+      "event" : {
+        "expand" : {
+          "nodeID" : "S"
+        }
+      },
+      "index" : 1,
+      "state" : {
+        "costs" : [
+          {
+            "h" : 0,
+            "nodeID" : "A"
+          },
+          {
+            "h" : 0,
+            "nodeID" : "B"
+          },
+          {
+            "h" : 0,
+            "nodeID" : "G"
+          },
+          {
+            "g" : 0,
+            "h" : 0,
+            "nodeID" : "S"
+          }
+        ],
+        "frontier" : [
+
+        ],
+        "settled" : [
+          "S"
+        ]
+      }
+    },
+    {
+      "event" : {
+        "relax" : {
+          "accepted" : true,
+          "candidateCost" : 1,
+          "from" : "S",
+          "to" : "A"
+        }
+      },
+      "index" : 2,
+      "state" : {
+        "costs" : [
+          {
+            "g" : 1,
+            "h" : 0,
+            "nodeID" : "A",
+            "predecessor" : "S"
+          },
+          {
+            "h" : 0,
+            "nodeID" : "B"
+          },
+          {
+            "h" : 0,
+            "nodeID" : "G"
+          },
+          {
+            "g" : 0,
+            "h" : 0,
+            "nodeID" : "S"
+          }
+        ],
+        "frontier" : [
+          "A"
+        ],
+        "settled" : [
+          "S"
+        ]
+      }
+    },
+    {
+      "event" : {
+        "expand" : {
+          "nodeID" : "A"
+        }
+      },
+      "index" : 3,
+      "state" : {
+        "costs" : [
+          {
+            "g" : 1,
+            "h" : 0,
+            "nodeID" : "A",
+            "predecessor" : "S"
+          },
+          {
+            "h" : 0,
+            "nodeID" : "B"
+          },
+          {
+            "h" : 0,
+            "nodeID" : "G"
+          },
+          {
+            "g" : 0,
+            "h" : 0,
+            "nodeID" : "S"
+          }
+        ],
+        "frontier" : [
+
+        ],
+        "settled" : [
+          "S",
+          "A"
+        ]
+      }
+    },
+    {
+      "event" : {
+        "relax" : {
+          "accepted" : false,
+          "candidateCost" : 2,
+          "from" : "A",
+          "previousCost" : 0,
+          "to" : "S"
+        }
+      },
+      "index" : 4,
+      "state" : {
+        "costs" : [
+          {
+            "g" : 1,
+            "h" : 0,
+            "nodeID" : "A",
+            "predecessor" : "S"
+          },
+          {
+            "h" : 0,
+            "nodeID" : "B"
+          },
+          {
+            "h" : 0,
+            "nodeID" : "G"
+          },
+          {
+            "g" : 0,
+            "h" : 0,
+            "nodeID" : "S"
+          }
+        ],
+        "frontier" : [
+
+        ],
+        "settled" : [
+          "S",
+          "A"
+        ]
+      }
+    },
+    {
+      "event" : {
+        "unreachable" : {
+
+        }
+      },
+      "index" : 5,
+      "state" : {
+        "costs" : [
+          {
+            "g" : 1,
+            "h" : 0,
+            "nodeID" : "A",
+            "predecessor" : "S"
+          },
+          {
+            "h" : 0,
+            "nodeID" : "B"
+          },
+          {
+            "h" : 0,
+            "nodeID" : "G"
+          },
+          {
+            "g" : 0,
+            "h" : 0,
+            "nodeID" : "S"
+          }
+        ],
+        "frontier" : [
+
+        ],
+        "settled" : [
+          "S",
+          "A"
+        ]
+      }
+    }
+  ]
+}

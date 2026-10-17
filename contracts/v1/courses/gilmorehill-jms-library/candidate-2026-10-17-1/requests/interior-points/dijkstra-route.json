@@ -1,0 +1,72 @@
+{
+  "course" : {
+    "id" : "gilmorehill-jms-library",
+    "version" : "candidate-2026-10-17-1"
+  },
+  "distanceMetres" : 519,
+  "edgeIDs" : [
+    "path:jms-gardens:1",
+    "path:gardens-house:0",
+    "path:house-rejoin:0",
+    "path:rejoin-fraser:0",
+    "path:fraser-library:0"
+  ],
+  "nodeIDs" : [
+    "selection:source",
+    "junction:02-lilybank-gardens",
+    "junction:03-lilybank-house",
+    "junction:05-rejoin",
+    "junction:06-fraser",
+    "selection:goal"
+  ],
+  "polyline" : [
+    {
+      "latitude" : 55.8737,
+      "longitude" : -4.2935
+    },
+    {
+      "latitude" : 55.87395,
+      "longitude" : -4.29335
+    },
+    {
+      "latitude" : 55.87425,
+      "longitude" : -4.29275
+    },
+    {
+      "latitude" : 55.87465,
+      "longitude" : -4.2926
+    },
+    {
+      "latitude" : 55.87468,
+      "longitude" : -4.29145
+    },
+    {
+      "latitude" : 55.8747,
+      "longitude" : -4.2909
+    },
+    {
+      "latitude" : 55.87415,
+      "longitude" : -4.29065
+    },
+    {
+      "latitude" : 55.87375,
+      "longitude" : -4.2902
+    },
+    {
+      "latitude" : 55.87335,
+      "longitude" : -4.2901
+    },
+    {
+      "latitude" : 55.87312,
+      "longitude" : -4.28955
+    },
+    {
+      "latitude" : 55.87312,
+      "longitude" : -4.28875
+    },
+    {
+      "latitude" : 55.8734,
+      "longitude" : -4.28875
+    }
+  ]
+}

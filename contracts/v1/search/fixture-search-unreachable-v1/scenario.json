@@ -1,0 +1,41 @@
+{
+  "edges" : [
+    {
+      "bidirectional" : true,
+      "cost" : 1,
+      "from" : "S",
+      "to" : "A"
+    },
+    {
+      "bidirectional" : false,
+      "cost" : 1,
+      "from" : "G",
+      "to" : "B"
+    }
+  ],
+  "goal" : "G",
+  "id" : "fixture-search-unreachable-v1",
+  "nodes" : [
+    {
+      "heuristic" : 0,
+      "id" : "S",
+      "label" : "S"
+    },
+    {
+      "heuristic" : 0,
+      "id" : "A",
+      "label" : "A"
+    },
+    {
+      "heuristic" : 0,
+      "id" : "B",
+      "label" : "B"
+    },
+    {
+      "heuristic" : 0,
+      "id" : "G",
+      "label" : "G"
+    }
+  ],
+  "source" : "S"
+}
