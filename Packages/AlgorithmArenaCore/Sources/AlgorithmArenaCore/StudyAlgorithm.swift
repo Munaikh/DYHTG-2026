@@ -44,7 +44,7 @@ public enum StudyAlgorithm: String, Codable, CaseIterable, Identifiable, Sendabl
   }
   public var rule: String {
     switch self {
-    case .bfs: "Visit nearby points first. Use the first point added to the queue."
+    case .bfs: "Explore by number of edges from the start. Use the first point added to the queue."
     case .dfs: "Follow one branch deeply. Use the next point on top of the stack."
     case .dijkstra: "Choose the available point with the lowest cost from the start."
     case .aStar: "Choose the lowest total: cost so far (g) + estimated cost left (h)."

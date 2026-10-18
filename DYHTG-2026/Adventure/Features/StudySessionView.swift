@@ -87,6 +87,7 @@ struct StudySessionView: View {
                     .font(.caption.weight(.bold)).foregroundStyle(Color.arenaAccent)
             }
             AdventureHeading(title: "Which point is next?", subtitle: activity.algorithm.rule)
+            Text(activity.algorithm.tieRule).font(.subheadline).foregroundStyle(.secondary)
             if learning.profile.preferences.beginnerGuide && correct == nil {
                 Label("Dashed circles are your available moves. Tap a point or choose below.", systemImage: "lightbulb")
                     .font(.subheadline).foregroundStyle(.secondary)

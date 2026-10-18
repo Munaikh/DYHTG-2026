@@ -117,7 +117,7 @@ public enum LessonCatalog {
       scenario: graph, trace: trace,
       questions: [
         .init(id: "frontier", title: "Think ahead. Then choose.",
-              prompt: "A is cheaper to reach. Does that make it the next node?",
+              prompt: "A is cheaper to reach. Which node does A* explore next?",
               hint: "g is paid so far. h estimates what remains. A* compares their total, f = g + h.",
               explanation: "A: 2 + 5 = 7. B: 4 + 2 = 6. A* picks B because its estimated total is lower, even though getting there costs more.",
               scenario: graph, trace: trace, beforeStepIndex: choose - 1, revealStepIndex: choose,
