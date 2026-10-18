@@ -190,11 +190,13 @@ struct PlayHomeView: View {
                 }
                 .padding(24)
             }
+            .background(ArenaPalette.canvas)
             .navigationTitle("Join a duel")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Cancel") { joining = false } } }
         }
         .presentationDetents([.medium, .large])
+        .presentationBackground(ArenaPalette.canvas)
     }
 
     private var connectionBanner: some View {
