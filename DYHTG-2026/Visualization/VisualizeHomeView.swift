@@ -13,7 +13,6 @@ struct VisualizeHomeView: View {
     @State private var selection: SelectedEndpoint?
     @State private var destinationSheet: CampusEndpointSheet?
     @State private var expanded = false
-    @GestureState private var sheetDrag: CGFloat = 0
     @State private var speed = 1.0
     @State private var retry = 0
     @State private var cameraRequest = 0
@@ -24,7 +23,6 @@ struct VisualizeHomeView: View {
         NavigationStack {
             GeometryReader { geometry in
                 let restingHeight = selection != nil ? 146.0 : expanded ? geometry.size.height * 0.86 : min(282, geometry.size.height * 0.48)
-                let sheetHeight = min(max(restingHeight - sheetDrag, 140), geometry.size.height * 0.9)
                 ZStack(alignment: .bottom) {
                     CampusSearchMap(
                         experiment: loader.experiment,
@@ -33,7 +31,7 @@ struct VisualizeHomeView: View {
                         destination: destination,
                         selection: selection,
                         cameraRequest: cameraRequest,
-                        bottomInset: sheetHeight + 8,
+                        bottomInset: restingHeight + 8,
                         showsControls: !expanded || selection != nil,
                         onSelect: selectCoordinate
                     )
@@ -45,12 +43,16 @@ struct VisualizeHomeView: View {
                     .padding(.horizontal, 16)
                     .padding(.top, 8)
 
-                    routeSheet(height: sheetHeight)
+                    CampusRouteSheet(
+                        expanded: $expanded,
+                        isSelecting: selection != nil,
+                        availableHeight: geometry.size.height,
+                        header: sheetHandle,
+                        content: routeSheetContent
+                    )
                         .padding(.horizontal, 8)
                         .padding(.bottom, 6)
                 }
-                .animation(reduceMotion ? nil : .spring(response: 0.38, dampingFraction: 0.86), value: expanded)
-                .animation(reduceMotion ? nil : .spring(response: 0.35), value: selection)
             }
             .toolbar(.hidden, for: .navigationBar)
             .background(ArenaPalette.ink)
@@ -98,9 +100,8 @@ struct VisualizeHomeView: View {
         }
     }
 
-    private func routeSheet(height: CGFloat) -> some View {
-        VStack(spacing: 0) {
-            sheetHandle
+    private var routeSheetContent: some View {
+        Group {
             if selection != nil {
                 VStack(alignment: .leading, spacing: 5) {
                     Text(selectionError ?? "Tap a path or place on campus.")
@@ -142,27 +143,19 @@ struct VisualizeHomeView: View {
                         .padding(.bottom, 28)
                         .contentShape(Rectangle())
                     }
-                    .frame(height: max(height - 64, 1))
                     .contentShape(Rectangle())
                     .scrollIndicators(.hidden)
                     .accessibilityIdentifier("visualize.sheet.scroll")
                     .onChange(of: expanded) { _, isExpanded in
-                        if !isExpanded { scroll.scrollTo("route-controls", anchor: .top) }
+                        if !isExpanded {
+                            var transaction = Transaction()
+                            transaction.disablesAnimations = true
+                            withTransaction(transaction) { scroll.scrollTo("route-controls", anchor: .top) }
+                        }
                     }
                 }
             }
         }
-        .frame(maxWidth: .infinity)
-        .frame(height: height, alignment: .top)
-        .background(.regularMaterial, in: .rect(cornerRadius: 30))
-        .overlay {
-            RoundedRectangle(cornerRadius: 30)
-                .strokeBorder(Color.primary.opacity(0.05), lineWidth: 0.5)
-                .allowsHitTesting(false)
-        }
-        .clipShape(.rect(cornerRadius: 30))
-        .contentShape(.rect(cornerRadius: 30))
-        .shadow(color: .black.opacity(0.1), radius: 18, y: 4)
     }
 
     private var sheetHandle: some View {
@@ -199,15 +192,6 @@ struct VisualizeHomeView: View {
         }
         .frame(height: 64)
         .contentShape(Rectangle())
-        .gesture(DragGesture(minimumDistance: 8)
-            .updating($sheetDrag) { value, state, _ in state = value.translation.height }
-            .onEnded { value in
-                guard selection == nil else { return }
-                withAnimation(reduceMotion ? nil : .spring(response: 0.35)) {
-                    if value.predictedEndTranslation.height < -45 { expanded = true }
-                    if value.predictedEndTranslation.height > 45 { expanded = false }
-                }
-            })
     }
 
     private var endpointControls: some View {
@@ -389,6 +373,62 @@ struct VisualizeHomeView: View {
             playback.move(to: playback.index + 1, animated: !reduceMotion)
         }
         playback.isPlaying = false
+    }
+}
+
+/// Lay out the full scroll viewport when dragging starts, then move only the
+/// sheet's offset. Restore the detent viewport when the gesture ends.
+private struct CampusRouteSheet<Header: View, Content: View>: View {
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Binding var expanded: Bool
+    let isSelecting: Bool
+    let availableHeight: CGFloat
+    let header: Header
+    let content: Content
+    @GestureState private var drag: CGFloat = 0
+
+    private var restingHeight: CGFloat {
+        isSelecting ? 146 : expanded ? availableHeight * 0.86 : min(282, availableHeight * 0.48)
+    }
+
+    var body: some View {
+        let canvasHeight = availableHeight * 0.9
+        let visibleHeight = min(max(restingHeight - drag, 140), canvasHeight)
+        let viewportHeight = drag == 0 ? restingHeight : canvasHeight
+        VStack(spacing: 0) {
+            header
+                .gesture(DragGesture(minimumDistance: 8, coordinateSpace: .global)
+                    .updating($drag) { value, state, transaction in
+                        guard !isSelecting else { return }
+                        transaction.animation = nil
+                        state = value.translation.height
+                    }
+                    .onEnded { value in
+                        guard !isSelecting else { return }
+                        if value.predictedEndTranslation.height < -45 { expanded = true }
+                        if value.predictedEndTranslation.height > 45 { expanded = false }
+                    })
+            content
+                .frame(height: max(viewportHeight - 64, 1), alignment: .top)
+            Spacer(minLength: 0)
+        }
+        .frame(maxWidth: .infinity)
+        .frame(height: canvasHeight, alignment: .top)
+        .background(.regularMaterial, in: .rect(cornerRadius: 30))
+        .overlay {
+            RoundedRectangle(cornerRadius: 30)
+                .strokeBorder(Color.primary.opacity(0.05), lineWidth: 0.5)
+                .allowsHitTesting(false)
+        }
+        .clipShape(.rect(cornerRadius: 30))
+        .contentShape(.rect(cornerRadius: 30))
+        .shadow(color: .black.opacity(0.1), radius: 18, y: 4)
+        .offset(y: canvasHeight - visibleHeight)
+        .frame(height: canvasHeight, alignment: .top)
+        .clipShape(.rect(cornerRadius: 30))
+        .animation(reduceMotion ? nil : .spring(response: 0.32, dampingFraction: 0.9), value: expanded)
+        .animation(reduceMotion || drag != 0 ? nil : .spring(response: 0.32, dampingFraction: 0.9), value: drag == 0)
+        .animation(reduceMotion ? nil : .spring(response: 0.32, dampingFraction: 0.9), value: isSelecting)
     }
 }
 
