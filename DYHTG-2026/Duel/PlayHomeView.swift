@@ -5,7 +5,6 @@ struct PlayHomeView: View {
     @Bindable var store: DuelStore
     @AppStorage("nickname") private var nickname = ""
     @State private var algorithm = StudyAlgorithm.dijkstra
-    @State private var joinCode = ""
     @State private var joining = false
     @State private var leaving = false
     @FocusState private var nicknameFocused: Bool
@@ -68,11 +67,13 @@ struct PlayHomeView: View {
             } message: {
                 Text("The match will end as incomplete for both players.")
             }
-            .sheet(isPresented: $joining) { joinSheet }
+            .sheet(isPresented: $joining, onDismiss: { store.error = nil }) {
+                DuelJoinSheet(nickname: cleanNickname, store: store)
+            }
             .sheet(isPresented: $showingPractice) {
                 LearnLibrary(learning: learning, mode: .practice, dismissable: true)
             }
-            .alert(item: $store.error) { error in
+            .alert(item: Binding(get: { joining ? nil : store.error }, set: { store.error = $0 })) { error in
                 if error.canRetry {
                     Alert(title: Text(error.title), message: Text(error.message),
                           primaryButton: .default(Text("Retry")) { Task { await store.retry() } },
@@ -127,7 +128,7 @@ struct PlayHomeView: View {
                         .disabled(!validNickname || !store.canAct)
                         .accessibilityIdentifier("duel.create")
 
-                        Button("Join with a code") { nicknameFocused = false; joining = true }
+                        Button("Join a duel", systemImage: "qrcode.viewfinder") { nicknameFocused = false; joining = true }
                             .buttonStyle(ArenaActionStyle(prominent: false))
                             .disabled(!validNickname || !store.canAct)
                             .accessibilityIdentifier("duel.join")
@@ -158,45 +159,6 @@ struct PlayHomeView: View {
             .buttonStyle(.plain)
             .accessibilityIdentifier("duel.practice")
         }
-    }
-
-    private var joinSheet: some View {
-        NavigationStack {
-            ScrollView {
-                VStack(alignment: .leading, spacing: 24) {
-                    Text("Enter a room code")
-                        .font(.title2.bold())
-                    Text("Enter the six-character code on your friend's screen.")
-                        .foregroundStyle(.secondary)
-                    TextField("ROOM CODE", text: $joinCode)
-                        .font(.system(.largeTitle, design: .monospaced).weight(.bold))
-                        .keyboardType(.asciiCapable)
-                        .textInputAutocapitalization(.characters)
-                        .autocorrectionDisabled()
-                        .padding(20)
-                        .background(ArenaPalette.canvas, in: .rect(cornerRadius: 18))
-                        .accessibilityIdentifier("duel.code")
-                        .onChange(of: joinCode) { _, value in
-                            let normalized = String(value.uppercased().filter { $0.isASCII && ($0.isLetter || $0.isNumber) }.prefix(6))
-                            if normalized != value { joinCode = normalized }
-                        }
-                    Button("Join Duel") {
-                        joining = false
-                        Task { await store.join(nickname: cleanNickname, code: joinCode) }
-                    }
-                    .buttonStyle(ArenaActionStyle())
-                    .disabled(joinCode.count != 6 || !validNickname || !store.canAct)
-                    .accessibilityIdentifier("duel.confirmJoin")
-                }
-                .padding(24)
-            }
-            .background(ArenaPalette.canvas)
-            .navigationTitle("Join a duel")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Cancel") { joining = false } } }
-        }
-        .presentationDetents([.medium, .large])
-        .presentationBackground(ArenaPalette.canvas)
     }
 
     private var connectionBanner: some View {

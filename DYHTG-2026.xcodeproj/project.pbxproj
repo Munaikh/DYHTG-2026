@@ -232,7 +232,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = Arena;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.education";
-				INFOPLIST_KEY_NSCameraUsageDescription = "Arena uses the camera for the AR replay and to scan organiser check-in codes.";
+				INFOPLIST_KEY_NSCameraUsageDescription = "Arena uses the camera to scan room invitations and organiser check-in codes, and for AR replay.";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Arena checks your location when you check in at the start, a checkpoint or the finish.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -270,7 +270,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = Arena;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.education";
-				INFOPLIST_KEY_NSCameraUsageDescription = "Arena uses the camera for the AR replay and to scan organiser check-in codes.";
+				INFOPLIST_KEY_NSCameraUsageDescription = "Arena uses the camera to scan room invitations and organiser check-in codes, and for AR replay.";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Arena checks your location when you check in at the start, a checkpoint or the finish.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;

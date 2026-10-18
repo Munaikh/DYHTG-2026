@@ -3,13 +3,14 @@ import VisionKit
 
 struct CodeScanner: UIViewControllerRepresentable {
     let onScan: (String) -> Void
+    var onFailure: (String) -> Void = { _ in }
 
     static var isAvailable: Bool {
         DataScannerViewController.isSupported && DataScannerViewController.isAvailable
     }
 
     func makeCoordinator() -> Coordinator {
-        Coordinator(onScan: onScan)
+        Coordinator(onScan: onScan, onFailure: onFailure)
     }
 
     func makeUIViewController(context: Context) -> DataScannerViewController {
@@ -19,7 +20,12 @@ struct CodeScanner: UIViewControllerRepresentable {
             isHighlightingEnabled: true
         )
         scanner.delegate = context.coordinator
-        try? scanner.startScanning()
+        do {
+            try scanner.startScanning()
+        } catch {
+            // Defer presentation changes until the representable has been mounted.
+            Task { @MainActor in context.coordinator.fail() }
+        }
         return scanner
     }
 
@@ -32,10 +38,24 @@ struct CodeScanner: UIViewControllerRepresentable {
     @MainActor
     final class Coordinator: NSObject, DataScannerViewControllerDelegate {
         private let onScan: (String) -> Void
+        private let onFailure: (String) -> Void
         private var didScan = false
 
-        init(onScan: @escaping (String) -> Void) {
+        init(onScan: @escaping (String) -> Void, onFailure: @escaping (String) -> Void) {
             self.onScan = onScan
+            self.onFailure = onFailure
+        }
+
+        func fail() {
+            guard !didScan else { return }
+            didScan = true
+            onFailure("The camera couldn’t start.")
+        }
+
+        func dataScanner(_ dataScanner: DataScannerViewController,
+                         becameUnavailableWithError error: DataScannerViewController.ScanningUnavailable) {
+            dataScanner.stopScanning()
+            fail()
         }
 
         func dataScanner(_ dataScanner: DataScannerViewController, didAdd addedItems: [RecognizedItem], allItems: [RecognizedItem]) {
@@ -55,15 +75,19 @@ struct CodeScannerSheet: View {
     let title: String
     let instructions: String
     let onScan: (String) -> Void
+    var onFailure: (String) -> Void = { _ in }
 
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
         NavigationStack {
-            CodeScanner { payload in
+            CodeScanner(onScan: { payload in
                 onScan(payload)
                 dismiss()
-            }
+            }, onFailure: { message in
+                onFailure(message)
+                dismiss()
+            })
             .ignoresSafeArea()
             .overlay(alignment: .bottom) {
                 Text(instructions)

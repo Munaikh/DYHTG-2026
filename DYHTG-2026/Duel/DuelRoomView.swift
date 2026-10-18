@@ -24,34 +24,37 @@ struct DuelRoomView: View {
 
     private var lobby: some View {
         VStack(spacing: 20) {
-            VStack(alignment: .leading, spacing: 14) {
-                ArenaEyebrow(text: "Your arena is ready", color: ArenaPalette.mint)
-                Text("Bring your\nfavourite rival.")
-                    .font(.system(.largeTitle, design: .rounded).bold())
-                    .foregroundStyle(.white)
+            VStack(alignment: .leading, spacing: 16) {
+                Text("Invite a friend").font(.title2.bold())
+                Text("Open Play on another device, choose Join a duel, then scan this code.")
+                    .font(.subheadline).foregroundStyle(.secondary)
+                if let payload = DuelInvitation.payload(for: snapshot.roomCode) {
+                    QRCodeView(text: payload)
+                        .frame(width: 184, height: 184)
+                        .frame(maxWidth: .infinity)
+                        .accessibilityLabel("Room invitation QR code")
+                        .accessibilityIdentifier("duel.roomQR")
+                }
                 HStack {
-                    Text(snapshot.roomCode)
-                        .font(.system(.largeTitle, design: .monospaced).bold())
-                        .tracking(4)
-                        .foregroundStyle(ArenaPalette.mint)
-                        .textSelection(.enabled)
-                        .accessibilityLabel("Room code")
-                        .accessibilityValue(snapshot.roomCode.map(String.init).joined(separator: " "))
-                        .accessibilityIdentifier("duel.roomCode")
-                    Spacer()
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Or enter the room code").font(.caption).foregroundStyle(.secondary)
+                        Text(snapshot.roomCode)
+                            .font(.system(.title, design: .monospaced).bold())
+                            .textSelection(.enabled)
+                            .accessibilityLabel("Room code")
+                            .accessibilityValue(snapshot.roomCode.map(String.init).joined(separator: " "))
+                            .accessibilityIdentifier("duel.roomCode")
+                    }
+                    Spacer(minLength: 8)
                     ShareLink(item: "Join my Plot Twist Duel in Algorithm Arena. Room code: \(snapshot.roomCode)") {
                         Image(systemName: "square.and.arrow.up")
-                            .font(.title3)
-                            .frame(width: 44, height: 44)
+                            .frame(width: 28, height: 32)
                     }
                     .buttonStyle(ArenaCompactButtonStyle())
-                    .tint(.white)
                     .accessibilityLabel("Share room code")
                 }
             }
-            .padding(24)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .background(ArenaPalette.ink, in: .rect(cornerRadius: 26))
+            .arenaCard()
 
             VStack(alignment: .leading, spacing: 18) {
                 HStack {
