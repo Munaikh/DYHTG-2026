@@ -15,24 +15,19 @@ struct LearnHomeView: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: 22) {
                     hero
-                    LearningXPBar(profile: learning.profile).arenaCard()
-                    HStack {
-                        Text("Make it click").font(.title2.bold())
-                        Spacer()
-                        Text("5 algorithms").font(.caption.weight(.semibold)).foregroundStyle(.secondary)
-                    }
                     VStack(spacing: 12) {
-                        destinationCard("Lessons", detail: "15 small steps. Five ways to think.",
+                        destinationCard("Lessons", detail: "Guided steps for five search algorithms.",
                                         symbol: "book.closed.fill", progress: "\(learning.profile.lessonCount)/15") {
                             destination = .lessons
                         }
                         .accessibilityIdentifier("home.lessons")
-                        destinationCard("Practice", detail: "15 puzzles. Your next move is yours.",
+                        destinationCard("Practice", detail: "Apply what you’ve learned to new graphs.",
                                         symbol: "puzzlepiece.extension.fill", progress: "\(learning.profile.practice.count)/15") {
                             destination = .practice
                         }
                         .accessibilityIdentifier("home.practice")
                     }
+                    LearningXPBar(profile: learning.profile).arenaCard()
                     questCard
                     if learning.profile.preferences.beginnerGuide {
                         VStack(alignment: .leading, spacing: 10) {
@@ -44,7 +39,7 @@ struct LearnHomeView: View {
                     }
                     warmups
                     Button(action: openPlay) {
-                        Label("Ready for a Plot Twist Duel?", systemImage: "bolt.shield.fill")
+                        Label("Play a duel", systemImage: "bolt.shield.fill")
                     }
                     .buttonStyle(ArenaActionStyle(prominent: false))
                     .accessibilityIdentifier("home.play")
@@ -57,7 +52,7 @@ struct LearnHomeView: View {
                 .frame(maxWidth: .infinity)
             }
             .background(ArenaPalette.canvas)
-            .navigationTitle("Home")
+            .navigationTitle("Learn")
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button { destination = .quests } label: {
@@ -89,34 +84,40 @@ struct LearnHomeView: View {
     }
 
     private var hero: some View {
-        VStack(alignment: .leading, spacing: 18) {
-            HStack {
-                ArenaEyebrow(text: learning.equippedTitle, color: ArenaPalette.mint)
-                Spacer(minLength: 0)
-                Image(systemName: "sparkles").foregroundStyle(ArenaPalette.mint)
+        VStack(alignment: .leading, spacing: 14) {
+            Text(learning.nextLesson == nil ? "Lessons complete" : "Next lesson")
+                .font(.subheadline.weight(.medium))
+                .foregroundStyle(.secondary)
+            if let next = learning.nextLesson {
+                VStack(alignment: .leading, spacing: 6) {
+                    Text(next.title)
+                        .font(.title2.bold())
+                        .fixedSize(horizontal: false, vertical: true)
+                    Text(next.algorithm.name)
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                }
+            } else {
+                Text("You’ve completed all 15 lessons.")
+                    .font(.headline)
+                Text("Practice on a new graph, or revisit a lesson below.")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
             }
-            Text("Think like\nan algorithm.")
-                .font(.system(.largeTitle, design: .rounded, weight: .bold))
-                .foregroundStyle(.white)
-                .fixedSize(horizontal: false, vertical: true)
-            Text(learning.nextLesson.map { "Up next: \($0.algorithm.shortName) · \($0.title)" }
-                 ?? "All 15 lessons complete. Put your thinking to the test.")
-                .font(.subheadline).foregroundStyle(.white.opacity(0.85))
             Button {
                 if let next = learning.nextLesson { destination = .activity(next) }
                 else { destination = .practice }
             } label: {
                 HStack {
-                    Text(learning.nextLesson == nil ? "Try a practice puzzle" : "Continue learning")
-                    Image(systemName: "arrow.right")
+                    Text(learning.nextLesson == nil ? "Open practice" : "Continue learning")
+                    Image(systemName: "chevron.right")
+                        .font(.caption.weight(.semibold))
                 }
             }
             .buttonStyle(ArenaActionStyle())
             .accessibilityIdentifier("home.continue")
         }
-        .padding(24)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(ArenaPalette.ink, in: .rect(cornerRadius: 28))
+        .arenaCard()
     }
 
     private func destinationCard(_ title: String, detail: String, symbol: String,
@@ -134,7 +135,7 @@ struct LearnHomeView: View {
                 Spacer(minLength: 0)
                 VStack(spacing: 6) {
                     Text(progress).font(.caption.weight(.bold)).monospacedDigit()
-                    Image(systemName: "arrow.up.right").font(.caption.weight(.bold))
+                    Image(systemName: "chevron.right").font(.caption.weight(.bold))
                 }.foregroundStyle(LearnStyle.teal)
             }
             .arenaCard()
@@ -151,7 +152,7 @@ struct LearnHomeView: View {
                     Spacer()
                     Image(systemName: "flag.checkered").foregroundStyle(LearnStyle.teal)
                 }
-                Text(quest?.name ?? "Every quest, conquered.").font(.title3.bold())
+                Text(quest?.name ?? "All quests complete").font(.title3.bold())
                 Text(quest?.instruction ?? "Explore your titles and achievements in Profile.")
                     .font(.subheadline).foregroundStyle(.secondary)
                 if let quest {
@@ -160,7 +161,7 @@ struct LearnHomeView: View {
                     HStack {
                         Text("\(quest.progress(in: learning.profile))/\(quest.goal)").monospacedDigit()
                         Spacer()
-                        Text(quest.canClaim(in: learning.profile) ? "Claim \(quest.xp) XP →" : "+\(quest.xp) XP")
+                        Text(quest.canClaim(in: learning.profile) ? "Claim \(quest.xp) XP" : "+\(quest.xp) XP")
                     }.font(.caption.weight(.semibold)).foregroundStyle(LearnStyle.teal)
                 }
             }.arenaCard()
@@ -170,7 +171,7 @@ struct LearnHomeView: View {
     private var warmups: some View {
         VStack(alignment: .leading, spacing: 14) {
             Text("Duel warm-ups").font(.title2.bold())
-            Text("Our original guided lessons: predict, calculate, replay, and try a new graph.")
+            Text("Predict the next step, calculate costs, and replay Dijkstra or A*.")
                 .font(.subheadline).foregroundStyle(.secondary)
             ForEach(AlgorithmKind.allCases, id: \.self) { algorithm in
                 Button { path.append(algorithm) } label: {
@@ -180,7 +181,7 @@ struct LearnHomeView: View {
                         let record = progress.progress(for: algorithm)
                         Text(record.isComplete ? "Explored" : record.hasStarted ? "Continue" : "Explore")
                             .font(.subheadline)
-                        Image(systemName: record.isComplete ? "checkmark.circle.fill" : "arrow.right")
+                        Image(systemName: record.isComplete ? "checkmark.circle.fill" : "chevron.right")
                     }.padding(18)
                         .background(ArenaPalette.surface, in: .rect(cornerRadius: 18))
                 }

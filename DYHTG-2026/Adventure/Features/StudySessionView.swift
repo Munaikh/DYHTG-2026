@@ -9,6 +9,7 @@ struct StudySessionView: View {
     @State private var correct: Bool?
     @State private var showReplay = false
     @State private var earnedXP = 0
+    @State private var reviewHintCount = 0
     @State private var sessionError: String?
     @Environment(\.dismiss) private var dismiss
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
@@ -19,7 +20,9 @@ struct StudySessionView: View {
     }
 
     private var completed: Bool { learning.profile.completedActivities.contains(activity.id) }
-    private var hintCount: Int { learning.profile.attempts[activity.id]?.hints ?? 0 }
+    private var hintCount: Int {
+        max(learning.profile.attempts[activity.id]?.hints ?? 0, reviewHintCount)
+    }
     private var presentation: SearchPresentation {
         var value = studyPresentation(activity, state: activity.state)
         value.current = activity.state.settled.last
@@ -170,7 +173,13 @@ struct StudySessionView: View {
     private var hints: some View {
         VStack(alignment: .leading, spacing: 12) {
             Button(hintCount == 0 ? "Need a hint?" : hintCount < activity.hints.count ? "Another hint" : "Worked answer shown", systemImage: "lightbulb") {
-                learning.hint(for: activity)
+                if completed {
+                    // Reviewing a solved activity must still reveal hints, without
+                    // changing the attempt that earned its original completion.
+                    reviewHintCount = min(hintCount + 1, activity.hints.count)
+                } else {
+                    learning.hint(for: activity)
+                }
             }
             .font(.subheadline.weight(.semibold))
             .frame(maxWidth: .infinity, minHeight: 44)
@@ -245,6 +254,7 @@ struct StudySessionView: View {
             selected = nil
             correct = nil
             earnedXP = 0
+            reviewHintCount = 0
             sessionError = nil
             activity = next
         } catch {

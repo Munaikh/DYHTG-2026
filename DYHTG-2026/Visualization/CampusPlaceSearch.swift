@@ -150,10 +150,22 @@ private final class CampusApplePlaceSearch {
             watchdog.cancel()
             if current === search { current = nil }
         }
-        let response: MKLocalSearch.Response
+        let places: [CampusMapPoint]
         do {
-            response = try await withTaskCancellationHandler {
-                try await search.start()
+            places = try await withTaskCancellationHandler {
+                // Older SDKs do not mark MKLocalSearch.Response as Sendable.
+                // Consume it inside the callback and only resume with value types.
+                try await withCheckedThrowingContinuation { continuation in
+                    search.start { response, error in
+                        if let error {
+                            continuation.resume(throwing: error)
+                        } else if let response {
+                            continuation.resume(returning: Self.points(from: response))
+                        } else {
+                            continuation.resume(throwing: MKError(.unknown))
+                        }
+                    }
+                }
             } onCancel: {
                 Task { @MainActor [weak self] in
                     if self?.requestID == token { self?.cancel() }
@@ -164,6 +176,10 @@ private final class CampusApplePlaceSearch {
             throw error
         }
         try Task.checkCancellation()
+        return places
+    }
+
+    nonisolated private static func points(from response: MKLocalSearch.Response) -> [CampusMapPoint] {
         // Do not require pointOfInterestCategory: Apple returns valid campus
         // departments and buildings with a nil category.
         return response.mapItems.compactMap { item in

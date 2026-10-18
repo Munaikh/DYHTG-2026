@@ -12,6 +12,10 @@ on:
       - 'scripts/verify_search_fixtures.py'
       - 'scripts/verify_learning_content.py'
       - 'scripts/test_learning_store.*'
+      - 'scripts/test_duel_store.*'
+      - 'DYHTG-2026/Duel/DuelStore.swift'
+      - 'DYHTG-2026/Match/ActionError.swift'
+      - 'DYHTG-2026/Match/DisplayText.swift'
       - 'scripts/test_campus_routes.*'
       - 'DYHTG-2026/Visualization/**'
       - 'DYHTG-2026/Adventure/Services/LearningStore.swift'
@@ -28,6 +32,10 @@ on:
       - 'scripts/verify_search_fixtures.py'
       - 'scripts/verify_learning_content.py'
       - 'scripts/test_learning_store.*'
+      - 'scripts/test_duel_store.*'
+      - 'DYHTG-2026/Duel/DuelStore.swift'
+      - 'DYHTG-2026/Match/ActionError.swift'
+      - 'DYHTG-2026/Match/DisplayText.swift'
       - 'scripts/test_campus_routes.*'
       - 'DYHTG-2026/Visualization/**'
       - 'DYHTG-2026/Adventure/Services/LearningStore.swift'
@@ -47,6 +55,8 @@ jobs:
         run: swift test --package-path Packages/AlgorithmArenaCore
       - name: Test learning persistence, reward retries and nickname ownership
         run: bash scripts/test_learning_store.sh
+      - name: Test duel recovery and stale request isolation
+        run: bash scripts/test_duel_store.sh
       - name: Test campus walking geometry and route loading lifecycle
         run: bash scripts/test_campus_routes.sh
       - name: Verify cross-language search and course fixtures

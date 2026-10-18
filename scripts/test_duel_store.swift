@@ -64,6 +64,12 @@ private final class MockService: DuelService {
         continuation.resume(with: Result { try value(reply) })
     }
 
+    func takeSendCompletion() -> (Reply) -> Void {
+        let continuation = sendContinuation!
+        sendContinuation = nil
+        return { reply in continuation.resume(with: Result { try self.value(reply) }) }
+    }
+
     func finishSnapshot(_ reply: Reply) {
         guard let continuation = snapshotContinuation else { return }
         snapshotContinuation = nil
@@ -332,11 +338,42 @@ private func concurrentTapsAndCancellationKeepOnePendingCommand() async throws {
     try expect(service.commands.last == pending && store.pending == nil, "A cancelled request must retry idempotently")
 }
 
+@MainActor
+private func closingPendingRematchAllowsNewRoomWithoutOldBusyCleanup() async throws {
+    // Each outcome must be ignored once its room has been closed, including the
+    // busy flag: a newer request can already be using that flag by then.
+    for oldReply in [MockService.Reply.value(Fixture.snapshot(revision: 10, phase: .lobby)),
+                     .failure(Fixture.unavailable), .disconnected] {
+        let service = MockService()
+        service.sendReplies = [.deferred]
+        let store = await boot(service, snapshot: Fixture.snapshot(phase: .finished))
+        let rematch = Task { await store.perform(.rematch) }
+        try await waitUntil { service.sendSuspended }
+        store.closeResult()
+        try expect(store.canAct, "Closing a result must release controls even while its old request is unresolved")
+
+        // Retain the old continuation before suspending the next request.
+        let completeOld = service.takeSendCompletion()
+        service.sendReplies = [.deferred]
+        let create = Task { await store.create(nickname: "Host", algorithm: .dijkstra) }
+        try await waitUntil { service.sendSuspended }
+        completeOld(oldReply)
+        await rematch.value
+        try expect(store.isBusy && store.pending?.action == .create && store.error == nil,
+                   "An obsolete response must not clear the new request's busy state or pending command")
+        let newRoom = Fixture.snapshot(id: UUID(), revision: 1, phase: .lobby)
+        service.finishSend(.value(newRoom))
+        await create.value
+        try expect(store.snapshot == newRoom && store.canAct, "The new room must settle normally")
+    }
+}
+
 @main
 private enum DuelStoreTests {
     @MainActor
     static func main() async {
         let tests: [(String, @MainActor () async throws -> Void)] = [
+            ("closed rematch cannot block or unlock a new request", closingPendingRematchAllowsNewRoomWithoutOldBusyCleanup),
             ("lost receipt retries exact UUID and payload", lostReceiptRetriesTheExactCommand),
             ("stale revision reissues only valid same-round command", staleRevisionReissuesOnlyTheSameValidRound),
             ("failed refresh does not reissue stale state", failedRefreshCannotReissueFromStaleLocalState),
