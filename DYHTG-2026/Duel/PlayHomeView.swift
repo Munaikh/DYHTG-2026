@@ -5,7 +5,6 @@ struct PlayHomeView: View {
     @Bindable var store: DuelStore
     @AppStorage("nickname") private var nickname = ""
     @State private var algorithm = StudyAlgorithm.dijkstra
-    @State private var joinCode = ""
     @State private var joining = false
     @State private var leaving = false
     @FocusState private var nicknameFocused: Bool
@@ -39,6 +38,8 @@ struct PlayHomeView: View {
                     }
                     .padding(20)
                     .padding(.bottom, 12)
+                    .frame(maxWidth: 650)
+                    .frame(maxWidth: .infinity)
                     .id("duel-top")
                 }
                 .onChange(of: scrollResetID) { _, _ in
@@ -66,15 +67,17 @@ struct PlayHomeView: View {
             } message: {
                 Text("The match will end as incomplete for both players.")
             }
-            .sheet(isPresented: $joining) { joinSheet }
+            .sheet(isPresented: $joining, onDismiss: { store.error = nil }) {
+                DuelJoinSheet(nickname: cleanNickname, store: store)
+            }
             .sheet(isPresented: $showingPractice) {
                 LearnLibrary(learning: learning, mode: .practice, dismissable: true)
             }
-            .alert(item: $store.error) { error in
+            .alert(item: Binding(get: { joining ? nil : store.error }, set: { store.error = $0 })) { error in
                 if error.canRetry {
                     Alert(title: Text(error.title), message: Text(error.message),
                           primaryButton: .default(Text("Retry")) { Task { await store.retry() } },
-                          secondaryButton: .cancel(Text("Keep Trying")))
+                          secondaryButton: .cancel(Text("Dismiss")))
                 } else {
                     Alert(title: Text(error.title), message: Text(error.message), dismissButton: .default(Text("OK")))
                 }
@@ -85,17 +88,8 @@ struct PlayHomeView: View {
     private var entry: some View {
         VStack(spacing: 24) {
             DuelHero()
-            HStack(spacing: 0) {
-                fact("5", caption: "algorithms")
-                Spacer()
-                fact("3", caption: "rounds")
-                Spacer()
-                fact("1", caption: "plot twist")
-            }
-            .padding(.horizontal, 12)
-
             VStack(alignment: .leading, spacing: 16) {
-                ArenaEyebrow(text: "Enter the arena")
+                Text("Set up a duel").font(.headline)
                 TextField("Your nickname", text: $nickname)
                     .font(.title3.weight(.semibold))
                     .textContentType(.nickname)
@@ -125,16 +119,16 @@ struct PlayHomeView: View {
                             Task { await store.create(nickname: cleanNickname, algorithm: algorithm) }
                         } label: {
                             HStack {
-                                Text(store.isBusy ? "Creating room…" : "Create a Duel")
+                                Text(store.isBusy ? "Creating room…" : "Create a duel")
                                 if store.isBusy { ProgressView() }
-                                else { Image(systemName: "arrow.up.right") }
+                                else { Image(systemName: "chevron.right") }
                             }
                         }
                         .buttonStyle(ArenaActionStyle())
                         .disabled(!validNickname || !store.canAct)
                         .accessibilityIdentifier("duel.create")
 
-                        Button("Join with a Code") { nicknameFocused = false; joining = true }
+                        Button("Join a duel", systemImage: "qrcode.viewfinder") { nicknameFocused = false; joining = true }
                             .buttonStyle(ArenaActionStyle(prominent: false))
                             .disabled(!validNickname || !store.canAct)
                             .accessibilityIdentifier("duel.join")
@@ -159,48 +153,12 @@ struct PlayHomeView: View {
                             .font(.subheadline).foregroundStyle(.secondary)
                     }
                     Spacer(minLength: 0)
-                    Image(systemName: "arrow.up.right")
+                    Image(systemName: "chevron.right")
                 }.arenaCard()
             }
             .buttonStyle(.plain)
             .accessibilityIdentifier("duel.practice")
         }
-    }
-
-    private var joinSheet: some View {
-        NavigationStack {
-            VStack(alignment: .leading, spacing: 24) {
-                Text("Meet in the same arena.")
-                    .font(.largeTitle.bold())
-                Text("Enter the six-character code on your friend's screen.")
-                    .foregroundStyle(.secondary)
-                TextField("ROOM CODE", text: $joinCode)
-                    .font(.system(.largeTitle, design: .monospaced).weight(.bold))
-                    .keyboardType(.asciiCapable)
-                    .textInputAutocapitalization(.characters)
-                    .autocorrectionDisabled()
-                    .padding(20)
-                    .background(ArenaPalette.canvas, in: .rect(cornerRadius: 18))
-                    .accessibilityIdentifier("duel.code")
-                    .onChange(of: joinCode) { _, value in
-                        let normalized = String(value.uppercased().filter { $0.isASCII && ($0.isLetter || $0.isNumber) }.prefix(6))
-                        if normalized != value { joinCode = normalized }
-                    }
-                Button("Join Duel") {
-                    joining = false
-                    Task { await store.join(nickname: cleanNickname, code: joinCode) }
-                }
-                .buttonStyle(ArenaActionStyle())
-                .disabled(joinCode.count != 6 || !store.canAct)
-                .accessibilityIdentifier("duel.confirmJoin")
-                Spacer()
-            }
-            .padding(24)
-            .navigationTitle("Join a Duel")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Cancel") { joining = false } } }
-        }
-        .presentationDetents([.medium, .large])
     }
 
     private var connectionBanner: some View {
@@ -218,39 +176,18 @@ struct PlayHomeView: View {
         .accessibilityElement(children: .combine)
     }
 
-    private func fact(_ value: String, caption: String) -> some View {
-        VStack(spacing: 3) {
-            Text(value).font(.system(.title, design: .rounded).bold())
-            Text(caption).font(.caption).foregroundStyle(.secondary)
-        }
-    }
 }
 
 private struct DuelHero: View {
     var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            HStack {
-                ArenaEyebrow(text: "Think together. Compete.", color: ArenaPalette.mint)
-                Spacer(minLength: 4)
-                Image(systemName: "bolt.shield.fill").foregroundStyle(ArenaPalette.mint)
-            }
-            Text("Plot Twist\nDuel")
-                .font(.system(size: 43, weight: .bold, design: .rounded))
-                .tracking(-1.5)
-                .foregroundStyle(.white)
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Plot Twist Duel")
+                .font(.title2.bold())
+            Text("Challenge a friend over three rounds. Predict each move, then adapt when a bridge closes.")
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)
-            HStack(spacing: 10) {
-                Image(systemName: "point.topleft.down.to.point.bottomright.curvepath")
-                    .font(.system(size: 44, weight: .light))
-                    .foregroundStyle(ArenaPalette.mint)
-                    .accessibilityHidden(true)
-                Text("Predict the next move.\nThen the world changes.")
-                    .font(.subheadline.weight(.medium))
-                    .foregroundStyle(.white.opacity(0.85))
-            }
         }
-        .padding(26)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(ArenaPalette.ink.gradient, in: .rect(cornerRadius: 28))
     }
 }

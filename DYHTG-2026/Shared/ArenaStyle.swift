@@ -87,12 +87,9 @@ struct ArenaGlassGroup<Content: View>: View {
 }
 
 private struct ArenaControlDock: ViewModifier {
-    @ViewBuilder func body(content: Content) -> some View {
-        if #available(iOS 26, *) {
-            content
-        } else {
-            content.background(.regularMaterial)
-        }
+    func body(content: Content) -> some View {
+        // Keep scrolling lesson text from showing through action labels and help text.
+        content.background(ArenaPalette.canvas)
     }
 }
 
@@ -114,7 +111,7 @@ private struct ArenaLegacyActionStyle: ButtonStyle {
 }
 
 extension View {
-    /// Glass controls float above content; older systems retain a material dock.
+    /// A solid dock separates actions and helper text from scrolling content.
     func arenaControlDock() -> some View { modifier(ArenaControlDock()) }
 
     func arenaCard() -> some View {
@@ -129,9 +126,8 @@ struct ArenaEyebrow: View {
     var color: Color = .secondary
 
     var body: some View {
-        Text(text.uppercased())
-            .font(.caption.weight(.bold))
-            .tracking(1.6)
+        Text(text)
+            .font(.subheadline.weight(.semibold))
             .foregroundStyle(color)
     }
 }

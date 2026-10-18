@@ -1,7 +1,7 @@
 import AlgorithmArenaProgression
 import SwiftUI
 
-/// A focused library presented from the main Home/Play shell.
+/// A focused library presented from the Learn tab.
 struct LearnLibrary: View {
     @Bindable var learning: LearningStore
     let mode: ActivityMode
@@ -12,12 +12,11 @@ struct LearnLibrary: View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 20) {
-                    ArenaEyebrow(text: "5 algorithms · 15 \(mode == .lesson ? "lessons" : "puzzles")")
-                    AdventureHeading(
-                        title: mode == .lesson ? "Make every move count." : "Put your instincts to work.",
-                        subtitle: mode == .lesson
-                            ? "Predict a move, see why it works, then watch the search unfold."
-                            : "Build confidence with new decisions. Earn 20 XP for each new puzzle.")
+                    Text(mode == .lesson
+                         ? "Choose an algorithm. Each has three guided lessons with predictions and explanations."
+                         : "Choose an algorithm to practice on a new graph. Each completed puzzle earns 20 XP.")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
                     ForEach(StudyAlgorithm.allCases) { algorithm in
                         NavigationLink {
                             AlgorithmModuleView(algorithm: algorithm, mode: mode, learning: learning)
@@ -44,7 +43,7 @@ struct LearnLibrary: View {
                 .padding(20).frame(maxWidth: 650).frame(maxWidth: .infinity)
             }
             .background(ArenaPalette.canvas)
-            .navigationTitle(mode == .lesson ? "Learn" : "Practice")
+            .navigationTitle(mode == .lesson ? "Lessons" : "Practice")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 if dismissable {
@@ -74,10 +73,15 @@ struct AlgorithmModuleView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
-                AlgorithmBadge(algorithm: algorithm)
-                AdventureHeading(title: algorithm.name, subtitle: algorithm.rule)
+                HStack(alignment: .top, spacing: 14) {
+                    AlgorithmBadge(algorithm: algorithm)
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text(algorithm.name).font(.title2.bold())
+                        Text(algorithm.rule).font(.subheadline).foregroundStyle(.secondary)
+                    }
+                }
                 if mode == .lesson {
-                    Label("Finish this module for 100 bonus XP", systemImage: "sparkles")
+                    Label("Finish this module for 100 bonus XP", systemImage: "checkmark.seal")
                         .font(.subheadline.weight(.semibold)).foregroundStyle(Color.arenaAccent)
                 }
                 if let loadError {

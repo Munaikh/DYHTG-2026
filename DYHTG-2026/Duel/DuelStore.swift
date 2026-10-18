@@ -95,7 +95,7 @@ final class DuelStore {
         let previousRound = snapshot?.roundIndex
         do {
             let latest = try await service.send(command)
-            guard generation == requestedGeneration else { isBusy = false; return }
+            guard generation == requestedGeneration else { return }
             pending = nil
             isOffline = false
             if command.action == .leave { clear() }
@@ -103,8 +103,8 @@ final class DuelStore {
             save()
             isBusy = false
         } catch let failure as MatchServiceError {
-            isBusy = false
             guard generation == requestedGeneration else { return }
+            isBusy = false
             // A structured server rejection means the command was not accepted.
             pending = nil
             isOffline = false
@@ -126,7 +126,7 @@ final class DuelStore {
             guard generation == requestedGeneration else { return }
             error = ActionError(title: failure.code.title, message: failure.message)
         } catch {
-            guard generation == requestedGeneration else { isBusy = false; return }
+            guard generation == requestedGeneration else { return }
             // Keep the exact UUID and payload until the uncertain result is reconciled.
             isBusy = false
             isOffline = true
@@ -156,7 +156,9 @@ final class DuelStore {
         generation = UUID()
         snapshot = nil
         pending = nil
+        isBusy = false
         isOffline = false
+        error = nil
         if let persistenceURL { try? FileManager.default.removeItem(at: persistenceURL) }
     }
 

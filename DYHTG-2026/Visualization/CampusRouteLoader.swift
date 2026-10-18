@@ -228,10 +228,26 @@ private final class CampusWalkingDirections {
             watchdog.cancel()
             if current === directions { current = nil }
         }
-        let response: MKDirections.Response
+        let points: [Coordinate]
         do {
-            response = try await withTaskCancellationHandler {
-                try await directions.calculate()
+            points = try await withTaskCancellationHandler {
+                // Keep SDK response objects inside the callback; older SDKs do
+                // not make MKDirections.Response safe to cross actor boundaries.
+                try await withCheckedThrowingContinuation { continuation in
+                    directions.calculate { response, error in
+                        if let error {
+                            continuation.resume(throwing: error)
+                        } else if let response {
+                            do {
+                                continuation.resume(returning: try Self.coordinates(from: response))
+                            } catch {
+                                continuation.resume(throwing: error)
+                            }
+                        } else {
+                            continuation.resume(throwing: MKError(.directionsNotFound))
+                        }
+                    }
+                }
             } onCancel: {
                 Task { @MainActor [weak self] in
                     // Cancelling a replaced task must not cancel its successor.
@@ -243,6 +259,10 @@ private final class CampusWalkingDirections {
             throw error
         }
         try Task.checkCancellation()
+        return points
+    }
+
+    nonisolated private static func coordinates(from response: MKDirections.Response) throws -> [Coordinate] {
         guard let route = response.routes.min(by: { $0.distance < $1.distance }), route.polyline.pointCount >= 2 else {
             throw MKError(.directionsNotFound)
         }
